@@ -7,6 +7,52 @@ import {
 import Header from '../../components/landing/Header';
 import bgVideo from '../../assets/v.mp4';
 
+// Helper Component for 3D Mesh Layers
+const MeshGrid = ({ count = 5, speed = 10 }) => (
+  <div className="w-full h-full relative" style={{ transformStyle: 'preserve-3d' }}>
+     <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
+        <g stroke="var(--accent)" strokeWidth="0.2">
+           {[...Array(count + 1)].map((_, i) => {
+              const pos = (i * 200) / count;
+              return (
+                 <g key={i}>
+                    {/* Horizontal lines */}
+                    <motion.line 
+                       animate={{ strokeDashoffset: [0, 20] }}
+                       transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+                       x1="0" y1={pos} x2="200" y2={pos} 
+                       strokeDasharray="2 4" 
+                       opacity={0.3}
+                    />
+                    {/* Vertical lines */}
+                    <motion.line 
+                       animate={{ strokeDashoffset: [0, 20] }}
+                       transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+                       x1={pos} y1="0" x2={pos} y2="200" 
+                       strokeDasharray="2 4"
+                       opacity={0.3}
+                    />
+                    {/* Intersection Nodes */}
+                    {[...Array(count + 1)].map((_, j) => {
+                       const pos2 = (j * 200) / count;
+                       return (
+                          <motion.circle 
+                             key={j}
+                             cx={pos} cy={pos2} r="1"
+                             fill="var(--accent)"
+                             animate={{ opacity: [0.1, 0.4, 0.1], scale: [1, 1.3, 1] }}
+                             transition={{ duration: 2, delay: (i + j) * 0.2, repeat: Infinity }}
+                          />
+                       );
+                    })}
+                 </g>
+              );
+           })}
+        </g>
+     </svg>
+  </div>
+);
+
 export default function LandingPage() {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
@@ -17,10 +63,10 @@ export default function LandingPage() {
   const { scrollY } = useScroll();
 
   // Hero Parallax
-  // Text invisible initially, fades in from 200px to 600px
-  const heroOpacity = useTransform(scrollY, [200, 600], [0, 1]);
-  const heroScale = useTransform(scrollY, [200, 600], [0.9, 1]);
-  const heroTextY = useTransform(scrollY, [200, 600], [40, 0]);
+  // Text invisible initially, fades in from 100px to 400px
+  const heroOpacity = useTransform(scrollY, [100, 400], [0, 1]);
+  const heroScale = useTransform(scrollY, [100, 400], [0.9, 1]);
+  const heroTextY = useTransform(scrollY, [100, 400], [40, 0]);
 
   // Video darken as we scroll deeper (started at 0.7 for vibrancy)
   const videoOpacity = useTransform(scrollY, [400, 900], [0.7, 0.2]);
@@ -84,7 +130,7 @@ export default function LandingPage() {
 
       {/* Hero Section (Sticky Parallax) - Reduced height for better scroll tempo */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
           {/* Background Video Container - Anchored to black to prevent bleed */}
           <div className="absolute inset-0 z-0 bg-[#000000] cursor-pointer" onClick={() => {
             const newMuted = !isMuted;
@@ -108,7 +154,7 @@ export default function LandingPage() {
                 filter: 'brightness(1) contrast(1.1)'
               }}
             ></video>
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000000 0%, transparent 10%, transparent 90%, #000000 100%)', zIndex: 1 }}></div>
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000000 0%, transparent 10%, transparent 90%, #000000 100%)', zIndex: 0 }}></div>
           </div>
 
           <button
@@ -121,20 +167,20 @@ export default function LandingPage() {
                 videoRef.current.play();
               }
             }}
-            className="absolute bottom-10 right-10 z-20 w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
+            className="absolute bottom-10 right-10 z-50 w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
           >
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
 
           {/* Full Screen Blur Overlay - Linked to Hero Appearance */}
-          <motion.div
+          <motion.div 
             style={{ opacity: heroOpacity }}
-            className="absolute inset-0 z-5 backdrop-blur-xl bg-black/40 pointer-events-none"
+            className="absolute inset-0 z-10 backdrop-blur-xl pointer-events-none"
           />
 
           <motion.div
             style={{ opacity: heroOpacity, scale: heroScale, y: heroTextY }}
-            className="z-10 flex flex-col items-center max-w-4xl mx-auto mt-10 p-8"
+            className="z-50 flex flex-col items-center max-w-4xl mx-auto mt-10 p-8"
           >
             <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ backgroundColor: 'var(--accent)' }}></span>
@@ -152,10 +198,10 @@ export default function LandingPage() {
             </p>
             <button
               className="py-3.5 px-9 text-sm font-bold tracking-widest flex items-center gap-2 rounded-full transition-all hover:scale-105 active:scale-95"
-              style={{
-                backgroundColor: '#00b3ffff',
+              style={{ 
+                backgroundColor: '#FFFFFF', 
                 color: 'var(--accent)',
-                boxShadow: '0 0 30px rgba(255,255,255,0.3)',
+                boxShadow: '0 0 40px rgba(255,255,255,0.4)',
                 border: 'none'
               }}
               onClick={() => document.getElementById('header-get-started')?.click()}
@@ -166,7 +212,7 @@ export default function LandingPage() {
         </div>
         {/* The Trans-Theme Bridge: Bridging Black video section to themed content below */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-[800px] pointer-events-none z-30"
+          className="absolute bottom-0 left-0 right-0 h-[800px] pointer-events-none z-10"
           style={{
             background: 'linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%)'
           }}
@@ -177,10 +223,10 @@ export default function LandingPage() {
       <section ref={splitRef} className="py-40 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20">
           <motion.div style={{ y: leftY }} className="flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-8" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ color: 'var(--text-primary)' }}>
               A refined approach to creative scaling.
             </h2>
-            <p className="font-light leading-relaxed text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
+            <p className="font-normal leading-relaxed text-lg mb-8 opacity-80" style={{ color: 'var(--text-secondary)' }}>
               We eliminated the noise. No bidding wars. No unverified portfolios. Just an orchestrated pipeline where quality meets efficiency.
             </p>
             <ul className="space-y-6">
@@ -189,22 +235,72 @@ export default function LandingPage() {
                 "Escrow-protected milestones",
                 "Automated copyright handover"
               ].map((item, i) => (
-                <li key={i} className="flex items-center gap-4 text-sm font-light" style={{ color: 'var(--text-primary)' }}>
-                  <CheckCircle size={20} className="accent-icon" />
+                <li key={i} className="flex items-center gap-4 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <CheckCircle size={24} style={{ color: 'var(--accent)' }} />
                   {item}
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          <motion.div style={{ y: rightY }} className="relative h-[600px] w-full hidden md:block">
-            <div className="absolute inset-0 rounded-3xl overflow-hidden border backdrop-blur-3xl shadow-glow-lg flex items-center justify-center" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[80px]" style={{ background: 'var(--accent)', opacity: 0.1 }}></div>
-              <div className="relative z-10 w-32 h-32 border rounded-2xl flex flex-col items-center justify-center shadow-2xl" style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }}>
-                <div className="w-8 h-8 rounded-full border-t-2 border-l-2 animate-spin mb-3" style={{ borderColor: 'var(--accent)' }}></div>
-                <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Processing...</div>
-              </div>
-            </div>
+          <motion.div style={{ y: rightY, perspective: 1200 }} className="relative h-[600px] w-full hidden md:block flex items-center justify-center overflow-visible">
+            {/* Deep-Space 3D Parallax Matrix */}
+            <motion.div 
+              style={{ rotateX: 20, rotateY: -10, transformStyle: 'preserve-3d' }}
+              animate={{ 
+                rotateX: [20, 25, 20],
+                rotateY: [-10, -15, -10]
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              className="relative w-full h-full flex items-center justify-center"
+            >
+               {/* Layer 1: Far Perspective (Dim) */}
+               <div className="absolute inset-0" style={{ transform: 'translateZ(-200px)', opacity: 0.1 }}>
+                  <MeshGrid speed={15} count={4} />
+               </div>
+
+               {/* Layer 2: Mid Perspective (Active) */}
+               <div className="absolute inset-0" style={{ transform: 'translateZ(0px)', opacity: 0.3 }}>
+                  <MeshGrid speed={10} count={6} />
+               </div>
+
+               {/* Layer 3: Near Perspective (Glow) */}
+               <div className="absolute inset-0" style={{ transform: 'translateZ(200px)', opacity: 0.15 }}>
+                  <MeshGrid speed={6} count={3} />
+               </div>
+
+               {/* 3D Stage Text Layer */}
+               <div className="absolute inset-0 flex flex-col items-center justify-center text-center" style={{ transform: 'translateZ(100px)' }}>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="space-y-4"
+                  >
+                    <div className="text-[10px] uppercase font-black tracking-[0.5em] opacity-30" style={{ color: 'var(--text-primary)' }}>System Protocol</div>
+                    <div className="text-5xl md:text-7xl font-black uppercase tracking-tighter mix-blend-difference" style={{ color: 'var(--text-primary)' }}>
+                       <AnimatePresence mode="wait">
+                          <motion.span
+                             key={Math.floor(Date.now() / 3000) % 3}
+                             initial={{ z: -50, opacity: 0 }}
+                             animate={{ z: 0, opacity: 1 }}
+                             exit={{ z: 50, opacity: 0 }}
+                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                             className="block"
+                          >
+                             {["Vetting", "Escrow", "Copyright"][Math.floor(Date.now() / 3000) % 3]}
+                          </motion.span>
+                       </AnimatePresence>
+                    </div>
+                    {/* 3D Scanning Line */}
+                    <motion.div 
+                       animate={{ top: ['-20%', '120%'], opacity: [0, 1, 0] }}
+                       transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                       className="absolute left-0 right-0 h-px bg-accent z-20"
+                       style={{ background: 'linear-gradient(to right, transparent, var(--accent), transparent)', boxShadow: '0 0 20px var(--accent)' }}
+                    />
+                  </motion.div>
+               </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
