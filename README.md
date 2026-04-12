@@ -2,6 +2,10 @@
 
 **Virtual** is a high-end, cinematic platform designed for the elite creative economy. It bridges the gap between visionary initiators and world-class specialists through a managed execution framework characterized by technical precision and geometric stability.
 
+**Check it out**
+Okai most of the stuff is for AI But We have to alter it as we go forward..
+
+
 ---
 
 ## 💎 Core Features
@@ -64,7 +68,7 @@ git clone https://github.com/theuash/Virtual_website.git
 cd Virtual_website
 ```
 
-### 2. Backend Configuration
+### 2. Backend Configuration [Leave this for Now]
 Navigate to the `server` directory and install dependencies:
 ```bash
 cd server
