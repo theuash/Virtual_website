@@ -4,15 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        base: '#0a0a0f',
-        'dark-navy': '#0f0f1a',
-        'dark-violet': '#1a0a2e',
-        'deep-violet': '#2d1b69',
-        'electric-blue': '#4f8ef7',
-        'violet-bloom': '#7c3aed',
-        'violet-light': '#a855f7',
-        'card-bg': 'rgba(255,255,255,0.03)',
-        'glass-border': 'rgba(124,58,237,0.2)',
+        primary: 'var(--bg-primary)',
+        secondary: 'var(--bg-secondary)',
+        accent: 'var(--accent)',
+        forest: 'var(--forest)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        border: 'var(--border)',
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],

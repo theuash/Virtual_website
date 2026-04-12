@@ -1,17 +1,44 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Virtual — The premium freelancing platform where clients hire world-class creative talent. Hire Video Editors, 3D Animators, CGI Artists, Script Writers, and Graphic Designers." />
-    <meta name="keywords" content="freelancing, hire freelancers, video editing, 3D animation, CGI, script writing, graphic design" />
-    <meta property="og:title" content="Virtual — Where Talent Meets Opportunity" />
-    <meta property="og:description" content="The freelancing platform where you get paid to learn." />
-    <title>Virtual — Where Talent Meets Opportunity</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link class="logo-img" rel="icon" type="image/png" href="src/assets/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Virtual — The premium freelancing platform where clients hire world-class creative talent. Hire Video Editors, 3D Animators, CGI Artists, Script Writers, and Graphic Designers." />
+  <meta name="keywords"
+    content="freelancing, hire freelancers, video editing, 3D animation, CGI, script writing, graphic design" />
+  <meta property="og:title" content="Virtual — Where Talent Meets Opportunity" />
+  <meta property="og:description" content="The freelancing platform where you get paid to learn." />
+  <title>Virtual</title>
+  <script>
+    // Dynamic Favicon Colorizer (Dark Violet)
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light') document.documentElement.classList.add('light');
+
+      const img = new Image();
+      img.src = 'src/assets/logo.png';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 64; canvas.height = 64;
+
+        // Match the Header filter (Dark Violet)
+        ctx.filter = 'invert(22%) sepia(90%) saturate(1600%) hue-rotate(230deg) brightness(90%) contrast(100%)';
+        ctx.drawImage(img, 0, 0, 64, 64);
+
+        const link = document.querySelector('link[rel="icon"]');
+        if (link) link.href = canvas.toDataURL('image/png');
+      };
+    })();
+  </script>
+</head>
+
+<body class="transition-colors duration-300">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
