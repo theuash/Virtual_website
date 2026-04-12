@@ -1,0 +1,1 @@
+export default function AdminPromotions() { return <div className="p-6"><h1 className="text-2xl font-bold mb-4">AdminPromotions</h1><p className="text-text-muted">This page is under construction.</p></div>; }
