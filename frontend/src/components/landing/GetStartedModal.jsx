@@ -1,69 +1,106 @@
 import { useNavigate } from 'react-router-dom';
-import { X, Target, Briefcase } from 'lucide-react';
+import { X, Target, Briefcase, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function GetStartedModal({ open, onClose }) {
   const navigate = useNavigate();
-  if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal-box relative overflow-hidden" 
-        onClick={e => e.stopPropagation()} 
-        style={{ 
-          maxWidth: 520, 
-          background: 'var(--bg-primary)',
-          borderColor: 'var(--border)'
-        }}
-      >
-        <button onClick={onClose} className="absolute top-6 right-6 transition-colors" style={{ color: 'var(--text-secondary)' }}>
-          <X size={20} strokeWidth={1.5} />
-        </button>
+    <AnimatePresence>
+      {open && (
+        <div className="modal-overlay">
+          {/* Backdrop Blur Layer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+          />
 
-        <h2 className="text-2xl font-medium tracking-tight mb-2 text-center" style={{ color: 'var(--text-primary)' }}>
-          Experience Virtual
-        </h2>
-        <p className="text-center text-sm font-light mb-10" style={{ color: 'var(--text-secondary)' }}>
-          Select your portal to continue.
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            onClick={() => { onClose(); navigate('/signup?role=client'); }}
-            className="group relative p-6 border rounded-2xl text-left transition-all duration-300"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="modal-box p-8 md:p-10 relative z-10"
           >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}>
-               <Target size={20} strokeWidth={1.5} />
-            </div>
-            <div className="font-medium mb-1.5 text-sm" style={{ color: 'var(--text-primary)' }}>Hire Talent</div>
-            <div className="text-xs font-light leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Source highly vetted creatives for your next campaign.
-            </div>
-          </button>
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/5 transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <X size={20} strokeWidth={1.5} />
+            </button>
 
-          <button
-            onClick={() => { onClose(); navigate('/signup?role=freelancer'); }}
-            className="group relative p-6 border rounded-2xl text-left transition-all duration-300"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-          >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ background: 'var(--forest)', color: '#F0F2EF', opacity: 0.9 }}>
-               <Briefcase size={20} strokeWidth={1.5} />
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold tracking-tight mb-3" style={{ color: 'var(--text-primary)' }}>
+                Begin Your Journey
+              </h2>
+              <p className="text-sm font-light leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                Select the path that matches your goals.
+              </p>
             </div>
-            <div className="font-medium mb-1.5 text-sm" style={{ color: 'var(--text-primary)' }}>Join as Talent</div>
-            <div className="text-xs font-light leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-               Work on premium projects and scale your career ladder.
+
+            <div className="space-y-4">
+              {/* Option 1: Hire */}
+              <button
+                onClick={() => { onClose(); navigate('/signup?role=client'); }}
+                className="modal-option-card group w-full"
+              >
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110" 
+                       style={{ background: 'rgba(37,99,237,0.1)', color: 'var(--accent)' }}>
+                    <Target size={24} strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-base mb-0.5" style={{ color: 'var(--text-primary)' }}>Hire Elite Talent</div>
+                    <div className="text-xs font-light" style={{ color: 'var(--text-secondary)' }}>
+                      Access the world's top 1% creative specialists.
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent)' }} />
+                </div>
+              </button>
+
+              {/* Option 2: Join */}
+              <button
+                onClick={() => { onClose(); navigate('/signup?role=freelancer'); }}
+                className="modal-option-card group w-full"
+              >
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110" 
+                       style={{ background: 'rgba(27,48,34,0.1)', color: '#10B981' }}>
+                    <Briefcase size={24} strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-base mb-0.5" style={{ color: 'var(--text-primary)' }}>Join as Talent</div>
+                    <div className="text-xs font-light" style={{ color: 'var(--text-secondary)' }}>
+                      Work on premium projects and grow your career.
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent)' }} />
+                </div>
+              </button>
             </div>
-          </button>
+
+            <div className="text-center mt-10 pt-8 border-t border-white/[0.05]">
+              <p className="text-sm font-light" style={{ color: 'var(--text-secondary)' }}>
+                Already a member?{' '}
+                <button 
+                  onClick={() => { onClose(); navigate('/login'); }} 
+                  className="font-semibold hover:underline transition-all" 
+                  style={{ color: 'var(--accent)' }}
+                >
+                  Sign in
+                </button>
+              </p>
+            </div>
+          </motion.div>
         </div>
-
-        <p className="text-center mt-8 text-xs font-light" style={{ color: 'var(--text-secondary)' }}>
-          Already a member?{' '}
-          <button onClick={() => { onClose(); navigate('/login'); }} className="font-medium transition-colors" style={{ color: 'var(--accent)' }}>
-             Sign in
-          </button>
-        </p>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }
+

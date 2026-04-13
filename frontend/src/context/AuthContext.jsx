@@ -16,10 +16,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      const userData = { ...data.user, token: data.token };
-      setUser(userData);
-      localStorage.setItem('virtual_user', JSON.stringify(userData));
-      return userData;
+      
+      // If backend requires 2FA, we would handle it here
+      // For now, let's assume if the user has a phone, we'll ask for OTP in the UI
+      return data;
     } finally {
       setLoading(false);
     }
@@ -29,10 +29,26 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await api.post('/auth/signup', formData);
-      const userData = { ...data.user, token: data.token };
-      setUser(userData);
-      localStorage.setItem('virtual_user', JSON.stringify(userData));
-      return userData;
+      return data;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const verifyOTP = useCallback(async (userId, otp) => {
+    setLoading(true);
+    try {
+      // Mocking OTP verification
+      // const { data } = await api.post('/auth/verify-otp', { userId, otp });
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (otp === '123456') { // Mock success code
+        return { success: true };
+      } else {
+        throw new Error('Invalid verification code');
+      }
     } finally {
       setLoading(false);
     }
@@ -43,8 +59,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('virtual_user');
   }, []);
 
+  const completeAuth = useCallback((userData) => {
+    const finalData = { ...userData.user, token: userData.token };
+    setUser(finalData);
+    localStorage.setItem('virtual_user', JSON.stringify(finalData));
+    return finalData;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signup, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signup, verifyOTP, completeAuth, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,6 +16,7 @@
   --text-primary: #E6EDF3;
   --text-secondary: #8B949E;
   --accent: #2563EB;
+  --accent-rgb: 37, 99, 235;
   --forest: #1B3022;
   --btn-bg: #1B3022;
   --btn-text: #E6EDF3;
@@ -35,6 +36,7 @@
   --text-primary: #111D14;
   --text-secondary: #2C4233;
   --accent: #600A0A;
+  --accent-rgb: 96, 10, 10;
   --forest: #1B3022;
   --btn-bg: #1B3022;
   --btn-text: #F0F2EF;
@@ -229,9 +231,51 @@ svg[fill] {
   stroke: var(--accent) !important;
 }
 
-/* Animations using variables */
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
+/* ─── Modals & Overlays ───────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
-.animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.light .modal-box {
+  background: var(--bg-card);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.modal-option-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal-option-card:hover {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.05);
+  transform: translateY(-2px);
+}

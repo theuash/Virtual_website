@@ -1,161 +1,435 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { SKILLS } from '../../utils/roleGuards';
-import { Target, Briefcase } from 'lucide-react';
+import signupArt from '../../assets/auth/signup_art.jpg';
+import logo from '../../assets/logo.png';
+
+/* ── Shared input style helper ───────────────────────────────────────── */
+const inputStyle = {
+  paddingTop: '0.875rem',
+  paddingBottom: '0.875rem',
+  paddingLeft: '2.75rem',
+  paddingRight: '1rem',
+  background: 'var(--bg-secondary)',
+  border: '1px solid var(--border)',
+  color: 'var(--text-primary)',
+};
+
+const inputNoIconStyle = {
+  ...inputStyle,
+  paddingLeft: '1rem',
+};
+
+function Field({ label, icon: Icon, children }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
+        {label}
+      </label>
+      <div className="relative">
+        {Icon && (
+          <Icon
+            size={15}
+            strokeWidth={1.5}
+            className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10"
+            style={{ color: 'var(--text-secondary)' }}
+          />
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function SignupPage() {
   const [params] = useSearchParams();
   const roleParam = params.get('role');
   const navigate = useNavigate();
-  const { signup, loading } = useAuth();
+  const { signup, loading, verifyOTP, completeAuth } = useAuth();
 
   const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', confirmPassword: '',
+    name: '', email: '', phone: '', password: '', confirmPassword: '',
     company: '', skill: SKILLS[0], dob: '', portfolioUrl: ''
   });
   const [error, setError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [pendingUser, setPendingUser] = useState(null);
+
+  const { scrollY } = useScroll();
+  const contentOpacity = useTransform(scrollY, [0, 200], [0, 1]);
+  const contentY = useTransform(scrollY, [0, 200], [40, 0]);
+  const blurOverlayOpacity = useTransform(scrollY, [0, 200], [0, 0.9]);
 
   useEffect(() => {
-    if (roleParam === 'client' || roleParam === 'freelancer') {
-      setRole(roleParam);
-    }
+    window.scrollTo(0, 0);
+    if (roleParam === 'client' || roleParam === 'freelancer') setRole(roleParam);
   }, [roleParam]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      return setError('Passwords do not match');
-    }
-
+    if (formData.password !== formData.confirmPassword) return setError('Passwords do not match.');
     if (role === 'freelancer') {
-      const birthYear = new Date(formData.dob).getFullYear();
-      const currentYear = new Date().getFullYear();
-      if (currentYear - birthYear < 16) {
-        return setError('You must be at least 16 years old to work as a freelancer.');
-      }
+      const age = new Date().getFullYear() - new Date(formData.dob).getFullYear();
+      if (age < 16) return setError('You must be at least 16 years old.');
     }
-
     try {
-      const user = await signup({ ...formData, role });
-      navigate(user.role === 'client' ? '/client/dashboard' : '/freelancer/dashboard');
+      const response = await signup({ ...formData, role });
+      // In a real 2FA flow, the backend would trigger an SMS here.
+      setPendingUser(response);
+      setIsVerifying(true);
     } catch (err) {
       setError(err?.response?.data?.message || 'Error creating account. Please try again.');
     }
   };
 
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      await verifyOTP(pendingUser.user._id, otp);
+      const user = completeAuth(pendingUser);
+      navigate(user.role === 'client' ? '/client/dashboard' : '/freelancer/dashboard');
+    } catch (err) {
+      setError(err?.message || 'Invalid verification code.');
+    }
+  };
+
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
+  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } };
+
+  /* ── Role Selection Screen ──────────────────────────────────────────── */
   if (!role) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="glass-card max-w-3xl w-full p-12 py-16 animate-fade-in-up">
-           <h1 className="text-4xl font-medium tracking-tight text-center mb-4">Select Operations Portal</h1>
-           <p className="text-center text-text-muted font-light mb-12 max-w-lg mx-auto">
-             Choose the infrastructure required for your specific needs.
-           </p>
-           
-           <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-              <button 
-                onClick={() => setRole('client')} 
-                className="group relative p-10 bg-base border border-glass-border rounded-3xl text-center hover:border-electric-blue/40 transition-all duration-300"
-              >
-                <div className="w-16 h-16 mx-auto rounded-full bg-blue-900/10 text-electric-blue flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-electric-blue/20">
-                  <Target size={32} strokeWidth={1} />
-                </div>
-                <div className="text-xl font-medium text-white mb-2 tracking-wide">Client</div>
-                <div className="text-xs text-text-muted font-light leading-relaxed px-4">
-                  Deploy projects and scale your creative output with vetted talent.
-                </div>
-              </button>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
+        {/* Dot-grid backdrop */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(var(--text-primary) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-              <button 
-                onClick={() => setRole('freelancer')} 
-                className="group relative p-10 bg-base border border-glass-border rounded-3xl text-center hover:border-violet-light/40 transition-all duration-300"
-              >
-                <div className="w-16 h-16 mx-auto rounded-full bg-violet-900/10 text-violet-light flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-violet-bloom/20">
-                  <Briefcase size={32} strokeWidth={1} />
-                </div>
-                <div className="text-xl font-medium text-white mb-2 tracking-wide">Talent</div>
-                <div className="text-xs text-text-muted font-light leading-relaxed px-4">
-                  Join the platform, climb the career matrix, and increase earning capacity.
-                </div>
-              </button>
-           </div>
-           
-           <p className="text-center mt-12 text-sm text-text-muted font-light">
-             Already authenticated? <Link to="/login" className="text-white hover:text-violet-300 font-medium transition-colors">Sign in</Link>
-           </p>
-        </div>
+        <motion.div variants={containerVariants} initial="hidden" animate="visible"
+          className="relative z-10 w-full max-w-3xl px-4 py-12 text-center">
+
+          {/* Back */}
+          <motion.div variants={itemVariants} className="flex justify-start mb-10">
+            <button onClick={() => navigate('/')}
+              className="inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
+              style={{ color: 'var(--text-secondary)' }}>
+              <ArrowLeft size={12} strokeWidth={3} /> Back to Home
+            </button>
+          </motion.div>
+
+          {/* Logo + heading */}
+          <motion.div variants={itemVariants} className="flex flex-col items-center mb-10">
+            <img src={logo} className="w-14 h-14 mb-6" style={{ filter: 'var(--logo-filter)' }} alt="Virtual Logo" />
+            <div className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full border border-border bg-secondary/30">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent" style={{ backgroundColor: 'var(--accent)' }} />
+              <span className="text-[9px] uppercase font-black tracking-[0.3em]" style={{ color: 'var(--text-secondary)' }}>
+                Protocol Initialization
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3" style={{ color: 'var(--text-primary)' }}>
+              Choose Your Path
+            </h1>
+            <p className="text-sm font-light max-w-md opacity-60" style={{ color: 'var(--text-secondary)' }}>
+              Select the environment that matches your objective.
+            </p>
+          </motion.div>
+
+          {/* Cards */}
+          <div className="grid sm:grid-cols-2 gap-4 mb-10">
+            <motion.button variants={itemVariants} whileHover={{ y: -4 }}
+              onClick={() => setRole('client')}
+              className="group p-8 rounded-3xl text-left border transition-all duration-300"
+              style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                style={{ background: 'rgba(37,99,235,0.08)', color: 'var(--accent)' }}>
+                <Target size={24} strokeWidth={1.5} />
+              </div>
+              <h3 className="text-xl font-black mb-2" style={{ color: 'var(--text-primary)' }}>Client Portal</h3>
+              <p className="text-xs font-medium leading-relaxed opacity-50 mb-5" style={{ color: 'var(--text-secondary)' }}>
+                Post projects, manage teams, and access elite creative talent worldwide.
+              </p>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest group-hover:gap-3 transition-all" style={{ color: 'var(--accent)' }}>
+                Get Started <ArrowRight size={12} />
+              </div>
+            </motion.button>
+
+            <motion.button variants={itemVariants} whileHover={{ y: -4 }}
+              onClick={() => setRole('freelancer')}
+              className="group p-8 rounded-3xl text-left border transition-all duration-300"
+              style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                style={{ background: 'rgba(16,185,129,0.08)', color: '#10B981' }}>
+                <Briefcase size={24} strokeWidth={1.5} />
+              </div>
+              <h3 className="text-xl font-black mb-2" style={{ color: 'var(--text-primary)' }}>Talent Nexus</h3>
+              <p className="text-xs font-medium leading-relaxed opacity-50 mb-5" style={{ color: 'var(--text-secondary)' }}>
+                Find high-value projects, grow your portfolio, and get paid on time.
+              </p>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest group-hover:gap-3 transition-all text-emerald-500">
+                Join Now <ArrowRight size={12} />
+              </div>
+            </motion.button>
+          </div>
+
+          <motion.p variants={itemVariants} className="text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
+            Already have an account?{' '}
+            <Link to="/login" className="font-black hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
+              Sign In
+            </Link>
+          </motion.p>
+        </motion.div>
       </div>
     );
   }
 
+  /* ── Signup Form Screen ─────────────────────────────────────────────── */
+  const accentColor = role === 'client' ? 'var(--accent)' : '#10B981';
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-900/10 via-base to-base"></div>
-      
-      <div className="glass-card max-w-md w-full p-10 z-10 animate-fade-in-up border-glass-border">
-        <Link to="/" className="inline-block text-xs uppercase tracking-widest text-text-muted hover:text-white mb-8 transition-colors font-medium">
-          &larr; Return
-        </Link>
-        
-        <h2 className="text-2xl font-medium tracking-tight mb-2 text-white">Initialize {role === 'client' ? 'Client' : 'Talent'} Profile</h2>
-        <p className="text-text-muted mb-8 text-sm font-light">Complete the form below to enter the platform.</p>
+    <div className="min-h-screen flex select-none" style={{ background: 'var(--bg-primary)' }}>
 
-        {error && <div className="bg-red-950/50 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm font-light">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="form-group relative">
-            <input name="name" type="text" className="input" placeholder="Legal Name" required value={formData.name} onChange={handleChange} />
-          </div>
-          
-          <div className="form-group relative">
-             <input name="email" type="email" className="input" placeholder="Professional Email" required value={formData.email} onChange={handleChange} />
-          </div>
-
-          {role === 'client' && (
-            <div className="form-group relative">
-              <input name="company" type="text" className="input" placeholder="Company Designation (Optional)" value={formData.company} onChange={handleChange} />
+      {/* ── Left Art Panel (fixed, desktop only) ── */}
+      <div className="hidden lg:block fixed top-0 left-0 w-[60%] h-full z-0 bg-black border-r border-white/5 overflow-hidden">
+        <motion.img
+          src={signupArt}
+          className="w-full h-full object-cover"
+          alt="Nexus Onboarding"
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5 }}
+        />
+        <motion.div
+          style={{ opacity: blurOverlayOpacity, background: 'var(--bg-primary)' }}
+          className="absolute inset-0 backdrop-blur-xl z-10 transition-colors duration-300"
+        />
+        <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20">
+          <motion.div style={{ opacity: contentOpacity, y: contentY }} className="flex flex-col items-start gap-6">
+            <img src={logo} className="w-16 h-16" style={{ filter: 'var(--logo-filter)' }} alt="Virtual Logo" />
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
+                <span className="text-[9px] uppercase font-black tracking-[0.3em]" style={{ color: 'var(--text-secondary)' }}>
+                  Protocol Registry
+                </span>
+              </div>
+              <h1 className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.9] capitalize" style={{ color: 'var(--text-primary)' }}>
+                Begin Your <br />
+                <span className="text-transparent bg-clip-text"
+                  style={{ backgroundImage: `linear-gradient(to right, var(--text-primary), ${accentColor})` }}>
+                  {role} Era.
+                </span>
+              </h1>
+              <p className="max-w-sm text-sm font-light leading-relaxed opacity-60" style={{ color: 'var(--text-secondary)' }}>
+                Initialize your profile and enter the production matrix.
+              </p>
             </div>
-          )}
+          </motion.div>
+        </div>
+        <div className="absolute bottom-6 left-8 right-8 z-20 flex justify-between opacity-20">
+          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">Registry: New_Identity</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">Role: {role?.toUpperCase()}</span>
+        </div>
+      </div>
 
-          {role === 'freelancer' && (
-            <>
-              <div className="form-group">
-                <select name="skill" className="input appearance-none" required value={formData.skill} onChange={handleChange}>
-                  {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <input name="dob" type="date" className="input text-text-muted" required value={formData.dob} onChange={handleChange} title="Date of Birth" />
-              </div>
-              <div className="form-group">
-                <input name="portfolioUrl" type="url" className="input" placeholder="Portfolio Endpoint URL (Optional)" value={formData.portfolioUrl} onChange={handleChange} />
-              </div>
-            </>
-          )}
-
-          <div className="form-group relative">
-             <input name="password" type="password" className="input" placeholder="Security Token" required minLength={8} value={formData.password} onChange={handleChange} />
-          </div>
-          <div className="form-group relative">
-             <input name="confirmPassword" type="password" className="input" placeholder="Verify Security Token" required minLength={8} value={formData.confirmPassword} onChange={handleChange} />
-          </div>
-
-          <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 mt-8 text-sm tracking-wide font-medium">
-            {loading ? 'Initializing...' : 'Authorize Profile'}
+      {/* ── Right Form Panel ── */}
+      <div
+        className="w-full min-h-screen flex items-start justify-center px-6 py-16 z-10"
+        style={{ background: 'var(--bg-primary)', marginLeft: 'clamp(0px, 60vw, 60%)' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full"
+          style={{ maxWidth: 420 }}
+        >
+          {/* Back */}
+          <button onClick={() => isVerifying ? setIsVerifying(false) : setRole(null)}
+            className="inline-flex items-center gap-2 mb-10 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Setup' : 'Change Path'}
           </button>
-        </form>
 
-        <p className="text-center mt-8 text-xs text-text-muted font-light">
-          Already authenticated? <Link to="/login" className="text-white hover:text-violet-300 font-medium transition-colors">Sign in</Link>
-        </p>
+          {/* Heading */}
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full border border-border bg-secondary/30">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor }} />
+              <span className="text-[9px] uppercase font-black tracking-[0.25em] capitalize" style={{ color: 'var(--text-secondary)' }}>
+                {isVerifying ? 'Security Protocol' : `${role} Account`}
+              </span>
+            </div>
+            <h2 className="text-3xl font-black tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>
+              {isVerifying ? 'Two-Step Verification' : 'Create Account'}
+            </h2>
+            <p className="text-sm font-light opacity-50" style={{ color: 'var(--text-secondary)' }}>
+              {isVerifying 
+                ? `Enter the 6-digit code sent to ${formData.phone}` 
+                : 'Fill in your details to get started.'}
+            </p>
+          </div>
+
+          {/* Error */}
+          <AnimatePresence mode="wait">
+            {error && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="flex items-start gap-3 p-4 rounded-2xl mb-6 text-xs font-semibold"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-0.5" />
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {isVerifying ? (
+            <form onSubmit={handleVerifyOTP} className="flex flex-col gap-6">
+              <Field label="Verification Code" icon={ShieldCheck}>
+                <input 
+                  type="text"
+                  maxLength={6}
+                  className="w-full text-center text-2xl font-black tracking-[0.5em] rounded-xl border outline-none transition-all"
+                  style={{ ...inputStyle, paddingLeft: '1rem' }}
+                  placeholder="000000"
+                  required
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                />
+              </Field>
+
+              <div className="text-center">
+                <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-4" style={{ color: 'var(--text-secondary)' }}>
+                  Didn't receive the code?
+                </p>
+                <button type="button" className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
+                  Resend Security Code
+                </button>
+              </div>
+
+              <button type="submit" disabled={loading}
+                className="btn-primary w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98]">
+                {loading ? 'Verifying...' : 'Authenticate & Access'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {/* Full Name */}
+              <Field label="Full Name" icon={User}>
+                <input name="name" type="text"
+                  className="w-full text-sm rounded-xl border outline-none transition-all"
+                  style={inputStyle}
+                  placeholder="e.g. Jane Doe" required value={formData.name} onChange={handleChange} />
+              </Field>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Email */}
+                <Field label="Email Address" icon={Mail}>
+                  <input name="email" type="email"
+                    className="w-full text-sm rounded-xl border outline-none transition-all"
+                    style={inputStyle}
+                    placeholder="you@example.com" required value={formData.email} onChange={handleChange} />
+                </Field>
+
+                {/* Phone */}
+                <Field label="Phone Number" icon={Phone}>
+                  <input name="phone" type="tel"
+                    className="w-full text-sm rounded-xl border outline-none transition-all"
+                    style={inputStyle}
+                    placeholder="+1 234 567 890" required value={formData.phone} onChange={handleChange} />
+                </Field>
+              </div>
+
+              {/* Client-only: Company */}
+              {role === 'client' && (
+                <Field label="Company (Optional)" icon={Compass}>
+                  <input name="company" type="text"
+                    className="w-full text-sm rounded-xl border outline-none transition-all"
+                    style={inputStyle}
+                    placeholder="Your Organization" value={formData.company} onChange={handleChange} />
+                </Field>
+              )}
+
+              {/* Freelancer-only: Skill + DOB side by side, then Portfolio */}
+              {role === 'freelancer' && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
+                        Core Skill
+                      </label>
+                      <select name="skill"
+                        className="text-sm rounded-xl border outline-none transition-all cursor-pointer appearance-none"
+                        style={{ ...inputNoIconStyle, paddingLeft: '1rem' }}
+                        required value={formData.skill} onChange={handleChange}>
+                        {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <Field label="Date of Birth" icon={Calendar}>
+                      <input name="dob" type="date"
+                        className="w-full text-sm rounded-xl border outline-none transition-all"
+                        style={{ ...inputStyle, paddingLeft: '2.75rem' }}
+                        required value={formData.dob} onChange={handleChange} />
+                    </Field>
+                  </div>
+
+                  <Field label="Portfolio URL" icon={LinkIcon}>
+                    <input name="portfolioUrl" type="url"
+                      className="w-full text-sm rounded-xl border outline-none transition-all"
+                      style={inputStyle}
+                      placeholder="https://yourportfolio.com" value={formData.portfolioUrl} onChange={handleChange} />
+                  </Field>
+                </>
+              )}
+
+              {/* Password row */}
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Password" icon={Lock}>
+                  <input name="password" type="password"
+                    className="w-full text-sm rounded-xl border outline-none transition-all"
+                    style={inputStyle}
+                    placeholder="Min 8 chars" required minLength={8} value={formData.password} onChange={handleChange} />
+                </Field>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
+                    Confirm
+                  </label>
+                  <input name="confirmPassword" type="password"
+                    className="w-full text-sm rounded-xl border outline-none transition-all"
+                    style={inputNoIconStyle}
+                    placeholder="Repeat" required minLength={8} value={formData.confirmPassword} onChange={handleChange} />
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button type="submit" disabled={loading}
+                className="btn-primary w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98] mt-2">
+                {loading ? 'Initiating Verification...' : 'Send Security Code'}
+              </button>
+            </form>
+          )}
+
+          {/* Footer */}
+          {!isVerifying && (
+            <p className="text-center mt-8 text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
+              Already have an account?{' '}
+              <Link to="/login" className="font-black hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
+                Sign In →
+              </Link>
+            </p>
+          )}
+        </motion.div>
       </div>
     </div>
   );

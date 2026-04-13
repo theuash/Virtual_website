@@ -7,7 +7,6 @@ import logo from '../../assets/logo.png';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const { scrollY } = useScroll();
   const navigate = useNavigate();
@@ -125,13 +124,11 @@ export default function Header() {
             {isDark ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
           </button>
 
-          <button id="header-get-started" className="btn-primary" onClick={() => setModalOpen(true)}>
+          <button id="header-get-started" className="btn-primary" onClick={() => navigate('/signup')}>
             Get Started
           </button>
         </div>
       </motion.header>
-
-      <GetStartedModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }

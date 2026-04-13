@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout, ChevronRight, Volume2, VolumeX,
@@ -54,6 +55,7 @@ const MeshGrid = ({ count = 5, speed = 10 }) => (
 );
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -204,7 +206,7 @@ export default function LandingPage() {
                 boxShadow: '0 0 40px rgba(255,255,255,0.4)',
                 border: 'none'
               }}
-              onClick={() => document.getElementById('header-get-started')?.click()}
+              onClick={() => navigate('/signup?role=client')}
             >
               Hire Elite Talent <ArrowRight size={16} />
             </button>
