@@ -1,25 +1,51 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
+
+const unwrapResponse = (response) => response?.data?.data ?? response?.data ?? response;
+const normalizeRequestError = (error, fallbackMessage) => {
+  if (error?.code === 'ECONNABORTED') {
+    return new Error('Request timed out while waiting for the OTP service. Make sure WhatsApp is connected, then try again.');
+  }
+
+  const message = error?.response?.data?.message || error?.message || fallbackMessage;
+  return new Error(message);
+};
+
+const mapSignupPayload = (formData) => ({
+  role: formData.role,
+  email: formData.email.trim().toLowerCase(),
+  password: formData.password,
+  fullName: formData.name.trim(),
+  phone: formData.phone?.trim() || '',
+  company: formData.company?.trim() || '',
+  skill: formData.skill || '',
+  dob: formData.dob || '',
+  portfolioUrl: formData.portfolioUrl?.trim() || '',
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem('virtual_user');
       return stored ? JSON.parse(stored) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   });
   const [loading, setLoading] = useState(false);
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/login', { email, password });
-      
-      // If backend requires 2FA, we would handle it here
-      // For now, let's assume if the user has a phone, we'll ask for OTP in the UI
-      return data;
+      const response = await api.post('/auth/login', {
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -28,27 +54,69 @@ export const AuthProvider = ({ children }) => {
   const signup = useCallback(async (formData) => {
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/signup', formData);
-      return data;
+      const response = await api.post('/auth/register-otp', mapSignupPayload(formData));
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Signup failed');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const verifyOTP = useCallback(async (userId, otp) => {
+  const requestSignupOTP = useCallback(async (email) => {
     setLoading(true);
     try {
-      // Mocking OTP verification
-      // const { data } = await api.post('/auth/verify-otp', { userId, otp });
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (otp === '123456') { // Mock success code
-        return { success: true };
-      } else {
-        throw new Error('Invalid verification code');
-      }
+      const response = await api.post('/auth/otp/request-signup', {
+        email: email.trim().toLowerCase(),
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Unable to resend signup OTP');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const verifySignupOTP = useCallback(async (email, otp, signupData) => {
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/otp/verify-signup', {
+        email: email.trim().toLowerCase(),
+        token: otp,
+        signupData, // Pass full signup data so user is created after verification
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Unable to verify signup OTP');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const requestLoginOTP = useCallback(async (email) => {
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/otp/request-login', {
+        email: email.trim().toLowerCase(),
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Unable to request login OTP');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const verifyLoginOTP = useCallback(async (email, otp) => {
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/otp/verify-login', {
+        email: email.trim().toLowerCase(),
+        token: otp,
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Unable to verify login OTP');
     } finally {
       setLoading(false);
     }
@@ -59,15 +127,33 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('virtual_user');
   }, []);
 
-  const completeAuth = useCallback((userData) => {
-    const finalData = { ...userData.user, token: userData.token };
+  const completeAuth = useCallback((authData) => {
+    const finalData = {
+      ...authData.user,
+      token: authData.token,
+      refreshToken: authData.refreshToken,
+    };
     setUser(finalData);
     localStorage.setItem('virtual_user', JSON.stringify(finalData));
     return finalData;
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signup, verifyOTP, completeAuth, setUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        signup,
+        requestSignupOTP,
+        verifySignupOTP,
+        requestLoginOTP,
+        verifyLoginOTP,
+        completeAuth,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -75,6 +161,8 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
   return ctx;
 };

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/roleGuards';
 import api from '../../services/api';
+import DashboardHeader from '../../components/DashboardHeader';
 import { FolderKanban, Clock, Wallet, Check, AlertCircle, Info, ArrowRight } from 'lucide-react';
 
 export default function ClientDashboard() {
@@ -28,84 +29,146 @@ export default function ClientDashboard() {
     { label: 'Total Spent', value: formatCurrency(totalSpent), icon: <Wallet size={24} strokeWidth={1.5} /> },
   ];
 
-  if (isLoading) return <div className="text-text-muted mt-10">Loading dashboard...</div>;
-  if (isError) return <div className="text-red-400 mt-10">Error loading dashboard data. Please ensure backend is running.</div>;
+  if (isLoading) return (
+    <>
+      <DashboardHeader title="Dashboard" />
+      <div className="p-4 md:p-8" style={{ color: 'var(--text-secondary)' }}>Loading dashboard...</div>
+    </>
+  );
+  if (isError) return (
+    <>
+      <DashboardHeader title="Dashboard" />
+      <div className="p-4 md:p-8 text-red-400">Error loading dashboard data. Please ensure backend is running.</div>
+    </>
+  );
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="mb-10">
-        <h1 className="text-3xl font-medium tracking-tight text-white">Dashboard</h1>
-        <p className="text-text-muted mt-2 font-light">Welcome back, {user?.name || 'Client'}. Here's your project overview.</p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6 mb-10">
-        {stats.map((stat, i) => (
-          <div key={i} className="stat-card">
-            <div className="flex items-center gap-4 mb-4 text-violet-300">
-              <div className="w-10 h-10 rounded-full bg-violet-900/20 text-violet-light border border-violet-bloom/20 flex items-center justify-center">
-                 {stat.icon}
+    <>
+      <DashboardHeader title="Dashboard" />
+      <div className="p-4 md:p-8 space-y-8 animate-fade-in max-w-7xl mx-auto">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {stats.map((stat, i) => (
+            <div 
+              key={i} 
+              className="p-6 rounded-xl border backdrop-blur-xl transition-all hover:border-yellow-600/30 group cursor-pointer"
+              style={{ 
+                backgroundColor: 'rgba(34, 42, 54, 0.3)',
+                borderColor: 'var(--border-light)',
+                boxShadow: '0 8px 32px rgba(57, 17, 125, 0.06)',
+              }}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
+                  style={{ 
+                    backgroundColor: 'rgba(57, 17, 125, 0.15)',
+                    color: 'var(--accent-light)'
+                  }}
+                >
+                  {stat.icon}
+                </div>
+                <span className="font-medium text-sm uppercase" style={{ color: 'var(--text-secondary)' }}>{stat.label}</span>
               </div>
-              <span className="font-medium text-sm tracking-wide text-text-muted uppercase">{stat.label}</span>
+              <div className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{stat.value}</div>
             </div>
-            <div className="text-4xl font-semibold text-white tracking-tight">{stat.value}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="glass-card p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-medium tracking-tight text-white">Active Projects</h2>
-          </div>
-          <div className="space-y-5">
-            {projects.slice(0, 3).map(p => (
-              <div key={p.id || p._id} className="p-5 rounded-2xl bg-base border border-glass-border hover:border-violet-bloom/30 transition-colors group">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-medium text-white group-hover:text-electric-blue transition-colors">{p.title}</h3>
-                  <span className={`text-[10px] uppercase tracking-widest font-medium px-2 py-1 rounded-md ${p.status === 'in_progress' ? 'bg-indigo-900/30 text-indigo-300 border border-indigo-500/20' : 'bg-emerald-900/20 text-emerald-400 border border-emerald-500/20'}`}>
-                    {p.status.replace('_', ' ')}
-                  </span>
-                </div>
-                <div className="text-xs text-text-muted font-light mb-4 flex gap-4">
-                   <span>{p.category}</span>
-                   <span>{formatCurrency(p.budget)}</span>
-                </div>
-                <div className="progress-bar h-1.5 bg-violet-900/30">
-                  <div className="progress-fill bg-electric-blue" style={{ width: `${p.progress || 0}%` }}></div>
-                </div>
-              </div>
-            ))}
-            {projects.length === 0 && <div className="text-text-muted text-sm font-light">No active projects found.</div>}
-          </div>
-          <button className="w-full mt-6 py-3 text-sm font-medium text-electric-blue hover:bg-blue-900/10 rounded-xl transition-colors flex items-center justify-center gap-2">
-             View All Projects <ArrowRight size={16} />
-          </button>
+          ))}
         </div>
 
-        <div className="glass-card p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-medium tracking-tight text-white">Recent Activity</h2>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Active Projects */}
+          <div 
+            className="lg:col-span-2 p-6 rounded-xl border backdrop-blur-xl transition-all"
+            style={{ 
+              backgroundColor: 'rgba(34, 42, 54, 0.3)',
+              borderColor: 'var(--border-light)',
+              boxShadow: '0 8px 32px rgba(57, 17, 125, 0.06)',
+            }}
+          >
+            <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Active Projects</h2>
+            <div className="space-y-3">
+              {projects.slice(0, 3).map(p => (
+                <div 
+                  key={p.id || p._id}
+                  className="p-4 rounded-lg border transition-all hover:border-yellow-600/40 hover:bg-opacity-40 cursor-pointer group"
+                  style={{ 
+                    backgroundColor: 'rgba(20, 28, 50, 0.4)',
+                    borderColor: 'var(--border-light)',
+                  }}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-medium group-hover:text-yellow-300 transition-colors" style={{ color: 'var(--text-primary)' }}>{p.title}</h3>
+                    <span 
+                      className="text-xs font-semibold px-2 py-1 rounded transition-all group-hover:scale-105"
+                      style={{ 
+                        background: 'linear-gradient(135deg, #39117d 0%, #012f4a 100%)',
+                        color: '#EDE7F6'
+                      }}
+                    >
+                      {p.status.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <div className="text-xs mb-3 flex gap-4" style={{ color: 'var(--text-secondary)' }}>
+                    <span>{p.category}</span>
+                    <span>{formatCurrency(p.budget)}</span>
+                  </div>
+                  <div 
+                    className="w-full h-2 rounded-full overflow-hidden"
+                    style={{ backgroundColor: 'rgba(57, 17, 125, 0.1)' }}
+                  >
+                    <div 
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ 
+                        background: 'linear-gradient(90deg, #39117d 0%, #c084fc 100%)',
+                        width: `${p.progress || 0}%`
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+              {projects.length === 0 && (
+                <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>No active projects found</div>
+              )}
+            </div>
+            <button 
+              className="w-full mt-6 py-2.5 text-sm font-medium rounded-lg border transition-all hover:bg-opacity-40 group"
+              style={{ 
+                color: 'var(--accent-light)',
+                borderColor: 'var(--border-light)',
+                backgroundColor: 'rgba(57, 17, 125, 0.05)',
+              }}
+            >
+              View All Projects <ArrowRight size={14} className="inline ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
-          <div className="space-y-6 pt-2">
-            {activities.length > 0 ? activities.map((activity, i) => (
-              <div key={i} className="flex gap-5 items-start relative">
-                {i !== activities.length - 1 && <div className="absolute left-[15px] top-[30px] bottom-[-24px] w-px bg-glass-border"></div>}
-                
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 border ${
-                  activity.type === 'success' ? 'bg-emerald-950 border-emerald-500/30 text-emerald-400' : 
-                  activity.type === 'review' ? 'bg-amber-950 border-amber-500/30 text-amber-400' : 'bg-blue-950 border-blue-500/30 text-blue-400'
-                }`}>
-                  {activity.type === 'success' ? <Check size={14} /> : activity.type === 'review' ? <AlertCircle size={14} /> : <Info size={14} />}
+
+          {/* Recent Activity */}
+          <div 
+            className="p-6 rounded-xl border backdrop-blur-xl"
+            style={{ 
+              backgroundColor: 'rgba(34, 42, 54, 0.3)',
+              borderColor: 'var(--border-light)',
+              boxShadow: '0 8px 32px rgba(57, 17, 125, 0.06)',
+            }}
+          >
+            <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Recent Activity</h2>
+            <div className="space-y-4">
+              {activities.length > 0 ? activities.slice(0, 5).map((activity, i) => (
+                <div key={i} className="flex gap-3 items-start">
+                  <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: 'var(--accent)' }}></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>{activity.message || activity.text}</p>
+                    <span className="text-xs mt-1 block" style={{ color: 'var(--text-secondary)' }}>{activity.time || 'recently'}</span>
+                  </div>
                 </div>
-                <div className="pt-1.5">
-                  <p className="text-sm font-light text-white mb-1.5 leading-relaxed">{activity.message || activity.text}</p>
-                  <span className="text-xs text-text-muted tracking-wide">{activity.time || 'recently'}</span>
-                </div>
-              </div>
-            )) : <div className="text-text-muted text-sm font-light">No recent activity.</div>}
+              )) : (
+                <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>No activity yet</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

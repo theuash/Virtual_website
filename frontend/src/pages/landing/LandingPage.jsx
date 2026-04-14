@@ -58,8 +58,14 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const videoRef = useRef(null);
+  const scrollCountRef = useRef(0);
+  const lastScrollCountYRef = useRef(0);
+  const scrollCueCountRef = useRef(0);
+  const lastScrollCueYRef = useRef(0);
+  const showScrollCueRef = useRef(true);
   const [isMuted, setIsMuted] = useState(true);
   const [showUnmuteHint, setShowUnmuteHint] = useState(false);
+  const [showScrollCue, setShowScrollCue] = useState(true);
 
   // Scroll tracking
   const { scrollY } = useScroll();
@@ -93,6 +99,87 @@ export default function LandingPage() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
+    showScrollCueRef.current = showScrollCue;
+  }, [showScrollCue]);
+
+  useEffect(() => {
+    scrollCueCountRef.current = 0;
+    lastScrollCueYRef.current = scrollY.get();
+    setShowScrollCue(true);
+    showScrollCueRef.current = true;
+
+    const unsubscribe = scrollY.on('change', (latestY) => {
+      if (!showScrollCueRef.current) {
+        return;
+      }
+
+      const distanceSinceLastCueCount = Math.abs(latestY - lastScrollCueYRef.current);
+
+      if (distanceSinceLastCueCount < 120) {
+        return;
+      }
+
+      scrollCueCountRef.current += 1;
+      lastScrollCueYRef.current = latestY;
+
+      if (scrollCueCountRef.current >= 4) {
+        showScrollCueRef.current = false;
+        setShowScrollCue(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [scrollY]);
+
+  useEffect(() => {
+    if (isMuted) {
+      scrollCountRef.current = 0;
+      lastScrollCountYRef.current = scrollY.get();
+      return;
+    }
+
+    lastScrollCountYRef.current = scrollY.get();
+
+    const unsubscribe = scrollY.on('change', (latestY) => {
+      const distanceSinceLastCount = Math.abs(latestY - lastScrollCountYRef.current);
+
+      // Count one deliberate scroll step roughly every 120px of movement.
+      if (distanceSinceLastCount < 120) {
+        return;
+      }
+
+      scrollCountRef.current += 1;
+      lastScrollCountYRef.current = latestY;
+
+      if (scrollCountRef.current >= 4) {
+        setIsMuted(true);
+        setShowUnmuteHint(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isMuted, scrollY]);
+
+  const toggleMute = () => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    setShowUnmuteHint(false);
+    scrollCountRef.current = 0;
+    lastScrollCountYRef.current = scrollY.get();
+
+    if (videoRef.current) {
+      videoRef.current.muted = newMuted;
+      videoRef.current.play();
+    }
+  };
 
   const [activeFeature, setActiveFeature] = useState(0);
   const [taskSetKey, setTaskSetKey] = useState(0);
@@ -134,21 +221,13 @@ export default function LandingPage() {
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
           {/* Background Video Container - Anchored to black to prevent bleed */}
-          <div className="absolute inset-0 z-0 bg-[#000000] cursor-pointer" onClick={() => {
-            const newMuted = !isMuted;
-            setIsMuted(newMuted);
-            setShowUnmuteHint(false);
-            if (videoRef.current) {
-              videoRef.current.muted = newMuted;
-              videoRef.current.play();
-            }
-          }}>
+          <div className="absolute inset-0 z-0 bg-[#000000] cursor-pointer" onClick={toggleMute}>
             <video
               ref={videoRef}
               src={bgVideo}
               autoPlay
               loop
-              muted={true}
+              muted={isMuted}
               playsInline
               className="w-full h-full object-cover pointer-events-none"
               style={{
@@ -160,19 +239,36 @@ export default function LandingPage() {
           </div>
 
           <button
-            onClick={() => {
-              const newMuted = !isMuted;
-              setIsMuted(newMuted);
-              setShowUnmuteHint(false);
-              if (videoRef.current) {
-                videoRef.current.muted = newMuted;
-                videoRef.current.play();
-              }
-            }}
+            onClick={toggleMute}
             className="absolute bottom-10 right-10 z-50 w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
           >
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
+
+          <AnimatePresence>
+            {showScrollCue && (
+              <motion.button
+                type="button"
+                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 16, transition: { duration: 0.35, ease: 'easeOut' } }}
+                className="absolute bottom-10 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.35em]">Scroll Down</span>
+                  <motion.div
+                    animate={{ y: [0, 6, 0], opacity: [0.45, 1, 0.45] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20"
+                  >
+                    <ChevronRight size={18} className="rotate-90" />
+                  </motion.div>
+                  <div className="h-8 w-px bg-gradient-to-b from-white/60 to-transparent"></div>
+                </div>
+              </motion.button>
+            )}
+          </AnimatePresence>
 
           {/* Full Screen Blur Overlay - Linked to Hero Appearance */}
           <motion.div 

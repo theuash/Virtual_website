@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Lock, LogIn, ArrowRight, ShieldCheck, Phone } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import authArt from '../../assets/auth/login_art.jpg';
 import logo from '../../assets/logo.png';
+import { getRoleRedirect } from '../../utils/roleGuards';
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {
@@ -19,13 +20,14 @@ const inputStyle = {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loading, verifyOTP, completeAuth } = useAuth();
+  const { login, loading, requestLoginOTP, verifyLoginOTP, completeAuth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [otp, setOtp] = useState('');
-  const [pendingUser, setPendingUser] = useState(null);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [pendingPhone, setPendingPhone] = useState('');
 
   const { scrollY } = useScroll();
   const blurOverlayOpacity = useTransform(scrollY, [0, 150], [0, 0.85]);
@@ -37,10 +39,14 @@ export default function LoginPage() {
     setError('');
     try {
       const response = await login(email, password);
-      // In a real app, backend returns if 2FA is needed.
-      // For now we simulate that 2FA is always required after login.
-      setPendingUser(response);
-      setIsVerifying(true);
+      if (response?.requiresTwoFactor) {
+        setPendingEmail(response.email || email.trim().toLowerCase());
+        setPendingPhone(response.phone || '');
+        setIsVerifying(true);
+        return;
+      }
+      const user = completeAuth(response);
+      navigate(getRoleRedirect(user.role));
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     }
@@ -50,13 +56,30 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      await verifyOTP(pendingUser.user._id, otp);
-      const user = completeAuth(pendingUser);
-      if (user.role === 'client') navigate('/client/dashboard');
-      else if (user.role === 'freelancer') navigate('/freelancer/dashboard');
-      else if (user.role === 'admin') navigate('/admin/dashboard');
+      const response = await verifyLoginOTP(pendingEmail, otp);
+      const user = completeAuth(response);
+      navigate(getRoleRedirect(user.role));
     } catch (err) {
-      setError(err?.message || 'Invalid verification code.');
+      setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
+    }
+  };
+
+  const handleRequestOtp = async () => {
+    setError('');
+    const targetEmail = (pendingEmail || email).trim().toLowerCase();
+
+    if (!targetEmail) {
+      setError('Complete the password step first so we know where to resend the code.');
+      return;
+    }
+
+    try {
+      const response = await requestLoginOTP(targetEmail);
+      setPendingEmail(targetEmail);
+      setPendingPhone(response?.phone || pendingPhone);
+      setIsVerifying(true);
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to send login code right now.');
     }
   };
 
@@ -148,7 +171,7 @@ export default function LoginPage() {
             </h2>
             <p className="text-sm font-light opacity-50" style={{ color: 'var(--text-secondary)' }}>
               {isVerifying
-                ? 'Verify your identity to authorize this session.'
+                ? `Enter the 6-digit code sent to ${pendingPhone || 'your phone'}.`
                 : 'Authorize your session with your credentials.'}
             </p>
           </div>
@@ -197,9 +220,9 @@ export default function LoginPage() {
 
               <div className="text-center">
                 <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  Secure handshake required
+                  Secure phone handshake required
                 </p>
-                <button type="button" className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
+                <button type="button" onClick={handleRequestOtp} className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
                   Request New Code
                 </button>
               </div>
@@ -276,7 +299,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="btn-primary w-full flex items-center justify-center gap-2 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98]"
               >
-                {loading ? 'Checking Credentials...' : <><span>Continue to Security</span><ArrowRight size={14} strokeWidth={2.5} /></>}
+                {loading ? 'Checking Password...' : 'Continue To Phone Verification'}
               </button>
             </form>
           )}
@@ -301,4 +324,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

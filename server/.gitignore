@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Runtime caches and authentication
+.wwebjs_auth/
+.wwebjs_cache/
+.env.local
+
+package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

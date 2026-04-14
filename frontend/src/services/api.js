@@ -22,7 +22,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const requestUrl = err.config?.url || '';
+    const isAuthFlowRequest = requestUrl.includes('/auth/login')
+      || requestUrl.includes('/auth/register')
+      || requestUrl.includes('/auth/otp/');
+
+    if (err.response?.status === 401 && !isAuthFlowRequest) {
       localStorage.removeItem('virtual_user');
       window.location.href = '/login';
     }

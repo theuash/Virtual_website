@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/roleGuards';
 import api from '../../services/api';
+import DashboardHeader from '../../components/DashboardHeader';
 import { Users2, Server, Banknote, Scale, ArrowRight, Activity } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -20,79 +21,156 @@ export default function AdminDashboard() {
   const accessLogs = adminData?.accessLogs || [];
 
   const stats = [
-    { label: 'Total Network', value: platformStats.totalUsers.toLocaleString(), icon: <Users2 size={20} strokeWidth={1.5} />, color: 'text-zinc-300' },
-    { label: 'Active Pipeline', value: platformStats.activeProjects, icon: <Server size={20} strokeWidth={1.5} />, color: 'text-zinc-300' },
-    { label: 'Gross Volume', value: formatCurrency(platformStats.totalRevenue), icon: <Banknote size={20} strokeWidth={1.5} />, color: 'text-zinc-300' },
-    { label: 'Open Incidents', value: platformStats.openDisputes, icon: <Scale size={20} strokeWidth={1.5} />, color: 'text-zinc-300' },
+    { label: 'Total Network', value: platformStats.totalUsers.toLocaleString(), icon: <Users2 size={20} strokeWidth={1.5} /> },
+    { label: 'Active Pipeline', value: platformStats.activeProjects, icon: <Server size={20} strokeWidth={1.5} /> },
+    { label: 'Gross Volume', value: formatCurrency(platformStats.totalRevenue), icon: <Banknote size={20} strokeWidth={1.5} /> },
+    { label: 'Open Incidents', value: platformStats.openDisputes, icon: <Scale size={20} strokeWidth={1.5} /> },
   ];
 
-  if (isLoading) return <div className="text-zinc-500 mt-10 font-mono text-sm tracking-widest pl-6 border-l border-zinc-800">CONNECTING TO OPS CORE...</div>;
-  if (isError) return <div className="text-red-500 mt-10 font-mono text-sm tracking-widest pl-6 border-l border-red-900/50">FATAL LINK ERROR. CHECK BACKEND.</div>;
+  if (isLoading) return (
+    <>
+      <DashboardHeader title="System Telemetry" />
+      <div className="p-4 md:p-8" style={{ color: 'var(--text-secondary)' }}>Connecting to ops core...</div>
+    </>
+  );
+  if (isError) return (
+    <>
+      <DashboardHeader title="System Telemetry" />
+      <div className="p-4 md:p-8 text-red-400">Fatal link error. Check backend.</div>
+    </>
+  );
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex justify-between items-end mb-10 border-b border-zinc-900 pb-6">
-        <div>
-           <h1 className="text-2xl font-medium text-white tracking-tight">System Telemetry</h1>
-           <p className="text-zinc-500 font-light mt-1.5 text-sm">Real-time analytical overview of the Virtual platform.</p>
+    <>
+      <DashboardHeader title="System Telemetry" />
+      <div className="p-4 md:p-8 space-y-8 animate-fade-in max-w-7xl mx-auto">
+        {/* Status Badge */}
+        <div 
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full border w-fit backdrop-blur-sm"
+          style={{ 
+            backgroundColor: 'rgba(34, 42, 54, 0.4)',
+            borderColor: 'var(--border-light)',
+            boxShadow: '0 4px 12px rgba(57, 17, 125, 0.1)'
+          }}
+        >
+          <Activity size={14} className="animate-pulse" style={{ color: 'var(--accent-light)' }} />
+          <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>System Nominal</span>
         </div>
-        <div className="flex items-center gap-3 bg-emerald-950/30 border border-emerald-900/30 px-3 py-1.5 rounded-md">
-          <Activity size={14} className="text-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-mono tracking-widest text-emerald-500 uppercase">Sys_Nominal</span>
-        </div>
-      </div>
 
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, i) => (
-          <div key={i} className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 relative overflow-hidden group hover:border-zinc-700 transition-colors">
-            <div className="flex justify-between items-start mb-4">
-              <span className={`text-xl ${stat.color} opacity-70 group-hover:opacity-100 transition-opacity`}>{stat.icon}</span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, i) => (
+            <div 
+              key={i}
+              className="p-6 rounded-xl border backdrop-blur-xl transition-all hover:border-yellow-600/30 group"
+              style={{ 
+                backgroundColor: 'rgba(34, 42, 54, 0.3)',
+                borderColor: 'var(--border-light)',
+                boxShadow: '0 8px 32px rgba(57, 17, 125, 0.06)',
+              }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
+                  style={{ 
+                    backgroundColor: 'rgba(57, 17, 125, 0.15)',
+                    color: 'var(--accent-light)'
+                  }}
+                >
+                  {stat.icon}
+                </div>
+              </div>
+              <div className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>{stat.value}</div>
+              <p className="text-xs uppercase tracking-wider mt-2" style={{ color: 'var(--text-secondary)' }}>{stat.label}</p>
             </div>
-            <div className="text-3xl font-medium tracking-tight text-white mb-2">{stat.value}</div>
-            <div className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-8">
-          <div className="flex justify-between items-center mb-8">
-             <h2 className="text-xs font-semibold text-zinc-300 uppercase tracking-widest">Incident Queue</h2>
-             <span className={`bg-red-950/50 text-red-400 border border-red-900/50 px-2.5 py-0.5 rounded text-[10px] font-mono tracking-widest`}>
-               {incidents.length} FLAGS
-             </span>
-          </div>
-          <div className="space-y-3">
-             {incidents.length > 0 ? incidents.map((inc, i) => (
-               <div key={i} className="bg-zinc-950/80 border border-zinc-900 p-4 rounded-lg flex justify-between items-center">
-                 <span className="text-sm font-light text-zinc-400">{inc.message}</span>
-                 <button className="text-xs font-medium text-white hover:text-zinc-300 transition-colors">Review</button>
-               </div>
-             )) : <div className="text-zinc-500 text-sm font-light">Queue empty.</div>}
-          </div>
+          ))}
         </div>
 
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-8">
-          <div className="flex justify-between items-center mb-8">
-             <h2 className="text-xs font-semibold text-zinc-300 uppercase tracking-widest">Access Logs</h2>
-             <span className="text-[10px] uppercase tracking-widest font-mono text-zinc-500">Live Stream</span>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Incident Queue */}
+          <div 
+            className="p-6 rounded-xl border backdrop-blur-xl"
+            style={{ 
+                backgroundColor: 'rgba(34, 42, 54, 0.3)',
+                borderColor: 'var(--border-light)',
+                boxShadow: '0 8px 32px rgba(57, 17, 125, 0.06)',
+            }}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Incident Queue</h2>
+              <span 
+                className="text-xs font-bold px-2.5 py-1 rounded"
+                style={{ 
+                  background: 'linear-gradient(135deg, #39117d 0%, #012f4a 100%)',
+                  color: '#EDE7F6'
+                }}
+              >
+                {incidents.length} FLAGS
+              </span>
+            </div>
+            <div className="space-y-3">
+              {incidents.length > 0 ? incidents.map((inc, i) => (
+                <div 
+                  key={i}
+                  className="p-4 rounded-lg border flex justify-between items-center transition-all hover:border-yellow-600/40 group"
+                  style={{ 
+                    backgroundColor: 'rgba(20, 28, 50, 0.4)',
+                    borderColor: 'var(--border-light)',
+                  }}
+                >
+                  <span className="text-sm group-hover:text-yellow-300 transition-colors" style={{ color: 'var(--text-primary)' }}>{inc.message}</span>
+                  <button 
+                    className="text-xs font-medium px-3 py-1 rounded transition-all border"
+                    style={{ 
+                      color: 'var(--accent-light)',
+                      borderColor: 'var(--border-light)',
+                      backgroundColor: 'rgba(57, 17, 125, 0.05)'
+                    }}
+                  >
+                    Review
+                  </button>
+                </div>
+              )) : (
+                <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>Queue empty</div>
+              )}
+            </div>
           </div>
-          <div className="space-y-5">
-             {accessLogs.length > 0 ? accessLogs.map((u, i) => (
-               <div key={i} className="flex justify-between items-center pb-4 border-b border-zinc-800/50 last:border-0 last:pb-0">
-                 <div>
-                   <div className="text-sm font-medium text-white tracking-wide">{u.name || u.email}</div>
-                   <div className="text-xs font-light text-zinc-500 mt-0.5">{u.role}</div>
-                 </div>
-                 <div className="text-[10px] uppercase font-mono tracking-widest text-zinc-600">{u.time || 'now'}</div>
-               </div>
-             )) : <div className="text-zinc-500 text-sm font-light">Log stream empty.</div>}
+
+          {/* Access Logs */}
+          <div 
+            className="p-6 rounded-xl border backdrop-blur-xl"
+            style={{ 
+              backgroundColor: 'rgba(30, 58, 95, 0.3)',
+              borderColor: 'var(--border-light)',
+              boxShadow: '0 8px 32px rgba(59, 130, 246, 0.08)',
+            }}
+          >
+            <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Access Logs</h2>
+            <div className="space-y-4">
+              {accessLogs.length > 0 ? accessLogs.slice(0, 5).map((u, i) => (
+                <div 
+                  key={i}
+                  className="flex justify-between items-center pb-4 border-b last:border-0 last:pb-0 transition-all hover:translate-x-1"
+                  style={{ borderColor: 'rgba(148, 163, 184, 0.1)' }}
+                >
+                  <div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{u.name || u.email}</div>
+                    <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>{u.role}</div>
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{u.time || 'now'}</div>
+                </div>
+              )) : (
+                <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>No logs</div>
+              )}
+            </div>
+            <button className="w-full mt-6 py-2.5 text-sm font-medium rounded-lg border transition-all uppercase" 
+              style={{ color: 'var(--accent)', borderColor: 'var(--border)', backgroundColor: 'var(--bg-secondary)' }}>
+              Open Registry <ArrowRight size={14} className="inline ml-2" />
+            </button>
           </div>
-          <button className="w-full mt-8 py-3 bg-zinc-950 border border-zinc-800 text-xs text-zinc-400 font-medium hover:text-white hover:bg-zinc-800 transition-all rounded-lg uppercase tracking-widest flex items-center justify-center gap-2">
-            Open Registry <ArrowRight size={14} />
-          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

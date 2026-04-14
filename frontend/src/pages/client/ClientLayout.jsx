@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 export default function ClientLayout() {
   const { user, logout } = useAuth();
@@ -26,26 +27,26 @@ export default function ClientLayout() {
     <div className="dashboard-layout">
       
       <button 
-        className="md:hidden fixed top-4 right-4 z-50 p-2 bg-glass-card border border-glass-border rounded-lg text-text-primary"
+        className="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
+        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
       </button>
 
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="p-6 border-b border-glass-border">
+        <div className="p-6 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-bloom to-electric-blue flex items-center justify-center font-bold text-white shadow-glow-sm">V</div>
-            <span className="font-semibold tracking-tight text-lg text-white">Virtual</span>
+            <img src={logo} alt="Virtual" className="w-8 h-8" />
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-violet-900/30 border border-violet-bloom/20 flex items-center justify-center text-violet-300 font-medium text-sm">
+            <div className="w-10 h-10 rounded-full border flex items-center justify-center font-medium text-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--accent)', color: 'var(--accent)' }}>
               {user?.name?.charAt(0) || 'C'}
             </div>
             <div>
-              <div className="font-medium text-sm text-white">{user?.name}</div>
-              <div className="text-[10px] text-electric-blue/80 tracking-widest uppercase font-medium mt-0.5">Client Account</div>
+              <div className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{user?.name}</div>
+              <div className="text-[10px] tracking-widest uppercase font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>Client Account</div>
             </div>
           </div>
         </div>
@@ -64,8 +65,8 @@ export default function ClientLayout() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-glass-border">
-          <button onClick={handleLogout} className="nav-link w-full text-left text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-colors">
+        <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+          <button onClick={handleLogout} className="nav-link w-full text-left transition-colors" style={{ color: '#ef4444' }}>
             <LogOut size={18} strokeWidth={1.5} className="opacity-80" /> <span className="text-sm font-medium">Logout</span>
           </button>
         </div>

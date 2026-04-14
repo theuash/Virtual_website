@@ -19,12 +19,20 @@ export const RoleGuard = ({ children, allowedRoles }) => {
 export const getRoleRedirect = (role) => ROLE_REDIRECTS[role] || '/login';
 
 export const SKILLS = [
-  'Video Editing',
-  '3D Animation',
-  'CGI',
-  'Script Writing',
-  'Graphic Designing',
+  'video_editing',
+  '3d_animation',
+  'cgi',
+  'script_writing',
+  'graphic_designing',
 ];
+
+export const SKILL_LABELS = {
+  video_editing: 'Video Editing',
+  '3d_animation': '3D Animation',
+  cgi: 'CGI',
+  script_writing: 'Script Writing',
+  graphic_designing: 'Graphic Designing',
+};
 
 export const TIER_LABELS = {
   precrate: 'Precrate',

@@ -3,9 +3,10 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { SKILLS } from '../../utils/roleGuards';
+import { SKILLS, SKILL_LABELS } from '../../utils/roleGuards';
 import signupArt from '../../assets/auth/signup_art.jpg';
 import logo from '../../assets/logo.png';
+import { getRoleRedirect } from '../../utils/roleGuards';
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {
@@ -48,11 +49,11 @@ export default function SignupPage() {
   const [params] = useSearchParams();
   const roleParam = params.get('role');
   const navigate = useNavigate();
-  const { signup, loading, verifyOTP, completeAuth } = useAuth();
+  const { signup, loading, verifySignupOTP, requestSignupOTP, completeAuth } = useAuth();
 
   const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', password: '', confirmPassword: '',
+    name: '', email: '', countryCode: '+91', phone: '', password: '', confirmPassword: '',
     company: '', skill: SKILLS[0], dob: '', portfolioUrl: ''
   });
   const [error, setError] = useState('');
@@ -81,12 +82,12 @@ export default function SignupPage() {
       if (age < 16) return setError('You must be at least 16 years old.');
     }
     try {
-      const response = await signup({ ...formData, role });
-      // In a real 2FA flow, the backend would trigger an SMS here.
+      const fullPhone = `${formData.countryCode}${formData.phone}`;
+      const response = await signup({ ...formData, phone: fullPhone, role });
       setPendingUser(response);
       setIsVerifying(true);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Error creating account. Please try again.');
+      setError(err?.message || err?.response?.data?.message || 'Error creating account. Please try again.');
     }
   };
 
@@ -94,16 +95,32 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
     try {
-      await verifyOTP(pendingUser.user._id, otp);
-      const user = completeAuth(pendingUser);
-      navigate(user.role === 'client' ? '/client/dashboard' : '/freelancer/dashboard');
+      // Reconstruct full signup data with combined phone number
+      const signupDataForVerification = {
+        ...formData,
+        phone: `${formData.countryCode}${formData.phone}`,
+        role,
+      };
+      const verifiedAuth = await verifySignupOTP(pendingUser.user.email, otp, signupDataForVerification);
+      const user = completeAuth(verifiedAuth);
+      navigate(getRoleRedirect(user.role));
     } catch (err) {
-      setError(err?.message || 'Invalid verification code.');
+      setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setError('');
+    try {
+      await requestSignupOTP(pendingUser.user.email);
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to resend code right now.');
     }
   };
 
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } };
+  const otpDestination = pendingUser?.phone || pendingUser?.user?.phone || formData.phone;
 
   /* ── Role Selection Screen ──────────────────────────────────────────── */
   if (!role) {
@@ -272,7 +289,7 @@ export default function SignupPage() {
             </h2>
             <p className="text-sm font-light opacity-50" style={{ color: 'var(--text-secondary)' }}>
               {isVerifying 
-                ? `Enter the 6-digit code sent to ${formData.phone}` 
+                ? `Enter the 6-digit code sent to ${otpDestination}` 
                 : 'Fill in your details to get started.'}
             </p>
           </div>
@@ -311,10 +328,10 @@ export default function SignupPage() {
 
               <div className="text-center">
                 <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  Didn't receive the code?
+                  Didn&apos;t receive the phone code?
                 </p>
-                <button type="button" className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
-                  Resend Security Code
+                <button type="button" onClick={handleResendOtp} className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
+                  Resend Phone Code
                 </button>
               </div>
 
@@ -343,12 +360,36 @@ export default function SignupPage() {
                 </Field>
 
                 {/* Phone */}
-                <Field label="Phone Number" icon={Phone}>
-                  <input name="phone" type="tel"
-                    className="w-full text-sm rounded-xl border outline-none transition-all"
-                    style={inputStyle}
-                    placeholder="+1 234 567 890" required value={formData.phone} onChange={handleChange} />
-                </Field>
+                <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                  <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
+                    Phone Number
+                  </label>
+                  <div className="flex gap-2 w-full">
+                    <select name="countryCode"
+                      className="text-sm rounded-xl border outline-none transition-all cursor-pointer flex-shrink-0"
+                      style={{ ...inputNoIconStyle, paddingLeft: '0.5rem', width: '120px' }}
+                      required value={formData.countryCode} onChange={handleChange}>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+61">🇦🇺 +61</option>
+                      <option value="+86">🇨🇳 +86</option>
+                      <option value="+81">🇯🇵 +81</option>
+                      <option value="+33">🇫🇷 +33</option>
+                      <option value="+49">🇩🇪 +49</option>
+                      <option value="+39">🇮🇹 +39</option>
+                      <option value="+34">🇪🇸 +34</option>
+                      <option value="+31">🇳🇱 +31</option>
+                      <option value="+47">🇳🇴 +47</option>
+                      <option value="+46">🇸🇪 +46</option>
+                      <option value="+41">🇨🇭 +41</option>
+                    </select>
+                    <input name="phone" type="tel"
+                      className="flex-1 text-sm rounded-xl border outline-none transition-all"
+                      style={inputNoIconStyle}
+                      placeholder="9876543210" required value={formData.phone} onChange={handleChange} />
+                  </div>
+                </div>
               </div>
 
               {/* Client-only: Company */}
@@ -373,7 +414,7 @@ export default function SignupPage() {
                         className="text-sm rounded-xl border outline-none transition-all cursor-pointer appearance-none"
                         style={{ ...inputNoIconStyle, paddingLeft: '1rem' }}
                         required value={formData.skill} onChange={handleChange}>
-                        {SKILLS.map(s => <option key={s} value={s}>{s}</option>)}
+                        {SKILLS.map(s => <option key={s} value={s}>{SKILL_LABELS[s] || s}</option>)}
                       </select>
                     </div>
                     <Field label="Date of Birth" icon={Calendar}>
@@ -415,7 +456,7 @@ export default function SignupPage() {
               {/* Submit */}
               <button type="submit" disabled={loading}
                 className="btn-primary w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98] mt-2">
-                {loading ? 'Initiating Verification...' : 'Send Security Code'}
+                {loading ? 'Initiating Verification...' : 'Send Phone Code'}
               </button>
             </form>
           )}
