@@ -1,8 +1,7 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { User } from '../models/User.js';
-import { Client } from '../models/Client.js';
-import { Freelancer } from '../models/Freelancer.js';
+import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
 import { Project } from '../models/Project.js';
 import { MicroTask } from '../models/MicroTask.js';
 import { Pricing } from '../models/Pricing.js';
@@ -14,12 +13,7 @@ export const runSeed = asyncHandler(async (req, res) => {
     return res.status(403).json(new ApiResponse(403, null, 'Cannot seed in production'));
   }
 
-  // Clear existing
-  await User.deleteMany({});
-  await Project.deleteMany({});
-  await MicroTask.deleteMany({});
-
-  // Seed pricing (upsert so it's safe to re-run)
+  // ── Seed pricing (safe upsert — never deletes existing data) ──
   for (const dept of pricingData) {
     await Pricing.findOneAndUpdate(
       { department: dept.department },
@@ -28,73 +22,35 @@ export const runSeed = asyncHandler(async (req, res) => {
     );
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash('Admin@1234', salt);
-  const userPasswordHash = await bcrypt.hash('demo123', salt);
+  // ── Create Momentum Supervisor: Mohammad Maaz ─────────────────
+  // Only create if not already present
+  const existing = await User.findOne({ email: 'maazmohammed072006@gmail.com' });
+  if (!existing) {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash('maaza@123', salt);
 
-  // 1. Admin
-  await User.create({
-    email: 'admin@virtual.io',
-    passwordHash,
-    role: 'admin',
-    fullName: 'System Administrator',
-    isVerified: true
-  });
+    await MomentumSupervisor.create({
+      email: 'maazmohammed072006@gmail.com',
+      passwordHash,
+      role: 'momentum_supervisor',
+      fullName: 'Mohammad Maaz',
+      phone: '+917483316929',
+      phoneVerified: true,
+      isVerified: true,
+      authMethod: 'password',
+      dateOfBirth: new Date('2006-05-07'),
+    });
+  }
 
-  // 2. Clients
-  const client1 = await Client.create({
-    email: 'client@demo.com',
-    passwordHash: userPasswordHash,
-    role: 'client',
-    fullName: 'Alex Morgan',
-    companyName: 'TechStartup Inc.',
-    totalSpent: 12400,
-  });
-
-  // 3. Freelancers
-  const free1 = await Freelancer.create({
-    email: 'freelancer@demo.com',
-    passwordHash: userPasswordHash,
-    role: 'freelancer',
-    fullName: 'Arjun Sharma',
-    primarySkill: 'video_editing',
-    tier: 'crate',
-    totalEarnings: 4800,
-    tasksCompleted: 12,
-  });
-
-  // 4. Create Project
-  const project1 = await Project.create({
-    title: "Brand Promo Video",
-    description: "Create a 60s brand promo using raw footage.",
-    category: "video_editing",
-    clientId: client1._id,
-    budget: 800,
-    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    status: 'in_progress',
-  });
-
-  // 5. Create MicroTask
-  await MicroTask.create({
-    projectId: project1._id,
-    title: "Edit Raw Footage - Part 1",
-    description: "Color grade and trim the first 30 seconds.",
-    assignedTo: free1._id,
-    skillRequired: "video_editing",
-    status: "assigned",
-    earnings: 200,
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-  });
-
-  res.json(new ApiResponse(200, null, 'Database seeded successfully'));
+  res.json(new ApiResponse(200, null, 'Pricing seeded. Maaz account ready.'));
 });
 
 export const clearSeed = asyncHandler(async (req, res) => {
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json(new ApiResponse(403, null, 'Cannot clear in production'));
   }
-  await User.deleteMany({});
+  // Only clear projects and tasks — never delete user accounts or pricing
   await Project.deleteMany({});
   await MicroTask.deleteMany({});
-  res.json(new ApiResponse(200, null, 'Database cleared'));
+  res.json(new ApiResponse(200, null, 'Projects and tasks cleared. Users and pricing preserved.'));
 });

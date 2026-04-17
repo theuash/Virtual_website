@@ -1,4 +1,4 @@
-export const ROLES = ['client', 'freelancer', 'admin'];
+export const ROLES = ['client', 'freelancer', 'admin', 'momentum_supervisor'];
 export const SKILLS = ['video_editing', '3d_animation', 'cgi', 'script_writing', 'graphic_designing'];
 export const TIERS = ['precrate', 'crate', 'project_initiator', 'momentum_supervisor', 'admin'];
 export const PROJECT_STATUS = ['open', 'in_progress', 'under_review', 'completed', 'cancelled'];

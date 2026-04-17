@@ -830,119 +830,164 @@ export default function FreelancerLearning() {
     <>
       <DashboardHeader title="Learning" />
 
-      <div className="p-6 md:p-8 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div className="p-6 md:p-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* ── Left / main content (2/3) ──────────────────────── */}
-          <div className="flex-1 min-w-0 space-y-6">
+          {/* ── Main content — 2 cols ──────────────────────────── */}
+          <div className="lg:col-span-2 space-y-4">
 
-            {/* Skill tabs */}
+            {/* Selection card: skill tabs + software picker */}
             <div
-              className="flex items-center gap-2 flex-wrap"
-              role="tablist"
-              aria-label="Skill tabs"
+              className="rounded-xl border overflow-hidden"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
             >
-              {userSkills.map((skill) => {
-                const isActive = skill === activeSkill;
-                return (
-                  <button
-                    key={skill}
-                    role="tab"
-                    aria-selected={isActive}
-                    onClick={() => handleSkillChange(skill)}
-                    className="px-4 py-2 rounded-full text-sm font-semibold border transition-all hover:scale-105 active:scale-95"
-                    style={{
-                      background: isActive ? 'var(--accent)' : 'var(--bg-secondary)',
-                      borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                      color: isActive ? '#fff' : 'var(--text-secondary)',
-                    }}
-                  >
-                    {SKILL_LABELS[skill]}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Software picker */}
-            {activeSkill && (
-              <div>
-                <div
-                  className="text-[9px] font-black uppercase tracking-widest mb-3"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  Choose Software
+              {/* Skill tabs */}
+              <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+                <div className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
+                  Your Skills
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  {(SKILL_SOFTWARE[activeSkill] ?? []).map((sw) => {
-                    const isActive = sw === activeSoftware;
+                <div className="flex items-center gap-2 flex-wrap">
+                  {userSkills.map((skill) => {
+                    const isActive = skill === activeSkill;
                     return (
                       <button
-                        key={sw}
-                        onClick={() => setActiveSoftware(sw)}
-                        className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all hover:scale-105 active:scale-95"
+                        key={skill}
+                        onClick={() => handleSkillChange(skill)}
+                        className="px-4 py-2 rounded-full text-xs font-bold border transition-all"
                         style={{
-                          background: isActive ? 'var(--bg-card)' : 'var(--bg-secondary)',
+                          background: isActive ? 'var(--accent)' : 'var(--bg-card)',
                           borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                          color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                          color: isActive ? '#fff' : 'var(--text-secondary)',
                         }}
                       >
-                        <Monitor size={13} strokeWidth={1.5} />
-                        {sw}
+                        {SKILL_LABELS[skill]}
                       </button>
                     );
                   })}
                 </div>
               </div>
-            )}
 
-            {/* Tutorial grid */}
+              {/* Software picker */}
+              {activeSkill && (
+                <div className="px-5 py-4">
+                  <div className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
+                    Select Software
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {(SKILL_SOFTWARE[activeSkill] ?? []).map((sw) => {
+                      const isActive = sw === activeSoftware;
+                      return (
+                        <button
+                          key={sw}
+                          onClick={() => setActiveSoftware(sw)}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all"
+                          style={{
+                            background: isActive ? 'var(--bg-primary)' : 'transparent',
+                            borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                            color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                          }}
+                        >
+                          <Monitor size={12} strokeWidth={1.5} />
+                          {sw}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Tutorial list */}
             {activeSoftware && (
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <BookOpen size={15} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-                  <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                    {activeSoftware} Tutorials
-                  </h2>
+              <div
+                className="rounded-xl border overflow-hidden"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+                  <div className="flex items-center gap-2">
+                    <BookOpen size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                    <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {activeSoftware}
+                    </h2>
+                  </div>
                   <span
-                    className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border"
-                    style={{
-                      color: 'var(--text-secondary)',
-                      borderColor: 'var(--border)',
-                      background: 'var(--bg-card)',
-                    }}
+                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                    style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)', background: 'var(--bg-card)' }}
                   >
                     {tutorials.length} lessons
                   </span>
                 </div>
 
+                {/* Rows */}
                 {tutorials.length === 0 ? (
-                  <div
-                    className="py-12 text-center rounded-xl border"
-                    style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-                  >
-                    <BookOpen
-                      size={28}
-                      strokeWidth={1}
-                      className="mx-auto mb-3"
-                      style={{ color: 'var(--text-secondary)', opacity: 0.4 }}
-                    />
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      No tutorials available for this software yet.
-                    </p>
+                  <div className="py-12 text-center">
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No tutorials available yet.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {tutorials.map((tutorial) => (
-                      <TutorialCard key={tutorial.id} tutorial={tutorial} />
-                    ))}
+                  <div>
+                    {tutorials.map((tutorial, i) => {
+                      const levelStyle = LEVEL_STYLES[tutorial.level] || LEVEL_STYLES.Beginner;
+                      const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(tutorial.youtubeQuery)}`;
+                      const isLast = i === tutorials.length - 1;
+                      return (
+                        <div
+                          key={tutorial.id}
+                          className={`flex items-center gap-4 px-5 py-4 ${!isLast ? 'border-b' : ''}`}
+                          style={{ borderColor: 'var(--border)' }}
+                        >
+                          {/* Icon */}
+                          <div
+                            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}
+                          >
+                            <Play size={14} strokeWidth={2} />
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                              <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                {tutorial.title}
+                              </span>
+                              <span
+                                className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0"
+                                style={levelStyle}
+                              >
+                                {tutorial.level}
+                              </span>
+                            </div>
+                            <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                              {tutorial.desc}
+                            </p>
+                          </div>
+
+                          {/* Duration + CTA */}
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="hidden sm:flex items-center gap-1 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                              <Clock size={11} strokeWidth={1.5} /> {tutorial.duration}
+                            </span>
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95"
+                              style={{ background: 'var(--accent)', color: '#fff' }}
+                            >
+                              Watch <ExternalLink size={10} strokeWidth={2} />
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* ── Right sidebar (1/3) ────────────────────────────── */}
-          <div className="w-full lg:w-80 shrink-0">
+          {/* ── Supervisor sidebar — 1 col ─────────────────────── */}
+          <div className="lg:col-span-1">
             <SupervisorPanel />
           </div>
 

@@ -116,6 +116,11 @@ const createUserByRole = async (data, passwordHash) => {
     return User.create(commonFields);
   }
 
+  if (role === 'momentum_supervisor') {
+    const { MomentumSupervisor } = await import('../models/MomentumSupervisor.js');
+    return MomentumSupervisor.create(commonFields);
+  }
+
   throw new Error('Invalid role');
 };
 
