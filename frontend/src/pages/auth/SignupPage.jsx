@@ -73,6 +73,9 @@ export default function SignupPage() {
   }, [roleParam]);
 
   const handleGoogleSignup = useGoogleLogin({
+    flow: 'implicit',
+    scope: 'openid email profile',
+    prompt: 'select_account',
     onSuccess: async (codeResponse) => {
       setError('');
       try {
@@ -80,7 +83,11 @@ export default function SignupPage() {
           setError('Please select a role first.');
           return;
         }
-        const response = await signupWithGoogle(codeResponse.access_token, role);
+        const token = codeResponse.access_token || codeResponse.credential;
+        if (!token) {
+          throw new Error('Google returned no usable token');
+        }
+        const response = await signupWithGoogle(token, role);
         const user = completeAuth(response);
         navigate(getRoleRedirect(user.role));
       } catch (err) {

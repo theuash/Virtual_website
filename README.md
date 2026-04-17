@@ -44,7 +44,7 @@ Virtual_website/
 │   │   ├── pages/        # Landing & Dashboard pages
 │   │   ├── components/   # Reusable UI systems
 │   │   └── assets/       # Cinematic media assets
-├── server/               # Node.js REST API
+├── backend/              # Node.js REST API
 │   ├── routes/           # API Endpoints
 │   ├── models/           # Mongoose Schemas
 │   ├── services/         # Business Logic

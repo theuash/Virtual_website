@@ -36,10 +36,17 @@ export default function LoginPage() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const handleGoogleLogin = useGoogleLogin({
+    flow: 'implicit',
+    scope: 'openid email profile',
+    prompt: 'select_account',
     onSuccess: async (codeResponse) => {
       setError('');
       try {
-        const response = await loginWithGoogle(codeResponse.access_token);
+        const token = codeResponse.access_token || codeResponse.credential;
+        if (!token) {
+          throw new Error('Google returned no usable token');
+        }
+        const response = await loginWithGoogle(token);
         const user = completeAuth(response);
         navigate(getRoleRedirect(user.role));
       } catch (err) {
