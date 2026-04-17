@@ -312,7 +312,7 @@ export default function LandingPage() {
                 className="text-transparent bg-clip-text"
                 style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}
               >
-                had to build.
+                had to Build
               </span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-medium tracking-wide leading-relaxed text-white/90">
