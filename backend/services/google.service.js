@@ -71,8 +71,8 @@ const createUserByRole = async (googleData, role) => {
     role,
     fullName: name,
     authMethod: 'google',
-    profilePicture: picture,
-    passwordHash: '', // No password for OAuth users
+    avatar: picture,
+    isVerified: true, // Google accounts are pre-verified
   };
 
   try {
@@ -86,7 +86,7 @@ const createUserByRole = async (googleData, role) => {
     if (role === 'freelancer') {
       return await Freelancer.create({
         ...commonFields,
-        primarySkill: '',
+        // primarySkill left unset — user fills it in after signup
       });
     }
 
@@ -116,8 +116,8 @@ export const signupWithGoogle = async (googleToken, role) => {
       // Update auth method if not already set
       if (!existingUser.authMethod || existingUser.authMethod !== 'google') {
         existingUser.authMethod = 'google';
-        if (googleData.picture && !existingUser.profilePicture) {
-          existingUser.profilePicture = googleData.picture;
+        if (googleData.picture && !existingUser.avatar) {
+          existingUser.avatar = googleData.picture;
         }
         await existingUser.save();
       }
@@ -157,8 +157,8 @@ export const loginWithGoogle = async (googleToken) => {
     // Update auth method if needed
     if (!user.authMethod || user.authMethod !== 'google') {
       user.authMethod = 'google';
-      if (googleData.picture && !user.profilePicture) {
-        user.profilePicture = googleData.picture;
+      if (googleData.picture && !user.avatar) {
+        user.avatar = googleData.picture;
       }
       await user.save();
     }

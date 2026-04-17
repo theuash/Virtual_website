@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Zap, TrendingDown } from 'lucide-react';
 import { getPricingSummary } from '../../services/pricing';
 
@@ -10,17 +10,65 @@ const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: (i = 0) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }
   })
 };
 
-const shimmer = {
-  hidden: { backgroundPosition: '200% center' },
-  show: {
-    backgroundPosition: '-200% center',
-    transition: { duration: 2, repeat: Infinity, ease: 'linear' }
-  }
-};
+// Same two-phase pop → expand animation as the floating pill
+function ExpandingCTA({ onClick }) {
+  const [expanded, setExpanded] = useState(false);
+  const [popped, setPopped] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !popped) {
+          setPopped(true);
+          setTimeout(() => setExpanded(true), 500);
+        }
+      },
+      { threshold: 0.8 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [popped]);
+
+  return (
+    <motion.button
+      ref={ref}
+      onClick={onClick}
+      className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
+      style={{
+        border: '1px solid var(--accent)',
+        background: 'rgba(96,10,10,0.05)',
+      }}
+      initial={{ scale: 0.4, opacity: 0 }}
+      animate={popped ? { scale: 1, opacity: 1 } : { scale: 0.4, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
+      whileHover={{ scale: 1.05 }}
+    >
+      {/* Icon dot — always visible anchor */}
+      <span className="flex items-center justify-center pl-4 pr-3 py-3.5">
+        <ArrowRight size={15} style={{ color: 'var(--accent)' }} />
+      </span>
+
+      {/* Text — expands in after pop */}
+      <motion.span
+        className="text-sm font-bold whitespace-nowrap overflow-hidden pr-6"
+        style={{ color: 'var(--accent)' }}
+        initial={{ width: 0, opacity: 0 }}
+        animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
+        transition={{
+          width: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.25, delay: 0.2 },
+        }}
+      >
+        Explore full pricing
+      </motion.span>
+    </motion.button>
+  );
+}
 
 export default function PricingStrip() {
   const navigate = useNavigate();
@@ -39,20 +87,14 @@ export default function PricingStrip() {
   return (
     <section
       id="stats"
-      className="py-48 px-6 relative z-20 border-t overflow-hidden"
+      className="pt-8 pb-12 px-6 relative z-20 border-t"
       style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}
     >
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-0 left-1/4 w-[400px] h-[400px] rounded-full blur-[120px] opacity-0 animate-pulse"
-          style={{ background: 'var(--accent)', animation: 'pulse 4s ease-in-out infinite' }}
-        />
-        <div
-          className="absolute bottom-0 right-1/4 w-[300px] h-[300px] rounded-full blur-[100px] opacity-0 animate-pulse"
-          style={{ background: 'var(--accent)', animation: 'pulse 5s ease-in-out infinite 1s' }}
-        />
-      </div>
+      {/* Subtle ambient glow */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] rounded-full blur-[120px] pointer-events-none"
+        style={{ background: 'var(--accent)', opacity: 0.04 }}
+      />
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
@@ -61,26 +103,26 @@ export default function PricingStrip() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mb-24 text-center"
+          className="mb-10 text-center"
         >
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest border rounded-full mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest border rounded-full mb-4"
             style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.3)', background: 'rgba(96,10,10,0.08)' }}
           >
             <Zap size={13} />
             Transparent Pricing
           </div>
           <h2
-            className="text-5xl md:text-7xl font-black tracking-tighter mb-6"
+            className="text-5xl md:text-6xl font-bold tracking-tighter mb-6"
             style={{ color: 'var(--text-primary)' }}
           >
             Per-unit. No surprises.
           </h2>
           <p
-            className="text-lg max-w-3xl mx-auto leading-relaxed"
+            className="text-base max-w-3xl mx-auto leading-relaxed"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Every service priced by the unit — per minute, per second, per design. You pay for exactly what you get. No hidden fees, no surprises.
+            Every service priced by the unit — per minute, per second, per design. You pay for exactly what you get.
           </p>
         </motion.div>
 
@@ -95,19 +137,9 @@ export default function PricingStrip() {
                 whileInView="show"
                 viewport={{ once: true }}
                 custom={i}
-                className="h-56 rounded-2xl overflow-hidden"
+                className="h-56 rounded-2xl"
                 style={{ background: 'var(--bg-secondary)' }}
-              >
-                <motion.div
-                  animate={{ backgroundPosition: ['200% center', '-200% center'] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  className="w-full h-full"
-                  style={{
-                    background: 'linear-gradient(90deg, var(--bg-secondary) 0%, rgba(255,255,255,0.1) 50%, var(--bg-secondary) 100%)',
-                    backgroundSize: '200% center',
-                  }}
-                />
-              </motion.div>
+              />
             ))}
           </div>
         ) : (
@@ -130,19 +162,11 @@ export default function PricingStrip() {
                     background: 'var(--bg-secondary)',
                     borderColor: 'var(--border)',
                   }}
-                  whileHover={{ y: -6, borderColor: 'var(--accent)' }}
+                  whileHover={{ y: -4, borderColor: 'var(--accent)' }}
                 >
-                  {/* Premium gradient overlay on hover */}
+                  {/* Top accent line on hover */}
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(96,10,10,0.1) 0%, transparent 100%)',
-                    }}
-                  />
-
-                  {/* Top accent line */}
-                  <motion.div
-                    className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute top-0 left-0 right-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     style={{
                       background: 'linear-gradient(to right, transparent, var(--accent), transparent)',
                     }}
@@ -151,25 +175,25 @@ export default function PricingStrip() {
                   {/* Content */}
                   <div className="relative z-10">
                     <div
-                      className="text-[11px] font-black uppercase tracking-[0.35em] mb-4"
+                      className="text-[11px] font-bold uppercase tracking-[0.35em] mb-4"
                       style={{ color: 'var(--text-secondary)', opacity: 0.6 }}
                     >
                       {dept.displayName}
                     </div>
 
-                    {/* Starting from label - ABOVE price */}
+                    {/* Starting from label */}
                     <div className="text-[9px] font-bold mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
                       STARTING FROM
                     </div>
 
-                    {/* Original Price */}
-                    <div className="mb-4">
-                      <div className="flex items-baseline gap-2">
+                    {/* Discounted Price - LARGER */}
+                    <div className="mb-3">
+                      <div className="flex items-baseline gap-1.5">
                         <span
                           className="text-5xl font-black tracking-tight"
-                          style={{ color: 'var(--text-primary)' }}
+                          style={{ color: 'var(--accent)' }}
                         >
-                          ₹{dept.startingFrom}
+                          ₹{discountedPrice}
                         </span>
                         <span
                           className="text-sm font-bold"
@@ -180,38 +204,21 @@ export default function PricingStrip() {
                       </div>
                     </div>
 
-                    {/* Discount badge with animation */}
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-                      className="flex items-center gap-2 px-3 py-2.5 rounded-lg mb-4 relative overflow-hidden"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(96,10,10,0.2), rgba(96,10,10,0.05))',
-                        border: '1px solid rgba(96,10,10,0.3)',
-                      }}
-                    >
-                      {/* Shimmer effect */}
-                      <motion.div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-20"
-                        animate={{ backgroundPosition: ['200% center', '-200% center'] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                        style={{
-                          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
-                          backgroundSize: '200% center',
-                        }}
-                      />
-
-                      <TrendingDown size={13} style={{ color: 'var(--accent)' }} />
-                      <div className="relative z-10">
-                        <div className="text-[10px] font-black" style={{ color: 'var(--accent)' }}>
-                          ₹{discountedPrice}/{dept.startingUnit}
-                        </div>
-                        <div className="text-[8px] font-bold" style={{ color: 'var(--accent)', opacity: 0.7 }}>
-                          Save ₹{savings} (15% off)
-                        </div>
-                      </div>
-                    </motion.div>
+                    {/* Original Price - smaller, strikethrough */}
+                    <div className="mb-4 flex items-center gap-2">
+                      <span
+                        className="text-sm line-through opacity-40"
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        ₹{dept.startingFrom}
+                      </span>
+                      <span
+                        className="text-xs font-bold px-2 py-1 rounded"
+                        style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}
+                      >
+                        Save ₹{savings}
+                      </span>
+                    </div>
 
                     {/* First project badge */}
                     <div
@@ -224,24 +231,16 @@ export default function PricingStrip() {
                   </div>
 
                   {/* Arrow indicator */}
-                  <motion.div
-                    className="relative z-10 mt-6 flex items-center justify-between pt-4 border-t"
-                    style={{ borderColor: 'rgba(255,255,255,0.05)' }}
-                  >
+                  <div className="relative z-10 mt-6 flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
                     <span className="text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent)' }}>
                       View all
                     </span>
-                    <motion.div
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="group-hover:opacity-100 opacity-40 transition-opacity"
-                    >
-                      <ArrowRight
-                        size={16}
-                        style={{ color: 'var(--accent)' }}
-                      />
-                    </motion.div>
-                  </motion.div>
+                    <ArrowRight
+                      size={16}
+                      className="opacity-40 group-hover:opacity-100 transition-opacity"
+                      style={{ color: 'var(--accent)' }}
+                    />
+                  </div>
                 </motion.button>
               );
             })}
@@ -255,38 +254,9 @@ export default function PricingStrip() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mt-16 flex justify-center"
+          className="mt-10 flex justify-center"
         >
-          <motion.button
-            onClick={() => navigate('/pricing')}
-            className="flex items-center gap-3 px-8 py-4 text-sm font-bold rounded-full border transition-all relative overflow-hidden group"
-            style={{
-              color: 'var(--accent)',
-              borderColor: 'var(--accent)',
-              background: 'rgba(96,10,10,0.05)',
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {/* Hover shimmer */}
-            <motion.div
-              className="absolute inset-0 opacity-0 group-hover:opacity-20"
-              animate={{ backgroundPosition: ['200% center', '-200% center'] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
-                backgroundSize: '200% center',
-              }}
-            />
-            <span className="relative z-10">Explore full pricing</span>
-            <motion.div
-              animate={{ x: [0, 4, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="relative z-10"
-            >
-              <ArrowRight size={16} />
-            </motion.div>
-          </motion.button>
+          <ExpandingCTA onClick={() => navigate('/pricing')} />
         </motion.div>
       </div>
     </section>

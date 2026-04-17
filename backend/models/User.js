@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
   otpCodeHash: { type: String },
   otpExpiresAt: { type: Date },
   loginOtpPending: { type: Boolean, default: false },
-  authMethod: { type: String, enum: ['password', 'otp'], default: 'password' },
+  authMethod: { type: String, enum: ['password', 'otp', 'google'], default: 'password' },
 }, { timestamps: true, discriminatorKey: 'userType' });
 
 userSchema.methods.matchPassword = async function(enteredPassword) {

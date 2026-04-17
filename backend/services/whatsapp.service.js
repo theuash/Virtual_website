@@ -21,7 +21,29 @@ const createClient = () => {
     }),
     puppeteer: {
       headless: process.env.WHATSAPP_HEADLESS !== 'false',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--disable-extensions',
+        '--disable-background-networking',
+        '--disable-default-apps',
+        '--disable-sync',
+        '--disable-translate',
+        '--hide-scrollbars',
+        '--metrics-recording-only',
+        '--mute-audio',
+        '--safebrowsing-disable-auto-update',
+      ],
+      timeout: 120000,
+    },
+    webVersionCache: {
+      type: 'remote',
+      remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
     },
   });
 
@@ -70,9 +92,10 @@ export const initializeWhatsAppClient = async () => {
   initializingPromise = whatsappClient.initialize()
     .then(() => whatsappClient)
     .catch((error) => {
+      console.error('WhatsApp client initialization failed (non-fatal):', error.message);
       whatsappClient = null;
       currentStatus = 'error';
-      throw error;
+      // Don't rethrow — WhatsApp failure should not crash the server
     })
     .finally(() => {
       initializingPromise = null;

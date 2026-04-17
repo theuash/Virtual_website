@@ -56,6 +56,169 @@ const MeshGrid = ({ count = 5, speed = 10 }) => (
   </div>
 );
 
+// Hero CTA — same pop → expand as floating pill and pricing CTA
+function HeroExpandingCTA({ onClick }) {
+  const [popped, setPopped] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !popped) {
+          setPopped(true);
+          setTimeout(() => setExpanded(true), 500);
+        }
+      },
+      { threshold: 0.8 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [popped]);
+
+  return (
+    <motion.button
+      ref={ref}
+      onClick={onClick}
+      className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
+      style={{
+        backgroundColor: '#FFFFFF',
+        color: 'var(--accent)',
+        boxShadow: '0 0 40px rgba(255,255,255,0.4)',
+        border: 'none',
+      }}
+      initial={{ scale: 0.4, opacity: 0 }}
+      animate={popped ? { scale: 1, opacity: 1 } : { scale: 0.4, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
+      whileHover={{ scale: 1.05 }}
+    >
+      {/* Arrow — anchor dot */}
+      <span className="flex items-center justify-center pl-5 pr-3 py-3.5">
+        <ArrowRight size={16} style={{ color: 'var(--accent)' }} />
+      </span>
+
+      {/* Text expands after pop */}
+      <motion.span
+        className="text-sm font-bold tracking-widest whitespace-nowrap overflow-hidden pr-6"
+        style={{ color: 'var(--accent)' }}
+        initial={{ width: 0, opacity: 0 }}
+        animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
+        transition={{
+          width: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+          opacity: { duration: 0.25, delay: 0.2 },
+        }}
+      >
+        Hire Elite Talent
+      </motion.span>
+    </motion.button>
+  );
+}
+
+// Floating Pill — pop-up first, then content reveals after
+function FloatingPill({ splitProgress, navigate, logo }) {
+  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const hasShown = useRef(false);
+
+  useMotionValueEvent(splitProgress, 'change', (v) => {
+    if (v > 0.08 && !hasShown.current) {
+      hasShown.current = true;
+      setVisible(true);
+      // Expand content 600ms after pill pops in
+      setTimeout(() => setExpanded(true), 600);
+    } else if (v <= 0.04) {
+      setVisible(false);
+      setExpanded(false);
+      hasShown.current = false;
+    }
+  });
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          key="floating-pill"
+          className="fixed bottom-6 left-1/2 z-[100] pointer-events-auto"
+          style={{ x: '-50%' }}
+          initial={{ opacity: 0, y: 48, scale: 0.4 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.7, transition: { duration: 0.2, ease: 'easeIn' } }}
+          transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
+        >
+          <div
+            className="flex items-center rounded-full"
+            style={{
+              background: 'rgba(10, 10, 10, 0.55)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,255,255,0.07), 0 0 40px rgba(100,120,255,0.08)',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Logo — always visible */}
+            <div className="flex items-center shrink-0 pl-3.5 pr-3 py-2.5">
+              <div
+                className="w-5 h-5 flex items-center justify-center"
+                style={{ filter: 'drop-shadow(0 0 6px rgba(180,190,255,0.5))' }}
+              >
+                <img
+                  src={logo}
+                  alt="V"
+                  className="w-full h-full object-contain"
+                  style={{ filter: 'invert(100%) brightness(200%)' }}
+                />
+              </div>
+            </div>
+
+            {/* Expanding content — slides in after pill lands */}
+            <motion.div
+              className="flex items-center gap-4 pr-2"
+              initial={{ width: 0, opacity: 0 }}
+              animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
+              transition={{ width: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.3, delay: 0.15 } }}
+              style={{ overflow: 'hidden' }}
+            >
+              <div className="w-px h-3.5 bg-white/10 shrink-0" />
+
+              <div className="hidden sm:flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-white/40">
+                <button
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="hover:text-white/70 transition-colors whitespace-nowrap"
+                >
+                  Overview
+                </button>
+                <button
+                  onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="hover:text-white/70 transition-colors whitespace-nowrap"
+                >
+                  Specs
+                </button>
+              </div>
+
+              <div className="w-px h-3.5 bg-white/10 shrink-0 hidden sm:block" />
+
+              <button
+                onClick={() => navigate('/signup?role=client')}
+                className="py-1.5 px-4 text-[10px] font-semibold uppercase tracking-widest rounded-full transition-all active:scale-95 shrink-0 whitespace-nowrap"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.85)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+              >
+                Hire Elite Talent
+              </button>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -319,18 +482,7 @@ export default function LandingPage() {
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-medium tracking-wide leading-relaxed text-white/90">
               A fully departmentalized creative platform. Structured teams, escrow-protected payments, and a professional chain of command behind every project.
             </p>
-            <button
-              className="py-3.5 px-9 text-sm font-bold tracking-widest flex items-center gap-2 rounded-full transition-all hover:scale-105 active:scale-95"
-              style={{ 
-                backgroundColor: '#FFFFFF', 
-                color: 'var(--accent)',
-                boxShadow: '0 0 40px rgba(255,255,255,0.4)',
-                border: 'none'
-              }}
-              onClick={() => navigate('/signup?role=client')}
-            >
-              Hire Elite Talent <ArrowRight size={16} />
-            </button>
+            <HeroExpandingCTA onClick={() => navigate('/signup?role=client')} />
           </motion.div>
         </div>
         {/* The Trans-Theme Bridge: Bridging Black video section to themed content below */}
@@ -343,8 +495,8 @@ export default function LandingPage() {
       </section>
 
       {/* Split Parallax (The Difference) */}
-      <section ref={splitRef} className="py-40 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20">
+      <section ref={splitRef} className="pt-16 pb-10 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
           <motion.div style={{ y: leftY }} className="flex flex-col justify-center">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ color: 'var(--text-primary)' }}>
               Not a freelance platform. A structured creative agency.
@@ -366,7 +518,7 @@ export default function LandingPage() {
             </ul>
           </motion.div>
 
-          <motion.div style={{ y: rightY, perspective: 1200 }} className="relative h-[600px] w-full hidden md:block flex items-center justify-center overflow-visible">
+          <motion.div style={{ y: rightY, perspective: 1200 }} className="relative h-[340px] w-full hidden md:flex items-center justify-center overflow-hidden">
             {/* Deep-Space 3D Parallax Matrix */}
             <motion.div 
               style={{ rotateX: 20, rotateY: -10, transformStyle: 'preserve-3d' }}
@@ -397,20 +549,20 @@ export default function LandingPage() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    className="space-y-4"
+                    className="space-y-3"
                   >
-                    <div className="text-[10px] uppercase font-black tracking-[0.5em] opacity-30" style={{ color: 'var(--text-primary)' }}>System Protocol</div>
-                    <div className="text-5xl md:text-7xl font-black uppercase tracking-tighter mix-blend-difference" style={{ color: 'var(--text-primary)' }}>
+                    <div className="text-[9px] uppercase font-black tracking-[0.5em] opacity-30" style={{ color: 'var(--text-primary)' }}>Department Model</div>
+                    <div className="text-3xl md:text-4xl font-black uppercase tracking-tighter mix-blend-difference" style={{ color: 'var(--text-primary)' }}>
                        <AnimatePresence mode="wait">
                           <motion.span
                              key={Math.floor(Date.now() / 3000) % 3}
-                             initial={{ z: -50, opacity: 0 }}
-                             animate={{ z: 0, opacity: 1 }}
-                             exit={{ z: 50, opacity: 0 }}
-                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                             initial={{ y: 20, opacity: 0 }}
+                             animate={{ y: 0, opacity: 1 }}
+                             exit={{ y: -20, opacity: 0 }}
+                             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                              className="block"
                           >
-                             {["Vetting", "Escrow", "Copyright"][Math.floor(Date.now() / 3000) % 3]}
+                             {["Structure", "Quality", "Delivery"][Math.floor(Date.now() / 3000) % 3]}
                           </motion.span>
                        </AnimatePresence>
                     </div>
@@ -418,7 +570,7 @@ export default function LandingPage() {
                     <motion.div 
                        animate={{ top: ['-20%', '120%'], opacity: [0, 1, 0] }}
                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                       className="absolute left-0 right-0 h-px bg-accent z-20"
+                       className="absolute left-0 right-0 h-px z-20"
                        style={{ background: 'linear-gradient(to right, transparent, var(--accent), transparent)', boxShadow: '0 0 20px var(--accent)' }}
                     />
                   </motion.div>
@@ -995,62 +1147,7 @@ export default function LandingPage() {
 
       {/* Apple-Style Floating Action Bar (Pill) */}
       <AnimatePresence>
-        <motion.div
-           style={{ 
-             opacity: useTransform(splitProgress, [0.05, 0.15], [0, 1]),
-             y: useTransform(splitProgress, [0.05, 0.15], [20, 0]),
-             x: '-50%'
-           }}
-           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-auto"
-        >
-           <div
-             className="flex items-center gap-4 px-4 py-2.5 rounded-full"
-             style={{
-               background: 'rgba(10, 10, 10, 0.55)',
-               backdropFilter: 'blur(20px)',
-               WebkitBackdropFilter: 'blur(20px)',
-               border: '1px solid rgba(255,255,255,0.08)',
-               boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,255,255,0.07), 0 0 40px rgba(100,120,255,0.08)',
-             }}
-           >
-              <div className="flex items-center">
-                 <div className="w-5 h-5 flex items-center justify-center"
-                   style={{ filter: 'drop-shadow(0 0 6px rgba(180,190,255,0.5))' }}
-                 >
-                    <img src={logo} alt="V" className="w-full h-full object-contain" style={{ filter: 'invert(100%) brightness(200%)' }} />
-                 </div>
-              </div>
-
-              <div className="w-px h-3.5 bg-white/10"></div>
-
-              <div className="hidden sm:flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-white/40">
-                 <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white/70 transition-colors">Overview</button>
-                 <button onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white/70 transition-colors">Specs</button>
-              </div>
-
-              <div className="w-px h-3.5 bg-white/10 hidden sm:block"></div>
-
-              <button 
-                onClick={() => navigate('/signup?role=client')}
-                className="py-1.5 px-4 text-[10px] font-semibold uppercase tracking-widest rounded-full transition-all active:scale-95"
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.85)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.18)';
-                  e.currentTarget.style.color = '#fff';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.85)';
-                }}
-              >
-                Hire Elite Talent
-              </button>
-           </div>
-        </motion.div>
+        <FloatingPill splitProgress={splitProgress} navigate={navigate} logo={logo} />
       </AnimatePresence>
 
       {/* Final Call to Action */}
