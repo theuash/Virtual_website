@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import { SKILLS, SKILL_LABELS } from '../../utils/roleGuards';
 import signupArt from '../../assets/auth/signup_art.jpg';
@@ -49,7 +50,7 @@ export default function SignupPage() {
   const [params] = useSearchParams();
   const roleParam = params.get('role');
   const navigate = useNavigate();
-  const { signup, loading, verifySignupOTP, requestSignupOTP, completeAuth } = useAuth();
+  const { signup, loading, verifySignupOTP, requestSignupOTP, completeAuth, signupWithGoogle } = useAuth();
 
   const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
@@ -70,6 +71,26 @@ export default function SignupPage() {
     window.scrollTo(0, 0);
     if (roleParam === 'client' || roleParam === 'freelancer') setRole(roleParam);
   }, [roleParam]);
+
+  const handleGoogleSignup = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      setError('');
+      try {
+        if (!role) {
+          setError('Please select a role first.');
+          return;
+        }
+        const response = await signupWithGoogle(codeResponse.access_token, role);
+        const user = completeAuth(response);
+        navigate(getRoleRedirect(user.role));
+      } catch (err) {
+        setError(err?.message || 'Google signup failed. Please try again.');
+      }
+    },
+    onError: () => {
+      setError('Google signup failed. Please try again.');
+    },
+  });
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -342,6 +363,41 @@ export default function SignupPage() {
             </form>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {/* Google Signup Button */}
+              <button
+                type="button"
+                onClick={() => handleGoogleSignup()}
+                disabled={loading}
+                className="w-full py-3 px-4 rounded-xl border transition-all flex items-center justify-center gap-3 hover:opacity-80 active:scale-[0.98] mb-2"
+                style={{ 
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="14" fontWeight="bold" fill="url(#grad1)" fontFamily="Arial, sans-serif">G</text>
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#4285F4"/>
+                      <stop offset="25%" stopColor="#EA4335"/>
+                      <stop offset="50%" stopColor="#FBBC04"/>
+                      <stop offset="75%" stopColor="#34A853"/>
+                      <stop offset="100%" stopColor="#4285F4"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span className="text-[11px] font-black uppercase tracking-widest">Sign up with Google</span>
+              </button>
+
+              {/* Divider */}
+              <div className="relative py-2">
+                <div style={{ background: 'var(--border)' }} className="absolute inset-0 h-px" />
+                <p className="relative text-center text-[9px] font-black uppercase tracking-widest px-2" style={{ color: 'var(--text-secondary)', background: 'var(--bg-primary)' }}>
+                  Or with Email
+                </p>
+              </div>
+
               {/* Full Name */}
               <Field label="Full Name" icon={User}>
                 <input name="name" type="text"

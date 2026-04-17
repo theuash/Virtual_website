@@ -122,6 +122,35 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const loginWithGoogle = useCallback(async (googleToken) => {
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/google/login', {
+        token: googleToken,
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const signupWithGoogle = useCallback(async (googleToken, role) => {
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/google/signup', {
+        token: googleToken,
+        role,
+      });
+      return unwrapResponse(response);
+    } catch (error) {
+      throw normalizeRequestError(error, 'Google signup failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('virtual_user');
@@ -150,6 +179,8 @@ export const AuthProvider = ({ children }) => {
         verifySignupOTP,
         requestLoginOTP,
         verifyLoginOTP,
+        loginWithGoogle,
+        signupWithGoogle,
         completeAuth,
         setUser,
       }}

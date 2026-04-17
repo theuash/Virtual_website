@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import authArt from '../../assets/auth/login_art.jpg';
 import logo from '../../assets/logo.png';
@@ -20,7 +21,7 @@ const inputStyle = {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loading, requestLoginOTP, verifyLoginOTP, completeAuth } = useAuth();
+  const { login, loading, requestLoginOTP, verifyLoginOTP, completeAuth, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -33,6 +34,22 @@ export default function LoginPage() {
   const blurOverlayOpacity = useTransform(scrollY, [0, 150], [0, 0.85]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      setError('');
+      try {
+        const response = await loginWithGoogle(codeResponse.access_token);
+        const user = completeAuth(response);
+        navigate(getRoleRedirect(user.role));
+      } catch (err) {
+        setError(err?.message || 'Google login failed. Please try again.');
+      }
+    },
+    onError: () => {
+      setError('Google login failed. Please try again.');
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -234,6 +251,41 @@ export default function LoginPage() {
             </form>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {/* Google Login Button */}
+              <button
+                type="button"
+                onClick={() => handleGoogleLogin()}
+                disabled={loading}
+                className="w-full py-3 px-4 rounded-xl border transition-all flex items-center justify-center gap-3 hover:opacity-80 active:scale-[0.98] mb-2"
+                style={{ 
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="14" fontWeight="bold" fill="url(#grad1)" fontFamily="Arial, sans-serif">G</text>
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#4285F4"/>
+                      <stop offset="25%" stopColor="#EA4335"/>
+                      <stop offset="50%" stopColor="#FBBC04"/>
+                      <stop offset="75%" stopColor="#34A853"/>
+                      <stop offset="100%" stopColor="#4285F4"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span className="text-[11px] font-black uppercase tracking-widest">Continue with Google</span>
+              </button>
+
+              {/* Divider */}
+              <div className="relative py-2">
+                <div style={{ background: 'var(--border)' }} className="absolute inset-0 h-px" />
+                <p className="relative text-center text-[9px] font-black uppercase tracking-widest px-2" style={{ color: 'var(--text-secondary)', background: 'var(--bg-primary)' }}>
+                  Or with Email
+                </p>
+              </div>
+
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
