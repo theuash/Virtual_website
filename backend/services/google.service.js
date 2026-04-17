@@ -113,7 +113,6 @@ export const signupWithGoogle = async (googleToken, role) => {
     const existingUser = await User.findOne({ email: googleData.email });
 
     if (existingUser) {
-      // Update auth method if not already set
       if (!existingUser.authMethod || existingUser.authMethod !== 'google') {
         existingUser.authMethod = 'google';
         if (googleData.picture && !existingUser.avatar) {
@@ -121,9 +120,11 @@ export const signupWithGoogle = async (googleToken, role) => {
         }
         await existingUser.save();
       }
+      const { token, refreshToken } = generateTokens(existingUser._id);
       return {
         user: sanitizeUser(existingUser),
-        tokens: generateTokens(existingUser._id),
+        token,
+        refreshToken,
         message: 'User already exists. Logged in with Google.',
         isNewUser: false,
       };
@@ -131,10 +132,12 @@ export const signupWithGoogle = async (googleToken, role) => {
 
     // Create new user
     const newUser = await createUserByRole(googleData, role);
+    const { token, refreshToken } = generateTokens(newUser._id);
 
     return {
       user: sanitizeUser(newUser),
-      tokens: generateTokens(newUser._id),
+      token,
+      refreshToken,
       message: 'User created and logged in successfully with Google.',
       isNewUser: true,
     };
@@ -163,9 +166,11 @@ export const loginWithGoogle = async (googleToken) => {
       await user.save();
     }
 
+    const { token, refreshToken } = generateTokens(user._id);
     return {
       user: sanitizeUser(user),
-      tokens: generateTokens(user._id),
+      token,
+      refreshToken,
       message: 'Logged in successfully with Google.',
     };
   } catch (error) {

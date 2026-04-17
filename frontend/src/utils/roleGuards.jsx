@@ -16,7 +16,13 @@ export const RoleGuard = ({ children, allowedRoles }) => {
   return children;
 };
 
-export const getRoleRedirect = (role) => ROLE_REDIRECTS[role] || '/login';
+// For freelancers who haven't completed onboarding, redirect to onboarding first
+export const getRoleRedirect = (role, user = null) => {
+  if (role === 'freelancer' && user && !user.onboardingComplete) {
+    return '/freelancer/onboarding';
+  }
+  return ROLE_REDIRECTS[role] || '/login';
+};
 
 export const SKILLS = [
   'video_editing',

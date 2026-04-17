@@ -30,6 +30,8 @@ import FreelancerEarnings from './pages/freelancer/FreelancerEarnings';
 import FreelancerProgress from './pages/freelancer/FreelancerProgress';
 import FreelancerMessages from './pages/freelancer/FreelancerMessages';
 import FreelancerSettings from './pages/freelancer/FreelancerSettings';
+import FreelancerLearning from './pages/freelancer/FreelancerLearning';
+import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
 
 // Admin
 import AdminLayout from './pages/admin/AdminLayout';
@@ -53,6 +55,7 @@ function App() {
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
 
       {/* Client — protected */}
       <Route path="/client" element={<RoleGuard allowedRoles={['client']}><ClientLayout /></RoleGuard>}>
@@ -72,6 +75,7 @@ function App() {
         <Route path="dashboard" element={<FreelancerDashboard />} />
         <Route path="tasks" element={<FreelancerTasks />} />
         <Route path="task/:id" element={<TaskDetail />} />
+        <Route path="learning" element={<FreelancerLearning />} />
         <Route path="earnings" element={<FreelancerEarnings />} />
         <Route path="progress" element={<FreelancerProgress />} />
         <Route path="messages" element={<FreelancerMessages />} />

@@ -55,7 +55,7 @@ export default function SignupPage() {
   const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
     name: '', email: '', countryCode: '+91', phone: '', password: '', confirmPassword: '',
-    company: '', skill: SKILLS[0], dob: '', portfolioUrl: ''
+    company: '',
   });
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -89,7 +89,7 @@ export default function SignupPage() {
         }
         const response = await signupWithGoogle(token, role);
         const user = completeAuth(response);
-        navigate(getRoleRedirect(user.role));
+        navigate(getRoleRedirect(user.role, user));
       } catch (err) {
         setError(err?.message || 'Google signup failed. Please try again.');
       }
@@ -105,10 +105,6 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
     if (formData.password !== formData.confirmPassword) return setError('Passwords do not match.');
-    if (role === 'freelancer') {
-      const age = new Date().getFullYear() - new Date(formData.dob).getFullYear();
-      if (age < 16) return setError('You must be at least 16 years old.');
-    }
     try {
       const fullPhone = `${formData.countryCode}${formData.phone}`;
       const response = await signup({ ...formData, phone: fullPhone, role });
@@ -131,7 +127,7 @@ export default function SignupPage() {
       };
       const verifiedAuth = await verifySignupOTP(pendingUser.user.email, otp, signupDataForVerification);
       const user = completeAuth(verifiedAuth);
-      navigate(getRoleRedirect(user.role));
+      navigate(getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
     }
@@ -463,38 +459,6 @@ export default function SignupPage() {
                     style={inputStyle}
                     placeholder="Your Organization" value={formData.company} onChange={handleChange} />
                 </Field>
-              )}
-
-              {/* Freelancer-only: Skill + DOB side by side, then Portfolio */}
-              {role === 'freelancer' && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
-                        Core Skill
-                      </label>
-                      <select name="skill"
-                        className="text-sm rounded-xl border outline-none transition-all cursor-pointer appearance-none"
-                        style={{ ...inputNoIconStyle, paddingLeft: '1rem' }}
-                        required value={formData.skill} onChange={handleChange}>
-                        {SKILLS.map(s => <option key={s} value={s}>{SKILL_LABELS[s] || s}</option>)}
-                      </select>
-                    </div>
-                    <Field label="Date of Birth" icon={Calendar}>
-                      <input name="dob" type="date"
-                        className="w-full text-sm rounded-xl border outline-none transition-all"
-                        style={{ ...inputStyle, paddingLeft: '2.75rem' }}
-                        required value={formData.dob} onChange={handleChange} />
-                    </Field>
-                  </div>
-
-                  <Field label="Portfolio URL" icon={LinkIcon}>
-                    <input name="portfolioUrl" type="url"
-                      className="w-full text-sm rounded-xl border outline-none transition-all"
-                      style={inputStyle}
-                      placeholder="https://yourportfolio.com" value={formData.portfolioUrl} onChange={handleChange} />
-                  </Field>
-                </>
               )}
 
               {/* Password row */}

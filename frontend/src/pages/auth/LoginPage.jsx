@@ -48,7 +48,7 @@ export default function LoginPage() {
         }
         const response = await loginWithGoogle(token);
         const user = completeAuth(response);
-        navigate(getRoleRedirect(user.role));
+        navigate(getRoleRedirect(user.role, user));
       } catch (err) {
         setError(err?.message || 'Google login failed. Please try again.');
       }
@@ -70,7 +70,7 @@ export default function LoginPage() {
         return;
       }
       const user = completeAuth(response);
-      navigate(getRoleRedirect(user.role));
+      navigate(getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     }
@@ -82,7 +82,7 @@ export default function LoginPage() {
     try {
       const response = await verifyLoginOTP(pendingEmail, otp);
       const user = completeAuth(response);
-      navigate(getRoleRedirect(user.role));
+      navigate(getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
     }

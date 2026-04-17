@@ -157,10 +157,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const completeAuth = useCallback((authData) => {
+    // Backend returns either { user, token, refreshToken } (password/OTP flow)
+    // or { user, tokens: { token, refreshToken } } (Google flow)
+    const token = authData.token ?? authData.tokens?.token;
+    const refreshToken = authData.refreshToken ?? authData.tokens?.refreshToken;
     const finalData = {
       ...authData.user,
-      token: authData.token,
-      refreshToken: authData.refreshToken,
+      token,
+      refreshToken,
     };
     setUser(finalData);
     localStorage.setItem('virtual_user', JSON.stringify(finalData));

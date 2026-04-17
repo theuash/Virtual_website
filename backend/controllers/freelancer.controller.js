@@ -5,6 +5,30 @@ import { MicroTask } from '../models/MicroTask.js';
 import { Submission } from '../models/Submission.js';
 import { Project } from '../models/Project.js';
 
+export const completeOnboarding = asyncHandler(async (req, res) => {
+  const { primarySkill, secondarySkills, hoursPerWeek, preferredContactTime, portfolioUrl, dateOfBirth } = req.body;
+
+  if (!primarySkill) return res.status(400).json(new ApiResponse(400, null, 'Primary skill is required'));
+  if (!hoursPerWeek) return res.status(400).json(new ApiResponse(400, null, 'Weekly availability is required'));
+  if (!preferredContactTime) return res.status(400).json(new ApiResponse(400, null, 'Preferred contact time is required'));
+
+  const freelancer = await Freelancer.findByIdAndUpdate(
+    req.user._id,
+    {
+      primarySkill,
+      secondarySkills: secondarySkills || [],
+      hoursPerWeek,
+      preferredContactTime,
+      portfolioUrl: portfolioUrl || '',
+      dateOfBirth: dateOfBirth || null,
+      onboardingComplete: true,
+    },
+    { new: true }
+  );
+
+  res.json(new ApiResponse(200, { onboardingComplete: true, freelancer }, 'Onboarding complete'));
+});
+
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const freelancer = await Freelancer.findById(req.user._id);
   
