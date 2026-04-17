@@ -5,6 +5,8 @@ import { Client } from '../models/Client.js';
 import { Freelancer } from '../models/Freelancer.js';
 import { Project } from '../models/Project.js';
 import { MicroTask } from '../models/MicroTask.js';
+import { Pricing } from '../models/Pricing.js';
+import { pricingData } from '../data/pricingData.js';
 import bcrypt from 'bcryptjs';
 
 export const runSeed = asyncHandler(async (req, res) => {
@@ -16,6 +18,15 @@ export const runSeed = asyncHandler(async (req, res) => {
   await User.deleteMany({});
   await Project.deleteMany({});
   await MicroTask.deleteMany({});
+
+  // Seed pricing (upsert so it's safe to re-run)
+  for (const dept of pricingData) {
+    await Pricing.findOneAndUpdate(
+      { department: dept.department },
+      dept,
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  }
 
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash('Admin@1234', salt);

@@ -6,6 +6,7 @@ import {
   Target, ShieldCheck, Zap, Users, Landmark, FileText, Bot, CreditCard, Scale, Bell, BarChart3, TrendingUp
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
+import PricingStrip from '../../components/landing/PricingStrip';
 import bgVideo from '../../assets/v.mp4';
 import logo from '../../assets/logo.png';
 
@@ -426,6 +427,9 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Pricing Strip — right after split section */}
+      <PricingStrip />
 
       {/* The Core Engine (Sticky Parallax Showcase) */}
       <section className="relative lg:py-0 z-20" style={{ background: 'var(--bg-primary)' }}>

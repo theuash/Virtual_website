@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  CheckCircle, ArrowRight, ShieldCheck, Users, BarChart3, MonitorPlay, Scale
+  CheckCircle, ArrowRight, ShieldCheck, Users, BarChart3, MonitorPlay, Scale, ChevronLeft
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
+import { useEffect } from 'react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -16,6 +17,12 @@ const fadeUp = {
 
 export default function AboutPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   return (
     <div
@@ -37,12 +44,21 @@ export default function AboutPage() {
           animate="show"
           className="max-w-3xl mx-auto relative z-10"
         >
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full mb-8"
-            style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
-            About Virtual
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <button
+              onClick={() => navigate('/')}
+              className="p-2 rounded-lg border transition-all hover:bg-white/5"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <ChevronLeft size={18} style={{ color: 'var(--text-secondary)' }} />
+            </button>
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full"
+              style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
+              About Virtual
+            </div>
           </div>
           <h1
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 leading-tight"

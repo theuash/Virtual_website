@@ -5,6 +5,7 @@ import { RoleGuard } from './utils/roleGuards';
 // Landing
 import LandingPage from './pages/landing/LandingPage';
 import AboutPage from './pages/landing/AboutPage';
+import PricingPage from './pages/landing/PricingPage';
 
 // Auth
 import LoginPage from './pages/auth/LoginPage';
@@ -49,6 +50,7 @@ function App() {
       {/* Public */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 

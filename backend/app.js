@@ -16,11 +16,13 @@ import clientRoutes from './routes/client.routes.js';
 import freelancerRoutes from './routes/freelancer.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import seedRoutes from './routes/seed.routes.js';
+import pricingRoutes from './routes/pricing.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/client', clientRoutes);
 app.use('/api/freelancer', freelancerRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/pricing', pricingRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
   app.use('/api/seed', seedRoutes);
