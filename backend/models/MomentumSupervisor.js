@@ -1,14 +1,44 @@
 import mongoose from 'mongoose';
-import { User } from './User.js';
+import bcrypt from 'bcryptjs';
 import { SKILLS } from '../config/constants.js';
 
-const momentumSupervisorSchema = new mongoose.Schema({
-  department: { type: String, enum: SKILLS },
-  supervisedFreelancers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  totalReviews: { type: Number, default: 0 },
-  approvalRate: { type: Number, default: 0 },
-  dateOfBirth: Date,
-  bio: { type: String, default: '' },
-});
+// ── Independent collection: 'momentum_supervisors' ───────────────
+const supervisorSchema = new mongoose.Schema({
+  // Auth
+  email:          { type: String, required: true, unique: true, lowercase: true, trim: true },
+  passwordHash:   { type: String, required: function () { return this.authMethod === 'password'; } },
+  authMethod:     { type: String, enum: ['password', 'google'], default: 'password' },
+  role:           { type: String, default: 'momentum_supervisor', immutable: true },
 
-export const MomentumSupervisor = User.discriminator('MomentumSupervisor', momentumSupervisorSchema);
+  // Profile
+  fullName:       { type: String, required: true },
+  phone:          { type: String },
+  avatar:         { type: String },
+  dateOfBirth:    { type: Date },
+  bio:            { type: String, default: '' },
+
+  // Verification
+  isVerified:     { type: Boolean, default: false },
+  isSuspended:    { type: Boolean, default: false },
+  phoneVerified:  { type: Boolean, default: false },
+  phoneVerifiedAt:{ type: Date },
+
+  // OTP
+  otpCodeHash:    { type: String },
+  otpExpiresAt:   { type: Date },
+  otpContext:     { type: String, enum: ['signup', 'login', null], default: null },
+  otpSentAt:      { type: Date },
+  loginOtpPending:{ type: Boolean, default: false },
+
+  // Work
+  department:             { type: String, enum: SKILLS },
+  supervisedFreelancers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer' }],
+  totalReviews:           { type: Number, default: 0 },
+  approvalRate:           { type: Number, default: 0 },
+}, { timestamps: true, collection: 'momentum_supervisors' });
+
+supervisorSchema.methods.matchPassword = async function (password) {
+  return bcrypt.compare(password, this.passwordHash);
+};
+
+export const MomentumSupervisor = mongoose.model('MomentumSupervisor', supervisorSchema);

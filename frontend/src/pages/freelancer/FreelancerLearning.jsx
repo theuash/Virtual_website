@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
 import {
   BookOpen, Play, Clock, ExternalLink, ChevronRight,
-  MessageSquare, User, Star, Monitor,
+  MessageSquare, User, Star, Monitor, CheckCircle2,
 } from 'lucide-react';
+import api from '../../services/api';
+import VideoPlayerModal from '../../components/VideoPlayerModal';
 
 // ── Skill label map ───────────────────────────────────────────────
 const SKILL_LABELS = {
@@ -606,149 +608,179 @@ const LEVEL_STYLES = {
 
 // ── Sub-components ────────────────────────────────────────────────
 
-function TutorialCard({ tutorial }) {
+function TutorialCard({ tutorial, progress, onWatch }) {
   const levelStyle = LEVEL_STYLES[tutorial.level] || LEVEL_STYLES.Beginner;
-  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(tutorial.youtubeQuery)}`;
+  const isCompleted = progress?.completed ?? false;
+  const pct = progress?.durationSeconds > 0
+    ? Math.min(100, Math.round((progress.watchedSeconds / progress.durationSeconds) * 100))
+    : 0;
 
   return (
     <div
-      className="flex flex-col justify-between p-5 rounded-xl border transition-all hover:scale-[1.01]"
-      style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+      className="flex flex-col justify-between p-5 rounded-xl border transition-all"
+      style={{
+        background: 'var(--bg-secondary)',
+        borderColor: isCompleted ? 'var(--accent)' : 'var(--border)',
+      }}
     >
       <div>
         <div className="flex items-start justify-between gap-3 mb-2">
           <h3 className="text-sm font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
             {tutorial.title}
           </h3>
-          <span
-            className="shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-            style={levelStyle}
-          >
-            {tutorial.level}
-          </span>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={levelStyle}>
+              {tutorial.level}
+            </span>
+            {isCompleted && (
+              <span className="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full"
+                style={{ background: 'var(--accent)', color: '#fff' }}>
+                <CheckCircle2 size={9} strokeWidth={2.5} /> Done
+              </span>
+            )}
+          </div>
         </div>
-        <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
           {tutorial.desc}
         </p>
+
+        {/* Progress bar — only show if started */}
+        {pct > 0 && (
+          <div className="mb-3">
+            <div className="flex justify-between mb-1">
+              <span className="text-[9px]" style={{ color: 'var(--text-secondary)' }}>Progress</span>
+              <span className="text-[9px] font-bold" style={{ color: 'var(--accent)' }}>{pct}%</span>
+            </div>
+            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+              <div className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+            </div>
+          </div>
+        )}
       </div>
-      <div className="flex items-center justify-between">
-        <span
-          className="flex items-center gap-1.5 text-[11px] font-semibold"
-          style={{ color: 'var(--text-secondary)' }}
-        >
+
+      <div className="flex items-center justify-between mt-2">
+        <span className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
           <Clock size={11} strokeWidth={1.5} />
           {tutorial.duration}
         </span>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => onWatch(tutorial)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95"
-          style={{ background: 'var(--accent)', color: '#fff' }}
+          style={{ background: isCompleted ? 'var(--bg-card)' : 'var(--accent)', color: isCompleted ? 'var(--accent)' : '#fff',
+            border: isCompleted ? '1px solid var(--accent)' : 'none' }}
         >
           <Play size={11} strokeWidth={2} />
-          Watch on YouTube
-          <ExternalLink size={10} strokeWidth={2} />
-        </a>
+          {isCompleted ? 'Rewatch' : pct > 0 ? 'Continue' : 'Watch'}
+        </button>
       </div>
     </div>
   );
 }
 
 function SupervisorPanel() {
+  const [supervisor, setSupervisor] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/freelancer/supervisor')
+      .then(res => setSupervisor(res.data?.data ?? null))
+      .catch(() => setSupervisor(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const initials = supervisor?.fullName
+    ? supervisor.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
+
   return (
     <div
       className="rounded-xl border overflow-hidden"
       style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
     >
       {/* Header */}
-      <div
-        className="px-5 py-4 border-b flex items-center gap-2"
-        style={{ borderColor: 'var(--border)' }}
-      >
+      <div className="px-5 py-4 border-b flex items-center gap-2" style={{ borderColor: 'var(--border)' }}>
         <Monitor size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
         <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
           Your Supervisor
         </h2>
       </div>
 
-      {/* Profile */}
       <div className="p-5">
-        <div className="flex items-center gap-3 mb-4">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-black shrink-0"
-            style={{ background: 'var(--accent)', color: '#fff' }}
-          >
-            AM
+        {loading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-4 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+            ))}
           </div>
-          <div>
-            <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-              Arjun Mehta
-            </div>
-            <div className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-              Momentum Supervisor
-            </div>
-            <div className="flex items-center gap-1 mt-0.5">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star
-                  key={s}
-                  size={10}
-                  strokeWidth={1.5}
-                  fill={s <= 5 ? 'var(--accent)' : 'none'}
-                  style={{ color: 'var(--accent)' }}
-                />
-              ))}
-            </div>
+        ) : !supervisor ? (
+          <div className="py-6 text-center">
+            <User size={28} strokeWidth={1} className="mx-auto mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.4 }} />
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+              No supervisor assigned yet.
+            </p>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Profile */}
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-base font-black shrink-0"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                {initials}
+              </div>
+              <div>
+                <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {supervisor.fullName}
+                </div>
+                <div className="text-[11px]" style={{ color: 'var(--accent)' }}>
+                  Momentum Supervisor
+                </div>
+                {supervisor.department && (
+                  <div className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                    {supervisor.department.replace(/_/g, ' ')} dept.
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {/* Stats */}
-        <div
-          className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg"
-          style={{ background: 'var(--bg-card)' }}
-        >
-          <div className="text-center">
-            <div className="text-base font-black" style={{ color: 'var(--accent)' }}>142</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
-              Reviews
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-base font-black" style={{ color: 'var(--accent)' }}>98%</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
-              Approval
-            </div>
-          </div>
-        </div>
+            {/* Stats — only show if real data exists */}
+            {(supervisor.totalReviews > 0 || supervisor.approvalRate > 0) && (
+              <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg" style={{ background: 'var(--bg-card)' }}>
+                <div className="text-center">
+                  <div className="text-base font-black" style={{ color: 'var(--accent)' }}>{supervisor.totalReviews}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Reviews</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-base font-black" style={{ color: 'var(--accent)' }}>{supervisor.approvalRate}%</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Approval</div>
+                </div>
+              </div>
+            )}
 
-        {/* Bio */}
-        <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-          Arjun oversees quality and delivery across creative departments. Reach out if you need
-          guidance on a task or feedback on your work.
-        </p>
+            {/* Bio — only if set */}
+            {supervisor.bio && (
+              <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+                {supervisor.bio}
+              </p>
+            )}
 
-        {/* Message button */}
-        <button
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold border transition-all hover:scale-[1.02] active:scale-95"
-          style={{
-            background: 'var(--bg-card)',
-            borderColor: 'var(--border)',
-            color: 'var(--text-primary)',
-          }}
-        >
-          <MessageSquare size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-          Message Supervisor
-        </button>
+            {/* Message */}
+            <button
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold border transition-all hover:scale-[1.02] active:scale-95"
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+            >
+              <MessageSquare size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+              Message Supervisor
+            </button>
+          </>
+        )}
       </div>
 
       {/* Tips */}
-      <div
-        className="px-5 pb-5 space-y-2"
-      >
-        <div
-          className="text-[9px] font-black uppercase tracking-widest mb-2"
-          style={{ color: 'var(--text-secondary)' }}
-        >
+      <div className="px-5 pb-5 space-y-2">
+        <div className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>
           Learning Tips
         </div>
         {[
@@ -756,11 +788,7 @@ function SupervisorPanel() {
           'Practice each technique on a real client brief.',
           'Ask your supervisor to review your first deliverable.',
         ].map((tip, i) => (
-          <div
-            key={i}
-            className="flex items-start gap-2 text-xs"
-            style={{ color: 'var(--text-secondary)' }}
-          >
+          <div key={i} className="flex items-start gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <ChevronRight size={12} strokeWidth={2} className="mt-0.5 shrink-0" style={{ color: 'var(--accent)' }} />
             {tip}
           </div>
@@ -775,18 +803,26 @@ export default function FreelancerLearning() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Build the ordered list of skills from the user's profile
   const userSkills = [
     ...(user?.primarySkill ? [user.primarySkill] : []),
     ...(Array.isArray(user?.secondarySkills) ? user.secondarySkills : []),
-  ].filter((s) => SKILL_LABELS[s]); // only known skills
+  ].filter((s) => SKILL_LABELS[s]);
 
-  const [activeSkill, setActiveSkill]     = useState(userSkills[0] || null);
+  const [activeSkill, setActiveSkill]       = useState(userSkills[0] || null);
   const [activeSoftware, setActiveSoftware] = useState(
     userSkills[0] ? (SKILL_SOFTWARE[userSkills[0]]?.[0] ?? null) : null
   );
+  // progress map: { [tutorialId]: { watchedSeconds, durationSeconds, completed, lastPosition } }
+  const [progress, setProgress]             = useState({});
+  const [playingTutorial, setPlayingTutorial] = useState(null);
 
-  // When the user switches skill tabs, reset software to the first option
+  // Fetch all progress on mount
+  useEffect(() => {
+    api.get('/freelancer/learning/progress')
+      .then(res => setProgress(res.data?.data ?? {}))
+      .catch(() => {});
+  }, []);
+
   function handleSkillChange(skill) {
     setActiveSkill(skill);
     setActiveSoftware(SKILL_SOFTWARE[skill]?.[0] ?? null);
@@ -928,20 +964,26 @@ export default function FreelancerLearning() {
                   <div>
                     {tutorials.map((tutorial, i) => {
                       const levelStyle = LEVEL_STYLES[tutorial.level] || LEVEL_STYLES.Beginner;
-                      const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(tutorial.youtubeQuery)}`;
                       const isLast = i === tutorials.length - 1;
+                      const tProgress = progress[tutorial.id];
+                      const isCompleted = tProgress?.completed ?? false;
+                      const pct = tProgress?.durationSeconds > 0
+                        ? Math.min(100, Math.round((tProgress.watchedSeconds / tProgress.durationSeconds) * 100))
+                        : 0;
                       return (
                         <div
                           key={tutorial.id}
                           className={`flex items-center gap-4 px-5 py-4 ${!isLast ? 'border-b' : ''}`}
-                          style={{ borderColor: 'var(--border)' }}
+                          style={{ borderColor: 'var(--border)', background: isCompleted ? 'rgba(96,10,10,0.03)' : 'transparent' }}
                         >
                           {/* Icon */}
                           <div
                             className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                            style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}
+                            style={{ background: isCompleted ? 'var(--accent)' : 'var(--bg-card)', color: isCompleted ? '#fff' : 'var(--accent)' }}
                           >
-                            <Play size={14} strokeWidth={2} />
+                            {isCompleted
+                              ? <CheckCircle2 size={14} strokeWidth={2} />
+                              : <Play size={14} strokeWidth={2} />}
                           </div>
 
                           {/* Info */}
@@ -950,16 +992,28 @@ export default function FreelancerLearning() {
                               <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                                 {tutorial.title}
                               </span>
-                              <span
-                                className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0"
-                                style={levelStyle}
-                              >
+                              <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0" style={levelStyle}>
                                 {tutorial.level}
                               </span>
+                              {isCompleted && (
+                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full shrink-0"
+                                  style={{ background: 'var(--accent)', color: '#fff' }}>
+                                  ✓ Complete
+                                </span>
+                              )}
                             </div>
-                            <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                            <p className="text-xs truncate mb-1" style={{ color: 'var(--text-secondary)' }}>
                               {tutorial.desc}
                             </p>
+                            {/* Inline progress bar */}
+                            {pct > 0 && !isCompleted && (
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)', opacity: 0.7 }} />
+                                </div>
+                                <span className="text-[9px] font-bold shrink-0" style={{ color: 'var(--accent)' }}>{pct}%</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Duration + CTA */}
@@ -967,15 +1021,18 @@ export default function FreelancerLearning() {
                             <span className="hidden sm:flex items-center gap-1 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
                               <Clock size={11} strokeWidth={1.5} /> {tutorial.duration}
                             </span>
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => setPlayingTutorial(tutorial)}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95"
-                              style={{ background: 'var(--accent)', color: '#fff' }}
+                              style={{
+                                background: isCompleted ? 'transparent' : 'var(--accent)',
+                                color: isCompleted ? 'var(--accent)' : '#fff',
+                                border: isCompleted ? '1px solid var(--accent)' : 'none',
+                              }}
                             >
-                              Watch <ExternalLink size={10} strokeWidth={2} />
-                            </a>
+                              <Play size={10} strokeWidth={2} />
+                              {isCompleted ? 'Rewatch' : pct > 0 ? 'Continue' : 'Watch'}
+                            </button>
                           </div>
                         </div>
                       );
@@ -993,6 +1050,21 @@ export default function FreelancerLearning() {
 
         </div>
       </div>
+
+      {/* ── Video Player Modal ──────────────────────────────────── */}
+      {playingTutorial && (
+        <VideoPlayerModal
+          tutorial={playingTutorial}
+          initialProgress={progress[playingTutorial.id]}
+          onClose={() => setPlayingTutorial(null)}
+          onComplete={(tutorialId) => {
+            setProgress(prev => ({
+              ...prev,
+              [tutorialId]: { ...(prev[tutorialId] ?? {}), completed: true },
+            }));
+          }}
+        />
+      )}
     </>
   );
 }

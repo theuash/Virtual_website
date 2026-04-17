@@ -1,6 +1,7 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-import { User } from '../models/User.js';
+import { Client } from '../models/Client.js';
+import { Freelancer } from '../models/Freelancer.js';
 import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
 import { Project } from '../models/Project.js';
 import { MicroTask } from '../models/MicroTask.js';
@@ -13,7 +14,7 @@ export const runSeed = asyncHandler(async (req, res) => {
     return res.status(403).json(new ApiResponse(403, null, 'Cannot seed in production'));
   }
 
-  // ── Seed pricing (safe upsert — never deletes existing data) ──
+  // ── Seed pricing (safe upsert) ────────────────────────────────
   for (const dept of pricingData) {
     await Pricing.findOneAndUpdate(
       { department: dept.department },
@@ -23,21 +24,20 @@ export const runSeed = asyncHandler(async (req, res) => {
   }
 
   // ── Create Momentum Supervisor: Mohammad Maaz ─────────────────
-  // Only create if not already present
-  const existing = await User.findOne({ email: 'maazmohammed072006@gmail.com' });
+  const existing = await MomentumSupervisor.findOne({ email: 'maazmohammed072006@gmail.com' });
   if (!existing) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash('maaza@123', salt);
 
     await MomentumSupervisor.create({
-      email: 'maazmohammed072006@gmail.com',
+      email:       'maazmohammed072006@gmail.com',
       passwordHash,
-      role: 'momentum_supervisor',
-      fullName: 'Mohammad Maaz',
-      phone: '+917483316929',
+      role:        'momentum_supervisor',
+      fullName:    'Mohammad Maaz',
+      phone:       '+917483316929',
       phoneVerified: true,
-      isVerified: true,
-      authMethod: 'password',
+      isVerified:  true,
+      authMethod:  'password',
       dateOfBirth: new Date('2006-05-07'),
     });
   }

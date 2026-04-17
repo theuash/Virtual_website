@@ -1,22 +1,55 @@
 import mongoose from 'mongoose';
-import { User } from './User.js';
+import bcrypt from 'bcryptjs';
 import { SKILLS, TIERS } from '../config/constants.js';
 
+// ── Independent collection: 'freelancers' ────────────────────────
 const freelancerSchema = new mongoose.Schema({
-  primarySkill: { type: String, enum: SKILLS },
-  secondarySkills: [{ type: String, enum: SKILLS }],
-  tier: { type: String, enum: TIERS, default: 'precrate' },
-  dateOfBirth: Date,
-  portfolioUrl: String,
-  hoursPerWeek: { type: Number },
-  preferredContactTime: { type: String },
+  // Auth
+  email:          { type: String, required: true, unique: true, lowercase: true, trim: true },
+  passwordHash:   { type: String, required: function () { return this.authMethod === 'password'; } },
+  authMethod:     { type: String, enum: ['password', 'google'], default: 'password' },
+  role:           { type: String, default: 'freelancer', immutable: true },
+
+  // Profile
+  fullName:       { type: String, required: true },
+  phone:          { type: String },
+  avatar:         { type: String },
+  dateOfBirth:    { type: Date },
+  portfolioUrl:   { type: String },
+
+  // Verification
+  isVerified:     { type: Boolean, default: false },
+  isSuspended:    { type: Boolean, default: false },
+  phoneVerified:  { type: Boolean, default: false },
+  phoneVerifiedAt:{ type: Date },
+
+  // OTP
+  otpCodeHash:    { type: String },
+  otpExpiresAt:   { type: Date },
+  otpContext:     { type: String, enum: ['signup', 'login', null], default: null },
+  otpSentAt:      { type: Date },
+  loginOtpPending:{ type: Boolean, default: false },
+
+  // Skills & onboarding
+  primarySkill:       { type: String, enum: SKILLS },
+  secondarySkills:    [{ type: String, enum: SKILLS }],
   onboardingComplete: { type: Boolean, default: false },
-  totalEarnings: { type: Number, default: 0 },
-  tasksCompleted: { type: Number, default: 0 },
-  projectsCompleted: { type: Number, default: 0 },
+  hoursPerWeek:       { type: Number },
+  preferredContactTime: { type: String },
+
+  // Career
+  tier:               { type: String, enum: TIERS, default: 'precrate' },
+  totalEarnings:      { type: Number, default: 0 },
+  tasksCompleted:     { type: Number, default: 0 },
+  projectsCompleted:  { type: Number, default: 0 },
   teamProjectsCompleted: { type: Number, default: 0 },
-  rating: { type: Number, default: 0 },
-  mentorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  promotionEligible: { type: Boolean, default: false }
-});
-export const Freelancer = User.discriminator('Freelancer', freelancerSchema);
+  rating:             { type: Number, default: 0 },
+  promotionEligible:  { type: Boolean, default: false },
+  mentorId:           { type: mongoose.Schema.Types.ObjectId, ref: 'MomentumSupervisor' },
+}, { timestamps: true, collection: 'freelancers' });
+
+freelancerSchema.methods.matchPassword = async function (password) {
+  return bcrypt.compare(password, this.passwordHash);
+};
+
+export const Freelancer = mongoose.model('Freelancer', freelancerSchema);

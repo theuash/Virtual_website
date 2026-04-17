@@ -1,39 +1,28 @@
 import { OAuth2Client } from 'google-auth-library';
-import { User } from '../models/User.js';
-import { Client } from '../models/Client.js';
-import { Freelancer } from '../models/Freelancer.js';
-import { generateTokens } from './auth.service.js';
+import { findUserByEmail, modelForRole } from '../utils/findUser.js';
+import { generateTokens, sanitizeUser } from './auth.service.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const fetchGoogleProfile = async (accessToken) => {
   const response = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
-
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`Invalid Google access token (${response.status}): ${body}`);
   }
-
   return response.json();
 };
 
 export const verifyGoogleToken = async (token) => {
   try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const ticket = await client.verifyIdToken({ idToken: token, audience: process.env.GOOGLE_CLIENT_ID });
     return ticket.getPayload();
-  } catch (error) {
+  } catch {
     try {
       const profile = await fetchGoogleProfile(token);
-      if (!profile.email) {
-        throw new Error('Google profile missing email');
-      }
+      if (!profile.email) throw new Error('Google profile missing email');
       return {
         email: profile.email,
         name: profile.name || profile.given_name || profile.email.split('@')[0],
@@ -42,66 +31,8 @@ export const verifyGoogleToken = async (token) => {
         sub: profile.sub,
       };
     } catch (fallbackError) {
-      const message = fallbackError?.message || error?.message || 'Invalid Google token';
-      throw new Error(message);
+      throw new Error(fallbackError?.message || 'Invalid Google token');
     }
-  }
-};
-
-const normalizePhone = (phone) => {
-  const trimmed = String(phone || '').trim();
-  if (!trimmed) return '';
-  const normalized = trimmed.replace(/[^\d+]/g, '');
-  if (!normalized) return '';
-  return normalized.startsWith('+') ? normalized : `+${normalized}`;
-};
-
-const sanitizeUser = (user) => {
-  const userObj = user.toObject();
-  delete userObj.passwordHash;
-  delete userObj.otpCodeHash;
-  return userObj;
-};
-
-const createUserByRole = async (googleData, role) => {
-  const { email, name, picture } = googleData;
-
-  const commonFields = {
-    email,
-    role,
-    fullName: name,
-    authMethod: 'google',
-    avatar: picture,
-    isVerified: true, // Google accounts are pre-verified
-  };
-
-  try {
-    if (role === 'client') {
-      return await Client.create({
-        ...commonFields,
-        companyName: '',
-      });
-    }
-
-    if (role === 'freelancer') {
-      return await Freelancer.create({
-        ...commonFields,
-        // primarySkill left unset — user fills it in after signup
-      });
-    }
-
-    if (role === 'admin') {
-      return await User.create(commonFields);
-    }
-
-    throw new Error('Invalid role');
-  } catch (error) {
-    // If user already exists, just return the existing user
-    if (error.message.includes('duplicate key')) {
-      const existingUser = await User.findOne({ email });
-      return existingUser;
-    }
-    throw error;
   }
 };
 
@@ -109,38 +40,30 @@ export const signupWithGoogle = async (googleToken, role) => {
   try {
     const googleData = await verifyGoogleToken(googleToken);
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: googleData.email });
-
-    if (existingUser) {
-      if (!existingUser.authMethod || existingUser.authMethod !== 'google') {
-        existingUser.authMethod = 'google';
-        if (googleData.picture && !existingUser.avatar) {
-          existingUser.avatar = googleData.picture;
-        }
-        await existingUser.save();
+    const existing = await findUserByEmail(googleData.email);
+    if (existing) {
+      if (existing.authMethod !== 'google') {
+        existing.authMethod = 'google';
+        if (googleData.picture && !existing.avatar) existing.avatar = googleData.picture;
+        await existing.save();
       }
-      const { token, refreshToken } = generateTokens(existingUser._id);
-      return {
-        user: sanitizeUser(existingUser),
-        token,
-        refreshToken,
-        message: 'User already exists. Logged in with Google.',
-        isNewUser: false,
-      };
+      const { token, refreshToken } = generateTokens(existing._id);
+      return { user: sanitizeUser(existing), token, refreshToken, message: 'Already registered. Logged in with Google.', isNewUser: false };
     }
 
-    // Create new user
-    const newUser = await createUserByRole(googleData, role);
-    const { token, refreshToken } = generateTokens(newUser._id);
+    const Model = modelForRole(role);
+    const newUser = await Model.create({
+      email:      googleData.email,
+      role,
+      fullName:   googleData.name,
+      avatar:     googleData.picture,
+      authMethod: 'google',
+      isVerified: true,
+      ...(role === 'client' && { companyName: '' }),
+    });
 
-    return {
-      user: sanitizeUser(newUser),
-      token,
-      refreshToken,
-      message: 'User created and logged in successfully with Google.',
-      isNewUser: true,
-    };
+    const { token, refreshToken } = generateTokens(newUser._id);
+    return { user: sanitizeUser(newUser), token, refreshToken, message: 'Account created with Google.', isNewUser: true };
   } catch (error) {
     throw new Error(`Google signup failed: ${error.message}`);
   }
@@ -149,30 +72,17 @@ export const signupWithGoogle = async (googleToken, role) => {
 export const loginWithGoogle = async (googleToken) => {
   try {
     const googleData = await verifyGoogleToken(googleToken);
+    const user = await findUserByEmail(googleData.email);
+    if (!user) throw new Error('No account found with this Google email. Please sign up first.');
 
-    // Find user by email
-    const user = await User.findOne({ email: googleData.email });
-
-    if (!user) {
-      throw new Error('No account found with this Google email. Please sign up first.');
-    }
-
-    // Update auth method if needed
-    if (!user.authMethod || user.authMethod !== 'google') {
+    if (user.authMethod !== 'google') {
       user.authMethod = 'google';
-      if (googleData.picture && !user.avatar) {
-        user.avatar = googleData.picture;
-      }
+      if (googleData.picture && !user.avatar) user.avatar = googleData.picture;
       await user.save();
     }
 
     const { token, refreshToken } = generateTokens(user._id);
-    return {
-      user: sanitizeUser(user),
-      token,
-      refreshToken,
-      message: 'Logged in successfully with Google.',
-    };
+    return { user: sanitizeUser(user), token, refreshToken, message: 'Logged in with Google.' };
   } catch (error) {
     throw new Error(`Google login failed: ${error.message}`);
   }
