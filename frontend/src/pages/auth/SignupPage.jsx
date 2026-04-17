@@ -526,12 +526,45 @@ export default function SignupPage() {
 
           {/* Footer */}
           {!isVerifying && (
-            <p className="text-center mt-8 text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
-              Already have an account?{' '}
-              <Link to="/login" className="font-black hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
-                Sign In →
+            <div className="mt-10 pt-8 flex flex-col items-center gap-6 text-center" style={{ borderTop: '1px solid var(--border)' }}>
+              {/* Logo with VIRTUAL text */}
+              <div
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.8rem' }}
+              >
+                <div style={{
+                  width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <img src={logo} alt="Virtual Logo" style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'var(--logo-filter)'
+                  }} />
+                </div>
+                <span style={{
+                  fontWeight: 800,
+                  fontSize: '1.5rem',
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.06em',
+                  marginLeft: '-12px'
+                }}>
+                  irtual
+                </span>
+              </div>
+
+              <p className="text-[11px] font-semibold opacity-40" style={{ color: 'var(--text-secondary)' }}>
+                Already have an account?
+              </p>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] hover:gap-3 transition-all group"
+                style={{ color: 'var(--accent)' }}
+              >
+                Sign In <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-            </p>
+            </div>
           )}
         </motion.div>
       </div>

@@ -10,26 +10,26 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-primary: #241f29;
-  --bg-secondary: #222a36;
-  --bg-card: #222a36;
-  --text-primary: #EDE7F6;
-  --text-secondary: #A89FB9;
-  --accent: #39117d;
-  --accent-rgb: 57, 17, 125;
-  --accent-light: #748bbd;
-  --accent-dark: #012f4a;
-  --forest: #222a36;
-  --btn-bg: #222a36;
-  --btn-text: #EDE7F6;
-  --border: rgba(57, 17, 125, 0.08);
-  --border-light: rgba(57, 17, 125, 0.15);
+  --bg-primary: #000000;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --accent: #007aff;
+  --accent-rgb: 0, 122, 255;
+  --accent-light: #4da3ff;
+  --accent-dark: #0056cc;
+  --forest: #1a1a1a;
+  --btn-bg: #007aff;
+  --btn-text: #ffffff;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.2);
   --transition-speed: 0.3s;
   --video-blend: screen;
-  --anim-glow: rgba(57, 17, 125, 0.3);
-  --anim-shadow: 0 0 40px rgba(57, 17, 125, 0.2);
-  --bg-glass: rgba(36, 31, 41, 0.6);
-  --gradient-accent: linear-gradient(135deg, #39117d 0%, #012f4a 100%);
+  --anim-glow: rgba(0, 122, 255, 0.3);
+  --anim-shadow: 0 0 40px rgba(0, 122, 255, 0.2);
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --gradient-accent: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
 }
 
 .light {

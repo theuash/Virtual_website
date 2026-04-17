@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import authArt from '../../assets/auth/login_art.jpg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
+import FloatingNotification from '../../components/FloatingNotification';
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {
@@ -29,11 +30,22 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
   const [pendingPhone, setPendingPhone] = useState('');
+  const [showNotification, setShowNotification] = useState(true);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationType, setNotificationType] = useState('info');
 
   const { scrollY } = useScroll();
   const blurOverlayOpacity = useTransform(scrollY, [0, 150], [0, 0.85]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Show welcome notification on page load
+  useEffect(() => {
+    // Show immediately for testing
+    setNotificationMessage('Welcome back! Secure your session with two-factor authentication.');
+    setNotificationType('info');
+    setShowNotification(true);
+  }, []);
 
   const handleGoogleLogin = useGoogleLogin({
     flow: 'implicit',
@@ -48,9 +60,15 @@ export default function LoginPage() {
         }
         const response = await loginWithGoogle(token);
         const user = completeAuth(response);
+        setNotificationMessage('Successfully signed in with Google!');
+        setNotificationType('success');
+        setShowNotification(true);
         navigate(getRoleRedirect(user.role));
       } catch (err) {
         setError(err?.message || 'Google login failed. Please try again.');
+        setNotificationMessage('Google login failed. Please check your connection and try again.');
+        setNotificationType('error');
+        setShowNotification(true);
       }
     },
     onError: () => {
@@ -70,9 +88,15 @@ export default function LoginPage() {
         return;
       }
       const user = completeAuth(response);
+      setNotificationMessage('Login successful! Redirecting to your dashboard...');
+      setNotificationType('success');
+      setShowNotification(true);
       navigate(getRoleRedirect(user.role));
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      setNotificationMessage('Login failed. Please check your credentials and try again.');
+      setNotificationType('error');
+      setShowNotification(true);
     }
   };
 
@@ -82,9 +106,15 @@ export default function LoginPage() {
     try {
       const response = await verifyLoginOTP(pendingEmail, otp);
       const user = completeAuth(response);
+      setNotificationMessage('Two-factor authentication successful! Welcome back.');
+      setNotificationType('success');
+      setShowNotification(true);
       navigate(getRoleRedirect(user.role));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
+      setNotificationMessage('Verification failed. Please check your code and try again.');
+      setNotificationType('error');
+      setShowNotification(true);
     }
   };
 
@@ -365,7 +395,34 @@ export default function LoginPage() {
 
           {/* Footer */}
           {!isVerifying && (
-            <div className="mt-10 pt-8 flex flex-col items-center gap-3 text-center" style={{ borderTop: '1px solid var(--border)' }}>
+            <div className="mt-10 pt-8 flex flex-col items-center gap-6 text-center" style={{ borderTop: '1px solid var(--border)' }}>
+              {/* Logo with VIRTUAL text */}
+              <div
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.8rem' }}
+              >
+                <div style={{
+                  width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <img src={logo} alt="Virtual Logo" style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'var(--logo-filter)'
+                  }} />
+                </div>
+                <span style={{
+                  fontWeight: 800,
+                  fontSize: '1.5rem',
+                  color: 'var(--text-primary)',
+                  letterSpacing: '-0.06em',
+                  marginLeft: '-12px'
+                }}>
+                  irtual
+                </span>
+              </div>
+
               <p className="text-[11px] font-semibold opacity-40" style={{ color: 'var(--text-secondary)' }}>
                 New to the platform?
               </p>
@@ -380,6 +437,67 @@ export default function LoginPage() {
           )}
         </motion.div>
       </div>
+
+      {/* Apple-style Floating Notification */}
+      <FloatingNotification
+        message={notificationMessage}
+        type={notificationType}
+        show={showNotification}
+        onClose={() => setShowNotification(false)}
+        actionText="Learn More"
+        onAction={() => {
+          // Could navigate to a security info page or show more details
+          setNotificationMessage('Two-factor authentication adds an extra layer of security to your account.');
+          setNotificationType('success');
+          setShowNotification(true);
+        }}
+      />
+
+      {/* Test buttons for different notification types (remove in production) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+          <button
+            onClick={() => {
+              setNotificationMessage('This is a success notification!');
+              setNotificationType('success');
+              setShowNotification(true);
+            }}
+            className="px-3 py-1 bg-green-500 text-white text-xs rounded"
+          >
+            Test Success
+          </button>
+          <button
+            onClick={() => {
+              setNotificationMessage('This is an error notification!');
+              setNotificationType('error');
+              setShowNotification(true);
+            }}
+            className="px-3 py-1 bg-red-500 text-white text-xs rounded"
+          >
+            Test Error
+          </button>
+          <button
+            onClick={() => {
+              setNotificationMessage('This is a warning notification!');
+              setNotificationType('warning');
+              setShowNotification(true);
+            }}
+            className="px-3 py-1 bg-yellow-500 text-white text-xs rounded"
+          >
+            Test Warning
+          </button>
+          <button
+            onClick={() => {
+              setNotificationMessage('This is an info notification!');
+              setNotificationType('info');
+              setShowNotification(true);
+            }}
+            className="px-3 py-1 bg-blue-500 text-white text-xs rounded"
+          >
+            Test Info
+          </button>
+        </div>
+      )}
     </div>
   );
 }

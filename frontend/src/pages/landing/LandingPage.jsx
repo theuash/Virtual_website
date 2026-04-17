@@ -6,6 +6,7 @@ import {
   Target, ShieldCheck, Zap, Users, Landmark, FileText, Bot, CreditCard, Scale, Bell, BarChart3, TrendingUp
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
+import logo from '../../assets/logo.png';
 import bgVideo from '../../assets/v.mp4';
 
 // Helper Component for 3D Mesh Layers
@@ -994,9 +995,31 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
             <div className="md:col-span-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-glow-sm" style={{ background: 'var(--accent)', color: '#F0F2EF' }}>V</div>
-                <span className="font-bold text-2xl tracking-tighter" style={{ color: '#F0F2EF' }}>Virtual</span>
+              {/* Logo with VIRTUAL text - same as header */}
+              <div
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}
+              >
+                <div style={{
+                  width: 44, height: 44,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <img src={logo} alt="Virtual Logo" style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(40%) contrast(100%)'
+                  }} />
+                </div>
+                <span style={{
+                  fontWeight: 800,
+                  fontSize: '2rem',
+                  color: '#F0F2EF',
+                  letterSpacing: '-0.06em',
+                  marginLeft: '-15px'
+                }}>
+                  irtual
+                </span>
               </div>
               <p className="font-normal text-base leading-relaxed mb-8 max-w-xs" style={{ color: '#F0F2EF', opacity: 0.8 }}>
                 The elite architecture for the creative economy. Managed execution for world-class visions.
