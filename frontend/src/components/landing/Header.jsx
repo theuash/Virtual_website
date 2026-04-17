@@ -123,6 +123,19 @@ export default function Header() {
               {label}
             </button>
           ))}
+          <button
+            onClick={() => navigate('/about')}
+            style={{
+              background: 'none', border: 'none', color: 'var(--text-secondary)',
+              fontFamily: 'inherit', fontSize: '1rem', fontWeight: 500,
+              cursor: 'pointer', transition: 'color 0.2s',
+              padding: '0.5rem 0',
+            }}
+            onMouseEnter={e => e.target.style.color = 'var(--accent)'}
+            onMouseLeave={e => e.target.style.color = 'var(--text-secondary)'}
+          >
+            About
+          </button>
         </nav>
 
         {/* Action Group */}

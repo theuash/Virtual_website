@@ -66,6 +66,15 @@ export default function LandingPage() {
   const [manuallyMuted, setManuallyMuted] = useState(true);
   const [showUnmuteHint, setShowUnmuteHint] = useState(false);
   const [showScrollCue, setShowScrollCue] = useState(true);
+  const [isDark, setIsDark] = useState(!document.documentElement.classList.contains('light'));
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(!document.documentElement.classList.contains('light'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Scroll & Velocity tracking
   const { scrollY } = useScroll();
@@ -239,6 +248,15 @@ export default function LandingPage() {
               }}
             ></video>
             <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000000 0%, transparent 10%, transparent 90%, #000000 100%)', zIndex: 0 }}></div>
+            {/* Text-legibility overlay — darkens in dark mode, lightens in light mode as text arrives */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                opacity: heroOpacity,
+                background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.45)',
+                zIndex: 1,
+              }}
+            />
           </div>
 
           <button
@@ -287,15 +305,18 @@ export default function LandingPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ backgroundColor: 'var(--accent)' }}></span>
               The New Standard
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-6 leading-tight text-white drop-shadow-2xl">
-              Where Talent Meets
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center mb-6 leading-[1.08] text-white drop-shadow-2xl">
+              The team you never
               <br />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to bottom right, #FFFFFF, var(--accent))' }}>
-                Opportunity.
+              <span
+                className="text-transparent bg-clip-text"
+                style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}
+              >
+                had to build.
               </span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-medium tracking-wide leading-relaxed text-white/90">
-              An elegant ecosystem for world-class creatives. Seamless workflows, transparent pricing, and unparalleled quality.
+              A fully departmentalized creative platform. Structured teams, escrow-protected payments, and a professional chain of command behind every project.
             </p>
             <button
               className="py-3.5 px-9 text-sm font-bold tracking-widest flex items-center gap-2 rounded-full transition-all hover:scale-105 active:scale-95"
@@ -325,16 +346,16 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20">
           <motion.div style={{ y: leftY }} className="flex flex-col justify-center">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ color: 'var(--text-primary)' }}>
-              A refined approach to creative scaling.
+              Not a freelance platform. A structured creative agency.
             </h2>
             <p className="font-normal leading-relaxed text-lg mb-8 opacity-80" style={{ color: 'var(--text-secondary)' }}>
-              We eliminated the noise. No bidding wars. No unverified portfolios. Just an orchestrated pipeline where quality meets efficiency.
+              Every category operates as its own department with a designated head — personally accountable for every deliverable. You get a professional chain of command, not a random freelancer.
             </p>
             <ul className="space-y-6">
               {[
-                "Strict algorithmic vetting",
-                "Escrow-protected milestones",
-                "Automated copyright handover"
+                "Structured execution — defined chain of command",
+                "Quality assurance — Momentum Supervisor reviews every deliverable",
+                "On-time delivery — timelines tracked live, delays flagged internally"
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-4 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                   <CheckCircle size={24} style={{ color: 'var(--accent)' }} />
@@ -803,31 +824,31 @@ export default function LandingPage() {
                 {
                   tag: "Intelligence",
                   title: "Micro-Task Distribution Engine",
-                  desc: "Our proprietary engine fragments projects into precision-scoped tasks, matching work to specialists through AI-driven mastery tiers.",
+                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist — not just whoever is available.",
                   color: "from-accent to-forest"
                 },
                 {
                   tag: "Security",
-                  title: "Sovereign Escrow Protection",
-                  desc: "100% of project funds are secured at initiation. Our managed escrow releases capital only upon expert supervisor verification.",
+                  title: "Wallet & Escrow Protection",
+                  desc: "Funds lock into escrow when a project is posted. Released only after you formally approve the completed work. Neither side can lose without the other delivering.",
                   color: "from-forest to-accent"
                 },
                 {
                   tag: "Accountability",
-                  title: "Managed Resolution Protocol",
-                  desc: "Eliminate friction with a documented resolution system. Every conflict is settled by internal human experts within 72 hours.",
+                  title: "Human-Led Dispute Resolution",
+                  desc: "Every dispute is handled by a trained Dispute Handler — not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
                   color: "from-accent to-forest"
                 },
                 {
                   tag: "Meritocracy",
                   title: "Algorithmic Growth System",
-                  desc: "Growth triggered by performance data. No subjective bias—only accuracy, speed, and volume define your ascent in the ecosystem.",
+                  desc: "Advancement is driven by data — accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
                   color: "from-forest to-accent"
                 },
                 {
                   tag: "Visibility",
                   title: "Live Command Dashboard",
-                  desc: "Total transparency through a singular command center. Track split-task progress and communicate with Initiators in real-time.",
+                  desc: "See every micro-task in real time — in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
                   color: "from-accent to-forest"
                 }
               ].map((item, i) => (
@@ -892,7 +913,7 @@ export default function LandingPage() {
                 <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>Action.</span>
               </h2>
               <p className="text-xl max-w-md opacity-70 leading-relaxed font-normal" style={{ color: 'var(--text-secondary)' }}>
-                Explore our specialized creative segments. Each department is powered by top 1% global talent and managed execution.
+                Five independent departments. Each with a designated head, a structured team, and full accountability for every deliverable.
               </p>
               <div className="mt-12 flex items-center gap-4">
                 <div className="w-12 h-px bg-accent" style={{ background: 'var(--accent)' }}></div>
@@ -904,32 +925,32 @@ export default function LandingPage() {
             {[
               { 
                 icon: <Video size={32} />, 
-                title: "Motion Graphics", 
-                desc: "Dynamic visual storytelling through kinetic typography and fluid transitions. We craft high-impact motion identities for global brands.",
-                details: ["Opening Sequences", "Title Design", "Social Content", "Commercial Edits"]
+                title: "Video Editing", 
+                desc: "A dedicated department managing every cut, grade, and sequence — with a department head accountable for every frame delivered.",
+                details: ["Cinematic Cuts", "Color Grading", "Motion Titles", "Commercial Edits"]
               },
               { 
                 icon: <Cuboid size={32} />, 
                 title: "3D Animation", 
-                desc: "Immersive three-dimensional worlds and character animations. From architectural visualization to complex product simulations.",
-                details: ["Character Rigging", "Environment Design", "VFX Integration", "Product Renders"]
+                desc: "From character rigging to architectural visualization — structured, reviewed, and delivered by a team with a clear chain of command.",
+                details: ["Character Rigging", "Environment Design", "Product Renders", "VFX Integration"]
               },
               { 
                 icon: <MonitorPlay size={32} />, 
                 title: "CGI & VFX", 
-                desc: "Hyper-realistic computer-generated imagery for cinematic visual effects. We bridge the gap between imagination and digital reality.",
+                desc: "Cinematic visual effects handled by a dedicated department. Every composite and simulation passes through supervisor review before delivery.",
                 details: ["Green Screen", "Compositing", "Fluid Sims", "3D Projection"]
               },
               { 
                 icon: <PenTool size={32} />, 
                 title: "Script Writing", 
-                desc: "Crafting compelling narratives and structural frameworks. Our writers build the soul of your cinematic projects from the ground up.",
+                desc: "Narratives and structural frameworks built by a writing department — not a solo freelancer. Department-reviewed before it reaches you.",
                 details: ["Storyboarding", "Brand Voice", "Concept Dev", "Ad Copy"]
               },
               { 
                 icon: <Layout size={32} />, 
-                title: "Content Architecture", 
-                desc: "Holistic visual design that unifies brand identity. We design the systems that make your digital presence unforgettable.",
+                title: "Graphic Design", 
+                desc: "Brand identity, design systems, and visual assets — managed by a full design department with a head overseeing every output.",
                 details: ["UI Architecture", "Design Systems", "Brand Manuals", "Asset Libraries"]
               }
             ].map((role, i) => (
@@ -976,32 +997,54 @@ export default function LandingPage() {
              y: useTransform(splitProgress, [0.05, 0.15], [20, 0]),
              x: '-50%'
            }}
-           className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[90vw] max-w-2xl h-16 pointer-events-auto"
+           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-auto"
         >
-           <div className="w-full h-full glass-card flex items-center justify-between px-6 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-black/40 backdrop-blur-2xl rounded-full">
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 flex items-center justify-center">
+           <div
+             className="flex items-center gap-4 px-4 py-2.5 rounded-full"
+             style={{
+               background: 'rgba(10, 10, 10, 0.55)',
+               backdropFilter: 'blur(20px)',
+               WebkitBackdropFilter: 'blur(20px)',
+               border: '1px solid rgba(255,255,255,0.08)',
+               boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,255,255,0.07), 0 0 40px rgba(100,120,255,0.08)',
+             }}
+           >
+              <div className="flex items-center">
+                 <div className="w-5 h-5 flex items-center justify-center"
+                   style={{ filter: 'drop-shadow(0 0 6px rgba(180,190,255,0.5))' }}
+                 >
                     <img src={logo} alt="V" className="w-full h-full object-contain" style={{ filter: 'invert(100%) brightness(200%)' }} />
-                 </div>
-                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-white/90">Virtual</span>
-                    <div className="w-px h-3 bg-white/20"></div>
-                    <span className="text-[10px] font-medium uppercase tracking-widest text-white/40">Protocol v2.4</span>
                  </div>
               </div>
 
-              <div className="flex items-center gap-6">
-                 <div className="hidden sm:flex items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-white/60">
-                    <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Overview</button>
-                    <button onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Specs</button>
-                 </div>
-                 <button 
-                   onClick={() => navigate('/signup')}
-                   className="py-2 px-5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-                 >
-                   Get Started
-                 </button>
+              <div className="w-px h-3.5 bg-white/10"></div>
+
+              <div className="hidden sm:flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-white/40">
+                 <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white/70 transition-colors">Overview</button>
+                 <button onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white/70 transition-colors">Specs</button>
               </div>
+
+              <div className="w-px h-3.5 bg-white/10 hidden sm:block"></div>
+
+              <button 
+                onClick={() => navigate('/signup?role=client')}
+                className="py-1.5 px-4 text-[10px] font-semibold uppercase tracking-widest rounded-full transition-all active:scale-95"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.85)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.18)';
+                  e.currentTarget.style.color = '#fff';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.color = 'rgba(255,255,255,0.85)';
+                }}
+              >
+                Hire Elite Talent
+              </button>
            </div>
         </motion.div>
       </AnimatePresence>
@@ -1011,12 +1054,12 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8" style={{ color: 'var(--text-primary)' }}>
-              Ready to deploy your
+              Ready to build with
               <br />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>Next Vision?</span>
+              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>a real team behind you?</span>
             </h2>
             <p className="text-xl mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
-              Stop browsing. Start building. Post your project today and experience managed creative service at its peak.
+              Post your project and get a structured department working on it — escrow-protected, supervisor-reviewed, and delivered on time.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button className="btn-primary py-4 px-10 text-base font-bold tracking-wide">Post a Project</button>
