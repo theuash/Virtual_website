@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sun, Moon } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useVelocity } from 'framer-motion';
 import GetStartedModal from './GetStartedModal';
 import logo from '../../assets/logo.png';
 
@@ -9,11 +9,23 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+
+  // Enhanced Scroll for Header (Responsive to speed)
+  const effectiveScroll = useTransform([scrollY, scrollVelocity], ([latestY, latestVel]) => {
+    return latestY + (latestVel * 0.2);
+  });
+
+  const smoothScrollY = useSpring(effectiveScroll, {
+    stiffness: 150,
+    damping: 25,
+    mass: 0.3
+  });
   const navigate = useNavigate();
 
   // Scroll reveals
-  const headerOpacity = useTransform(scrollY, [100, 400], [0, 1]);
-  const headerY = useTransform(scrollY, [100, 400], [-80, 0]);
+  const headerOpacity = useTransform(smoothScrollY, [100, 400], [0, 1]);
+  const headerY = useTransform(smoothScrollY, [100, 400], [-80, 0]);
 
   useEffect(() => {
     // Initial theme check
@@ -82,9 +94,9 @@ export default function Header() {
               width: '100%',
               height: '100%',
               objectFit: 'contain',
-              // Dynamic Violet Filter (Adapts to theme for visibility)
+              // Dynamic Filter (White in dark mode for premium contrast)
               filter: isDark
-                ? 'invert(42%) sepia(90%) saturate(1600%) hue-rotate(230deg) brightness(90%) contrast(100%) shadow(0 0 10px rgba(99,102,241,0.3))'
+                ? 'brightness(0) invert(1) drop-shadow(0 0 10px rgba(165, 129, 255, 0.3))'
                 : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(40%) contrast(100%)'
             }} />
           </div>

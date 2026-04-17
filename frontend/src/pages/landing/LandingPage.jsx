@@ -1,12 +1,13 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout, ChevronRight, Volume2, VolumeX,
   Target, ShieldCheck, Zap, Users, Landmark, FileText, Bot, CreditCard, Scale, Bell, BarChart3, TrendingUp
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import bgVideo from '../../assets/v.mp4';
+import logo from '../../assets/logo.png';
 
 // Helper Component for 3D Mesh Layers
 const MeshGrid = ({ count = 5, speed = 10 }) => (
@@ -58,26 +59,37 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  const scrollCountRef = useRef(0);
-  const lastScrollCountYRef = useRef(0);
   const scrollCueCountRef = useRef(0);
   const lastScrollCueYRef = useRef(0);
   const showScrollCueRef = useRef(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [manuallyMuted, setManuallyMuted] = useState(true);
   const [showUnmuteHint, setShowUnmuteHint] = useState(false);
   const [showScrollCue, setShowScrollCue] = useState(true);
 
-  // Scroll tracking
+  // Scroll & Velocity tracking
   const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  
+  // Create an "Enhanced Scroll" value that projects forward based on speed
+  // This essentially skips animation distance the faster you scroll
+  const effectiveScroll = useTransform([scrollY, scrollVelocity], ([latestY, latestVel]) => {
+    return latestY + (latestVel * 0.2); // 0.2 factor for aggressive skipping
+  });
+
+  const smoothScrollY = useSpring(effectiveScroll, {
+    stiffness: 150,
+    damping: 25,
+    mass: 0.3
+  });
 
   // Hero Parallax
-  // Text invisible initially, fades in from 100px to 400px
-  const heroOpacity = useTransform(scrollY, [100, 400], [0, 1]);
-  const heroScale = useTransform(scrollY, [100, 400], [0.9, 1]);
-  const heroTextY = useTransform(scrollY, [100, 400], [40, 0]);
+  const heroOpacity = useTransform(smoothScrollY, [100, 400], [0, 1]);
+  const heroScale = useTransform(smoothScrollY, [100, 400], [0.9, 1]);
+  const heroTextY = useTransform(smoothScrollY, [100, 400], [40, 0]);
 
-  // Video darken as we scroll deeper (started at 0.7 for vibrancy)
-  const videoOpacity = useTransform(scrollY, [400, 900], [0.7, 0.2]);
+  // Video darken as we scroll deeper
+  const videoOpacity = useTransform(smoothScrollY, [400, 900], [0.7, 0.2]);
 
   // Split-screen Parallax
   const splitRef = useRef(null);
@@ -88,6 +100,9 @@ export default function LandingPage() {
 
   const leftY = useTransform(splitProgress, [0, 1], [50, -150]);
   const rightY = useTransform(splitProgress, [0, 1], [-100, 100]);
+  
+  // Music Volume: Constant until section enters, then fades out by 20% into the section view
+  const musicVolume = useTransform(splitProgress, [0, 0.2], [1, 0]);
 
   // Start video and keep it playing
   useEffect(() => {
@@ -139,45 +154,33 @@ export default function LandingPage() {
     return () => unsubscribe();
   }, [scrollY]);
 
-  useEffect(() => {
-    if (isMuted) {
-      scrollCountRef.current = 0;
-      lastScrollCountYRef.current = scrollY.get();
-      return;
-    }
-
-    lastScrollCountYRef.current = scrollY.get();
-
-    const unsubscribe = scrollY.on('change', (latestY) => {
-      const distanceSinceLastCount = Math.abs(latestY - lastScrollCountYRef.current);
-
-      // Count one deliberate scroll step roughly every 120px of movement.
-      if (distanceSinceLastCount < 120) {
-        return;
-      }
-
-      scrollCountRef.current += 1;
-      lastScrollCountYRef.current = latestY;
-
-      if (scrollCountRef.current >= 4) {
+  // Location-aware Music Control
+  useMotionValueEvent(musicVolume, "change", (v) => {
+    if (videoRef.current && !manuallyMuted) {
+      videoRef.current.volume = v;
+      
+      // Auto-mute/unmute based on scroll position only if NOT manually muted
+      if (v <= 0 && !isMuted) {
         setIsMuted(true);
-        setShowUnmuteHint(false);
+      } else if (v > 0 && isMuted) {
+        setIsMuted(false);
       }
-    });
-
-    return () => unsubscribe();
-  }, [isMuted, scrollY]);
+    }
+  });
 
   const toggleMute = () => {
     const newMuted = !isMuted;
     setIsMuted(newMuted);
+    setManuallyMuted(newMuted); // Track manual intent
     setShowUnmuteHint(false);
-    scrollCountRef.current = 0;
-    lastScrollCountYRef.current = scrollY.get();
 
     if (videoRef.current) {
       videoRef.current.muted = newMuted;
-      videoRef.current.play();
+      // If unmuting, apply the current location-based volume immediately
+      if (!newMuted) {
+        videoRef.current.volume = musicVolume.get();
+        videoRef.current.play();
+      }
     }
   };
 
@@ -965,6 +968,44 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Apple-Style Floating Action Bar (Pill) */}
+      <AnimatePresence>
+        <motion.div
+           style={{ 
+             opacity: useTransform(splitProgress, [0.05, 0.15], [0, 1]),
+             y: useTransform(splitProgress, [0.05, 0.15], [20, 0]),
+             x: '-50%'
+           }}
+           className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[90vw] max-w-2xl h-16 pointer-events-auto"
+        >
+           <div className="w-full h-full glass-card flex items-center justify-between px-6 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-black/40 backdrop-blur-2xl rounded-full">
+              <div className="flex items-center gap-3">
+                 <div className="w-8 h-8 flex items-center justify-center">
+                    <img src={logo} alt="V" className="w-full h-full object-contain" style={{ filter: 'invert(100%) brightness(200%)' }} />
+                 </div>
+                 <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-white/90">Virtual</span>
+                    <div className="w-px h-3 bg-white/20"></div>
+                    <span className="text-[10px] font-medium uppercase tracking-widest text-white/40">Protocol v2.4</span>
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                 <div className="hidden sm:flex items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-white/60">
+                    <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-white transition-colors">Overview</button>
+                    <button onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Specs</button>
+                 </div>
+                 <button 
+                   onClick={() => navigate('/signup')}
+                   className="py-2 px-5 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                 >
+                   Get Started
+                 </button>
+              </div>
+           </div>
+        </motion.div>
+      </AnimatePresence>
+
       {/* Final Call to Action */}
       <section className="py-40 relative z-20 overflow-hidden border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto px-6 text-center">
@@ -989,68 +1030,94 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer (Premium Overhaul) */}
-      <footer className="pt-24 pb-12 relative z-30 border-t" style={{ background: 'var(--forest)', borderColor: 'var(--border)' }}>
+      {/* Footer (Apple-Inspired Premium Overhaul) */}
+      <footer className="pt-32 pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
             <div className="md:col-span-4">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-glow-sm" style={{ background: 'var(--accent)', color: '#F0F2EF' }}>V</div>
-                <span className="font-bold text-2xl tracking-tighter" style={{ color: '#F0F2EF' }}>Virtual</span>
+              {/* Logo - Exact Match to Header */}
+              <div
+                className="flex items-center gap-3 mb-8 cursor-pointer group"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                <div className="w-11 h-11 flex items-center justify-center">
+                  <img 
+                    src={logo} 
+                    alt="Virtual Logo" 
+                    className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110" 
+                    style={{
+                      // Dynamic Violet Filter (Matching Header)
+                      filter: 'invert(42%) sepia(90%) saturate(1600%) hue-rotate(230deg) brightness(90%) contrast(100%) drop-shadow(0 0 10px rgba(99,102,241,0.3))'
+                    }} 
+                  />
+                </div>
+                <span className="font-extrabold text-3xl tracking-tighter" style={{ color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
+                  irtual
+                </span>
               </div>
-              <p className="font-normal text-base leading-relaxed mb-8 max-w-xs" style={{ color: '#F0F2EF', opacity: 0.8 }}>
+              <p className="font-normal text-base leading-relaxed mb-8 max-w-xs opacity-60" style={{ color: 'var(--text-secondary)' }}>
                 The elite architecture for the creative economy. Managed execution for world-class visions.
               </p>
               <div className="flex gap-4">
                 {['Twitter', 'LinkedIn', 'Instagram'].map(social => (
-                  <a key={social} href="#" className="w-10 h-10 rounded-full border flex items-center justify-center transition-all" style={{ borderColor: 'rgba(240,242,239,0.1)', background: 'rgba(240,242,239,0.05)', color: '#F0F2EF' }}>{social[0]}</a>
+                  <a 
+                    key={social} 
+                    href="#" 
+                    className="w-10 h-10 rounded-full border flex items-center justify-center transition-all hover:scale-110 hover:border-accent hover:text-accent" 
+                    style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--text-primary)' }}
+                  >
+                    <span className="text-xs font-bold uppercase tracking-tighter">{social[0]}</span>
+                  </a>
                 ))}
               </div>
             </div>
 
-            <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
-              <div className="space-y-6">
-                <h4 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#F0F2EF' }}>Platform</h4>
-                <div className="flex flex-col gap-4 text-sm font-normal" style={{ color: '#F0F2EF', opacity: 0.7 }}>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Talent Directory</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Managed Services</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Pricing Structure</a>
+            <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-12">
+              {[
+                {
+                  title: "Platform",
+                  links: ["Talent Directory", "Managed Services", "Pricing Structure"]
+                },
+                {
+                  title: "Resources",
+                  links: ["Escrow Protection", "Skill Tiers", "API Docs"]
+                },
+                {
+                  title: "Company",
+                  links: ["About Virtual", "Legal Framework", "Contact"]
+                },
+                {
+                  title: "Support",
+                  links: ["Dispute Center", "Help Articles", "System Status"]
+                }
+              ].map((column) => (
+                <div key={column.title} className="space-y-6">
+                  <h4 className="font-bold text-[10px] uppercase tracking-[0.3em] opacity-40" style={{ color: 'var(--text-primary)' }}>{column.title}</h4>
+                  <div className="flex flex-col gap-4 text-sm font-normal">
+                    {column.links.map(link => (
+                      <a 
+                        key={link} 
+                        href="#" 
+                        className="transition-all duration-300 hover:text-white opacity-50 hover:opacity-100" 
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        {link}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-6">
-                <h4 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#F0F2EF' }}>Resources</h4>
-                <div className="flex flex-col gap-4 text-sm font-normal" style={{ color: '#F0F2EF', opacity: 0.7 }}>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Escrow Protection</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Skill Tiers</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">API Docs</a>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <h4 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#F0F2EF' }}>Company</h4>
-                <div className="flex flex-col gap-4 text-sm font-normal" style={{ color: '#F0F2EF', opacity: 0.7 }}>
-                  <a href="#" className="hover:opacity-100 transition-opacity">About Virtual</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Legal Framework</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Contact</a>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <h4 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#F0F2EF' }}>Support</h4>
-                <div className="flex flex-col gap-4 text-sm font-normal" style={{ color: '#F0F2EF', opacity: 0.7 }}>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Dispute Center</a>
-                  <a href="#" className="hover:opacity-100 transition-opacity">Help Articles</a>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          <div className="pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-6" style={{ borderColor: 'rgba(240,242,239,0.1)' }}>
-            <div className="text-[11px] font-normal uppercase tracking-widest" style={{ color: '#F0F2EF', opacity: 0.6 }}>
-              &copy; {new Date().getFullYear()} Virtual Inc. Powered by Managed Creative Pipelines.
+          <div className="pt-12 border-t flex flex-col sm:flex-row justify-between items-center gap-6" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div className="text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
+              &copy; {new Date().getFullYear()} Virtual Inc. Defined by Excellence.
             </div>
-            <div className="flex gap-8 text-[11px] font-normal uppercase tracking-widest" style={{ color: '#F0F2EF', opacity: 0.6 }}>
-              <a href="#" className="hover:opacity-100 transition-opacity">Privacy Policy</a>
-              <a href="#" className="hover:opacity-100 transition-opacity">Terms of Service</a>
-              <a href="#" className="hover:opacity-100 transition-opacity">Security</a>
+            <div className="flex gap-8 text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
+              <a href="#" className="hover:opacity-100 transition-opacity">Privacy</a>
+              <a href="#" className="hover:opacity-100 transition-opacity">Terms</a>
+              <a href="#" className="hover:opacity-100 transition-opacity">Cookies</a>
             </div>
           </div>
         </div>
