@@ -33,6 +33,11 @@ import FreelancerSettings from './pages/freelancer/FreelancerSettings';
 import FreelancerLearning from './pages/freelancer/FreelancerLearning';
 import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
 
+// Supervisor
+import SupervisorLayout from './pages/supervisor/SupervisorLayout';
+import SupervisorDashboard from './pages/supervisor/SupervisorDashboard';
+import SupervisorMessages from './pages/supervisor/SupervisorMessages';
+
 // Admin
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -80,6 +85,15 @@ function App() {
         <Route path="progress" element={<FreelancerProgress />} />
         <Route path="messages" element={<FreelancerMessages />} />
         <Route path="settings" element={<FreelancerSettings />} />
+      </Route>
+
+      {/* Supervisor — protected */}
+      <Route path="/supervisor" element={<RoleGuard allowedRoles={['momentum_supervisor']}><SupervisorLayout /></RoleGuard>}>
+        <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
+        <Route path="dashboard"   element={<SupervisorDashboard />} />
+        <Route path="messages"    element={<SupervisorMessages />} />
+        <Route path="freelancers" element={<SupervisorDashboard />} />
+        <Route path="settings"    element={<SupervisorDashboard />} />
       </Route>
 
       {/* Admin — direct URL only */}

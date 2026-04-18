@@ -122,7 +122,9 @@ export const loginUser = async (email, password) => {
   if (user.isSuspended) throw new Error('Account suspended');
   if (!user.isVerified) throw new Error('Please complete phone verification before logging in.');
 
-  if (!user.phoneVerified || !user.phone) {
+  // Internal staff (momentum_supervisor, admin) log in with password only — no OTP
+  const isInternalRole = ['momentum_supervisor', 'admin'].includes(user.role);
+  if (isInternalRole || !user.phoneVerified || !user.phone) {
     const { token, refreshToken } = generateTokens(user._id);
     return { user: sanitizeUser(user), token, refreshToken, requiresTwoFactor: false };
   }

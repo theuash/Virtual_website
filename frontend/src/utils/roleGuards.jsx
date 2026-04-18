@@ -2,9 +2,10 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ROLE_REDIRECTS = {
-  client: '/client/dashboard',
-  freelancer: '/freelancer/dashboard',
-  admin: '/admin/dashboard',
+  client:               '/client/dashboard',
+  freelancer:           '/freelancer/dashboard',
+  admin:                '/admin/dashboard',
+  momentum_supervisor:  '/supervisor/dashboard',
 };
 
 export const RoleGuard = ({ children, allowedRoles }) => {
