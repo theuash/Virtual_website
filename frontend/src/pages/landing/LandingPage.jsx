@@ -450,17 +450,7 @@ export default function LandingPage() {
                 exit={{ opacity: 0, y: 16, transition: { duration: 0.35, ease: 'easeOut' } }}
                 className="absolute bottom-10 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white"
               >
-                <div className="flex flex-col items-center gap-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.35em]">Scroll Down</span>
-                  <motion.div
-                    animate={{ y: [0, 6, 0], opacity: [0.45, 1, 0.45] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20"
-                  >
-                    <ChevronRight size={18} className="rotate-90" />
-                  </motion.div>
-                  <div className="h-8 w-px bg-gradient-to-b from-white/60 to-transparent"></div>
-                </div>
+                
               </motion.button>
             )}
           </AnimatePresence>
