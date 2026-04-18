@@ -3,6 +3,10 @@ import {
   getDashboardStats, createProject, getProjects, getProjectDetail, approveProject,
   getWallet, addMoneyToWallet, payDeposit, payFinal,
 } from '../controllers/client.controller.js';
+import {
+  getClientMeetings, createClientMeeting, getMeetingDetail,
+  updateMeetingStatus, addParticipant, cancelMeeting,
+} from '../controllers/meeting.controller.js';
 import { protect } from '../middleware/auth.js';
 import { requireRole } from '../middleware/roleGuard.js';
 
@@ -22,5 +26,15 @@ router.post('/projects/:id/pay-final',      payFinal);
 
 router.get('/wallet',      getWallet);
 router.post('/wallet/add', addMoneyToWallet);
+
+// Meeting routes
+router.route('/meetings')
+  .get(getClientMeetings)
+  .post(createClientMeeting);
+router.route('/meetings/:id')
+  .get(getMeetingDetail);
+router.patch('/meetings/:id/status', updateMeetingStatus);
+router.post('/meetings/:id/participants', addParticipant);
+router.post('/meetings/:id/cancel', cancelMeeting);
 
 export default router;

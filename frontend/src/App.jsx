@@ -11,6 +11,9 @@ import PricingPage from './pages/landing/PricingPage';
 import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
 
+// Meet
+import MeetRoom from './pages/MeetRoom';
+
 // Client
 import ClientLayout from './pages/client/ClientLayout';
 import ClientDashboard from './pages/client/ClientDashboard';
@@ -21,6 +24,7 @@ import ClientPayments from './pages/client/ClientPayments';
 import ClientMessages from './pages/client/ClientMessages';
 import ClientSettings from './pages/client/ClientSettings';
 import ClientWallet from './pages/client/ClientWallet';
+import ClientMeet from './pages/client/ClientMeet';
 
 // Freelancer
 import FreelancerLayout from './pages/freelancer/FreelancerLayout';
@@ -32,6 +36,7 @@ import FreelancerProgress from './pages/freelancer/FreelancerProgress';
 import FreelancerMessages from './pages/freelancer/FreelancerMessages';
 import FreelancerSettings from './pages/freelancer/FreelancerSettings';
 import FreelancerLearning from './pages/freelancer/FreelancerLearning';
+import FreelancerMeet from './pages/freelancer/FreelancerMeet';
 import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
 
 // Supervisor
@@ -61,6 +66,7 @@ function App() {
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/meet/:meetingId" element={<MeetRoom />} />
       <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
 
       {/* Client — protected */}
@@ -73,6 +79,7 @@ function App() {
         <Route path="wallet" element={<ClientWallet />} />
         <Route path="payments" element={<ClientPayments />} />
         <Route path="messages" element={<ClientMessages />} />
+        <Route path="meet" element={<ClientMeet />} />
         <Route path="settings" element={<ClientSettings />} />
       </Route>
 
@@ -83,6 +90,7 @@ function App() {
         <Route path="tasks" element={<FreelancerTasks />} />
         <Route path="task/:id" element={<TaskDetail />} />
         <Route path="learning" element={<FreelancerLearning />} />
+        <Route path="meet" element={<FreelancerMeet />} />
         <Route path="earnings" element={<FreelancerEarnings />} />
         <Route path="progress" element={<FreelancerProgress />} />
         <Route path="messages" element={<FreelancerMessages />} />

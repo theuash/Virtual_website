@@ -4,6 +4,10 @@ import {
   submitDeliverable, completeOnboarding, getSupervisor,
   getLearningProgress, reportWatchProgress,
 } from '../controllers/freelancer.controller.js';
+import {
+  getFreelancerMeetings, createFreelancerMeeting, getMeetingDetail,
+  updateMeetingStatus, addParticipant, cancelMeeting,
+} from '../controllers/meeting.controller.js';
 import { protect } from '../middleware/auth.js';
 import { requireRole } from '../middleware/roleGuard.js';
 
@@ -19,5 +23,15 @@ router.post('/learning/progress', reportWatchProgress);
 router.get('/tasks', getAvailableTasks);
 router.get('/tasks/:id', getTaskDetail);
 router.post('/tasks/:id/submit', submitDeliverable);
+
+// Meeting routes
+router.route('/meetings')
+  .get(getFreelancerMeetings)
+  .post(createFreelancerMeeting);
+router.route('/meetings/:id')
+  .get(getMeetingDetail);
+router.patch('/meetings/:id/status', updateMeetingStatus);
+router.post('/meetings/:id/participants', addParticipant);
+router.post('/meetings/:id/cancel', cancelMeeting);
 
 export default router;

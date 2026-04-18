@@ -25,11 +25,11 @@ export const runSeed = asyncHandler(async (req, res) => {
     );
   }
 
-  // ── Seed learning videos (safe upsert by id) ──────────────────
-  for (const video of learningVideos) {
+  // ── Seed learning videos with tutorials, playlists, and crash courses ──
+  for (const videoDoc of learningVideos) {
     await LearningVideo.findOneAndUpdate(
-      { id: video.id },
-      video,
+      { skill: videoDoc.skill, software: videoDoc.software },
+      videoDoc,
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
   }
@@ -53,7 +53,7 @@ export const runSeed = asyncHandler(async (req, res) => {
     });
   }
 
-  res.json(new ApiResponse(200, null, 'Pricing seeded. Learning videos seeded. Maaz account ready.'));
+  res.json(new ApiResponse(200, null, 'Pricing seeded. Learning videos with tutorials, playlists, and crash courses seeded. Maaz account ready.'));
 });
 
 export const clearSeed = asyncHandler(async (req, res) => {

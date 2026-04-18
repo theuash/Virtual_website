@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
-import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -18,6 +18,7 @@ export default function FreelancerLayout() {
     { path: '/freelancer/dashboard', icon: <LayoutDashboard size={17} strokeWidth={1.5} />, label: 'Dashboard' },
     { path: '/freelancer/tasks',     icon: <FolderKanban size={17} strokeWidth={1.5} />,    label: 'Projects' },
     { path: '/freelancer/learning',  icon: <BookOpen size={17} strokeWidth={1.5} />,        label: 'Learning' },
+    { path: '/freelancer/meet',      icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/freelancer/earnings',  icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Earnings' },
     { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career Matrix' },
     { path: '/freelancer/messages',  icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
@@ -89,7 +90,7 @@ export default function FreelancerLayout() {
           <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2" style={{ color: 'var(--text-secondary)' }}>
             Main
           </div>
-          {navItems.slice(0, 5).map(item => (
+          {navItems.slice(0, 6).map(item => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -104,7 +105,7 @@ export default function FreelancerLayout() {
           <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2 mt-3" style={{ color: 'var(--text-secondary)' }}>
             Account
           </div>
-          {navItems.slice(5).map(item => (
+          {navItems.slice(6).map(item => (
             <NavLink
               key={item.path}
               to={item.path}

@@ -3,12 +3,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonGrid } from '../../components/SkeletonLoader';
+import VideoPlayerModal from '../../components/VideoPlayerModal';
 import {
-  BookOpen, Play, Clock, ExternalLink, ChevronRight,
-  MessageSquare, User, Star, Monitor, CheckCircle2,
+  BookOpen, Play, Clock, ChevronRight,
+  MessageSquare, User, Monitor, CheckCircle2, X,
 } from 'lucide-react';
 import api from '../../services/api';
-import VideoPlayerModal from '../../components/VideoPlayerModal';
+import { motion } from 'framer-motion';
 
 // ── Skill label map ───────────────────────────────────────────────
 const SKILL_LABELS = {
@@ -21,683 +22,249 @@ const SKILL_LABELS = {
 
 // ── Software options per skill ────────────────────────────────────
 const SKILL_SOFTWARE = {
-  video_editing:     ['Adobe Premiere Pro', 'DaVinci Resolve', 'Final Cut Pro', 'CapCut'],
-  '3d_animation':    ['Blender', 'Cinema 4D', 'Maya', '3ds Max'],
-  cgi:               ['After Effects', 'Nuke', 'Fusion', 'Houdini'],
-  script_writing:    ['Final Draft', 'Celtx', 'Arc Studio', 'Google Docs'],
-  graphic_designing: ['Adobe Photoshop', 'Illustrator', 'Figma', 'Canva'],
+  video_editing:     ['davinci_resolve', 'adobe_premiere_pro', 'final_cut_pro', 'capcut'],
+  '3d_animation':    ['blender', 'cinema_4d', 'maya', '3ds_max'],
+  cgi:               ['after_effects', 'nuke', 'fusion', 'houdini'],
+  script_writing:    ['final_draft', 'celtx', 'arc_studio', 'google_docs'],
+  graphic_designing: ['adobe_photoshop', 'illustrator', 'figma', 'canva'],
 };
 
-// ── Tutorials per software ────────────────────────────────────────
-const SOFTWARE_TUTORIALS = {
-  'Adobe Premiere Pro': [
-    {
-      id: 'pp1',
-      title: 'Premiere Pro Interface & Workflow',
-      desc: 'Navigate the timeline, panels, and project structure.',
-      duration: '12 min',
-      level: 'Beginner',
-      youtubeQuery: 'premiere pro beginner interface tutorial',
-    },
-    {
-      id: 'pp2',
-      title: 'Color Correction & Grading',
-      desc: 'Use Lumetri Color for professional-grade color work.',
-      duration: '18 min',
-      level: 'Intermediate',
-      youtubeQuery: 'premiere pro lumetri color grading tutorial',
-    },
-    {
-      id: 'pp3',
-      title: 'Multi-cam Editing',
-      desc: 'Sync and cut between multiple camera angles efficiently.',
-      duration: '15 min',
-      level: 'Intermediate',
-      youtubeQuery: 'premiere pro multicam editing tutorial',
-    },
-    {
-      id: 'pp4',
-      title: 'Export Settings for Delivery',
-      desc: 'Correct codecs, bitrates, and formats for client delivery.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'premiere pro export settings tutorial',
-    },
-  ],
-  'DaVinci Resolve': [
-    {
-      id: 'dr1',
-      title: 'DaVinci Resolve Overview',
-      desc: 'Cut, color, Fairlight, and Fusion — all in one tool.',
-      duration: '14 min',
-      level: 'Beginner',
-      youtubeQuery: 'davinci resolve beginner overview tutorial',
-    },
-    {
-      id: 'dr2',
-      title: 'Node-Based Color Grading',
-      desc: 'Build professional color grades using the node system.',
-      duration: '20 min',
-      level: 'Intermediate',
-      youtubeQuery: 'davinci resolve node color grading tutorial',
-    },
-    {
-      id: 'dr3',
-      title: 'Fusion VFX Basics',
-      desc: 'Compositing and motion graphics inside Resolve.',
-      duration: '16 min',
-      level: 'Intermediate',
-      youtubeQuery: 'davinci resolve fusion basics tutorial',
-    },
-    {
-      id: 'dr4',
-      title: 'Audio Mixing in Fairlight',
-      desc: 'Clean, level, and master audio for video delivery.',
-      duration: '10 min',
-      level: 'Beginner',
-      youtubeQuery: 'davinci resolve fairlight audio tutorial',
-    },
-  ],
-  'Final Cut Pro': [
-    {
-      id: 'fcp1',
-      title: 'Final Cut Pro Magnetic Timeline',
-      desc: 'Master the unique magnetic timeline workflow.',
-      duration: '11 min',
-      level: 'Beginner',
-      youtubeQuery: 'final cut pro magnetic timeline tutorial',
-    },
-    {
-      id: 'fcp2',
-      title: 'Color Wheels & Curves',
-      desc: 'Professional color correction in Final Cut.',
-      duration: '14 min',
-      level: 'Intermediate',
-      youtubeQuery: 'final cut pro color correction tutorial',
-    },
-    {
-      id: 'fcp3',
-      title: 'Motion Graphics with Titles',
-      desc: 'Animated titles and lower thirds in Final Cut.',
-      duration: '12 min',
-      level: 'Intermediate',
-      youtubeQuery: 'final cut pro motion graphics titles tutorial',
-    },
-  ],
-  'CapCut': [
-    {
-      id: 'cc1',
-      title: 'CapCut for Professional Edits',
-      desc: 'Use CapCut beyond social media — for client-ready cuts.',
-      duration: '9 min',
-      level: 'Beginner',
-      youtubeQuery: 'capcut professional editing tutorial',
-    },
-    {
-      id: 'cc2',
-      title: 'Keyframe Animation in CapCut',
-      desc: 'Animate position, scale, and opacity with keyframes.',
-      duration: '11 min',
-      level: 'Intermediate',
-      youtubeQuery: 'capcut keyframe animation tutorial',
-    },
-    {
-      id: 'cc3',
-      title: 'CapCut Color Grading',
-      desc: 'Apply LUTs and manual color correction in CapCut.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'capcut color grading tutorial',
-    },
-  ],
-  'Blender': [
-    {
-      id: 'bl1',
-      title: 'Blender Interface & Navigation',
-      desc: 'Learn the viewport, outliner, and properties panels.',
-      duration: '13 min',
-      level: 'Beginner',
-      youtubeQuery: 'blender beginner interface tutorial',
-    },
-    {
-      id: 'bl2',
-      title: 'Modelling Fundamentals',
-      desc: 'Box modelling, loop cuts, and subdivision surfaces.',
-      duration: '22 min',
-      level: 'Beginner',
-      youtubeQuery: 'blender modelling fundamentals tutorial',
-    },
-    {
-      id: 'bl3',
-      title: 'Rigging & Weight Painting',
-      desc: 'Rig a character and paint weights for clean deformation.',
-      duration: '25 min',
-      level: 'Intermediate',
-      youtubeQuery: 'blender rigging weight painting tutorial',
-    },
-    {
-      id: 'bl4',
-      title: 'Cycles Rendering & Lighting',
-      desc: 'Set up a professional render with Cycles.',
-      duration: '18 min',
-      level: 'Intermediate',
-      youtubeQuery: 'blender cycles rendering lighting tutorial',
-    },
-  ],
-  'Cinema 4D': [
-    {
-      id: 'c4d1',
-      title: 'Cinema 4D Basics',
-      desc: 'Scene setup, objects, and the attribute manager.',
-      duration: '12 min',
-      level: 'Beginner',
-      youtubeQuery: 'cinema 4d beginner basics tutorial',
-    },
-    {
-      id: 'c4d2',
-      title: 'MoGraph Effectors',
-      desc: 'Use cloners and effectors for motion graphics.',
-      duration: '17 min',
-      level: 'Intermediate',
-      youtubeQuery: 'cinema 4d mograph effectors tutorial',
-    },
-    {
-      id: 'c4d3',
-      title: 'Redshift Rendering',
-      desc: 'GPU rendering with Redshift inside C4D.',
-      duration: '20 min',
-      level: 'Advanced',
-      youtubeQuery: 'cinema 4d redshift rendering tutorial',
-    },
-  ],
-  'Maya': [
-    {
-      id: 'ma1',
-      title: 'Maya Interface & Basics',
-      desc: 'Viewports, shelves, and the outliner.',
-      duration: '14 min',
-      level: 'Beginner',
-      youtubeQuery: 'maya beginner interface tutorial',
-    },
-    {
-      id: 'ma2',
-      title: 'Character Animation Principles',
-      desc: 'Blocking, spline, and polish in Maya.',
-      duration: '28 min',
-      level: 'Intermediate',
-      youtubeQuery: 'maya character animation tutorial',
-    },
-    {
-      id: 'ma3',
-      title: 'nCloth & Dynamics',
-      desc: 'Simulate cloth, hair, and rigid bodies.',
-      duration: '20 min',
-      level: 'Advanced',
-      youtubeQuery: 'maya ncloth dynamics tutorial',
-    },
-  ],
-  '3ds Max': [
-    {
-      id: '3m1',
-      title: '3ds Max Fundamentals',
-      desc: 'Scene management, modifiers, and the stack.',
-      duration: '13 min',
-      level: 'Beginner',
-      youtubeQuery: '3ds max beginner fundamentals tutorial',
-    },
-    {
-      id: '3m2',
-      title: 'Architectural Visualization',
-      desc: 'Model and render an interior scene.',
-      duration: '30 min',
-      level: 'Intermediate',
-      youtubeQuery: '3ds max architectural visualization tutorial',
-    },
-    {
-      id: '3m3',
-      title: 'V-Ray Rendering',
-      desc: 'Set up V-Ray materials, lights, and render settings.',
-      duration: '22 min',
-      level: 'Advanced',
-      youtubeQuery: '3ds max vray rendering tutorial',
-    },
-  ],
-  'After Effects': [
-    {
-      id: 'ae1',
-      title: 'After Effects Interface',
-      desc: 'Compositions, layers, and the timeline.',
-      duration: '11 min',
-      level: 'Beginner',
-      youtubeQuery: 'after effects beginner interface tutorial',
-    },
-    {
-      id: 'ae2',
-      title: 'Keying & Rotoscoping',
-      desc: 'Remove green screen and roto-paint subjects.',
-      duration: '19 min',
-      level: 'Intermediate',
-      youtubeQuery: 'after effects keying rotoscoping tutorial',
-    },
-    {
-      id: 'ae3',
-      title: 'Motion Tracking',
-      desc: 'Track footage and attach elements to moving objects.',
-      duration: '16 min',
-      level: 'Intermediate',
-      youtubeQuery: 'after effects motion tracking tutorial',
-    },
-    {
-      id: 'ae4',
-      title: '3D Camera & Depth',
-      desc: 'Work in 3D space with cameras and lights.',
-      duration: '14 min',
-      level: 'Intermediate',
-      youtubeQuery: 'after effects 3d camera tutorial',
-    },
-  ],
-  'Nuke': [
-    {
-      id: 'nk1',
-      title: 'Nuke Node Graph Basics',
-      desc: 'Understand the node-based compositing workflow.',
-      duration: '15 min',
-      level: 'Beginner',
-      youtubeQuery: 'nuke node graph compositing tutorial',
-    },
-    {
-      id: 'nk2',
-      title: 'Keying with Primatte',
-      desc: 'Professional green screen removal in Nuke.',
-      duration: '18 min',
-      level: 'Intermediate',
-      youtubeQuery: 'nuke primatte keying tutorial',
-    },
-    {
-      id: 'nk3',
-      title: 'Roto & Paint',
-      desc: 'Rotoscoping and paint fixes for VFX shots.',
-      duration: '20 min',
-      level: 'Intermediate',
-      youtubeQuery: 'nuke roto paint tutorial',
-    },
-  ],
-  'Fusion': [
-    {
-      id: 'fu1',
-      title: 'Fusion Compositing Basics',
-      desc: 'Nodes, tools, and the flow workspace.',
-      duration: '12 min',
-      level: 'Beginner',
-      youtubeQuery: 'fusion compositing basics tutorial',
-    },
-    {
-      id: 'fu2',
-      title: 'Particle Systems',
-      desc: 'Create fire, smoke, and particle effects.',
-      duration: '17 min',
-      level: 'Intermediate',
-      youtubeQuery: 'fusion particle systems tutorial',
-    },
-  ],
-  'Houdini': [
-    {
-      id: 'ho1',
-      title: 'Houdini Procedural Workflow',
-      desc: 'Understand SOPs, DOPs, and the network editor.',
-      duration: '18 min',
-      level: 'Beginner',
-      youtubeQuery: 'houdini procedural workflow tutorial',
-    },
-    {
-      id: 'ho2',
-      title: 'Fluid & Pyro Simulations',
-      desc: 'Simulate water, fire, and smoke.',
-      duration: '30 min',
-      level: 'Advanced',
-      youtubeQuery: 'houdini fluid pyro simulation tutorial',
-    },
-    {
-      id: 'ho3',
-      title: 'Destruction & Fracture',
-      desc: 'Break apart geometry with Voronoi fracture.',
-      duration: '25 min',
-      level: 'Advanced',
-      youtubeQuery: 'houdini destruction fracture tutorial',
-    },
-  ],
-  'Final Draft': [
-    {
-      id: 'fd1',
-      title: 'Screenplay Formatting Essentials',
-      desc: 'Industry-standard formatting rules for feature and TV scripts.',
-      duration: '10 min',
-      level: 'Beginner',
-      youtubeQuery: 'final draft screenplay formatting tutorial',
-    },
-    {
-      id: 'fd2',
-      title: 'Scene Headings & Action Lines',
-      desc: 'Write clear sluglines and action blocks that directors love.',
-      duration: '12 min',
-      level: 'Beginner',
-      youtubeQuery: 'final draft scene headings action lines tutorial',
-    },
-    {
-      id: 'fd3',
-      title: 'Dialogue Formatting & Character Cues',
-      desc: 'Format dialogue, parentheticals, and dual dialogue correctly.',
-      duration: '11 min',
-      level: 'Intermediate',
-      youtubeQuery: 'final draft dialogue formatting tutorial',
-    },
-  ],
-  'Celtx': [
-    {
-      id: 'cx1',
-      title: 'Celtx Script Writing Workflow',
-      desc: 'Set up a project and write your first script in Celtx.',
-      duration: '9 min',
-      level: 'Beginner',
-      youtubeQuery: 'celtx script writing workflow tutorial',
-    },
-    {
-      id: 'cx2',
-      title: 'Collaboration & Sharing',
-      desc: 'Invite collaborators and manage script revisions as a team.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'celtx collaboration sharing tutorial',
-    },
-    {
-      id: 'cx3',
-      title: 'Production Planning in Celtx',
-      desc: 'Break down your script into scenes, cast, and schedule.',
-      duration: '14 min',
-      level: 'Intermediate',
-      youtubeQuery: 'celtx production planning breakdown tutorial',
-    },
-  ],
-  'Arc Studio': [
-    {
-      id: 'as1',
-      title: 'Modern Screenwriting in Arc Studio',
-      desc: 'Get started with Arc Studio\'s clean, distraction-free interface.',
-      duration: '10 min',
-      level: 'Beginner',
-      youtubeQuery: 'arc studio screenwriting tutorial',
-    },
-    {
-      id: 'as2',
-      title: 'Beat Sheets & Story Structure',
-      desc: 'Use Arc\'s beat sheet tools to map your story beats.',
-      duration: '13 min',
-      level: 'Intermediate',
-      youtubeQuery: 'arc studio beat sheet story structure tutorial',
-    },
-    {
-      id: 'as3',
-      title: 'Outline Tools & Scene Cards',
-      desc: 'Organise your script with scene cards and outline view.',
-      duration: '11 min',
-      level: 'Intermediate',
-      youtubeQuery: 'arc studio outline tools scene cards tutorial',
-    },
-  ],
-  'Google Docs': [
-    {
-      id: 'gd1',
-      title: 'Script Templates in Google Docs',
-      desc: 'Set up a screenplay template with correct margins and fonts.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'google docs screenplay script template tutorial',
-    },
-    {
-      id: 'gd2',
-      title: 'Formatting with Paragraph Styles',
-      desc: 'Use heading styles to format scene headings, action, and dialogue.',
-      duration: '10 min',
-      level: 'Beginner',
-      youtubeQuery: 'google docs paragraph styles formatting tutorial',
-    },
-    {
-      id: 'gd3',
-      title: 'Real-Time Collaboration',
-      desc: 'Share, comment, and co-write scripts with your team live.',
-      duration: '7 min',
-      level: 'Beginner',
-      youtubeQuery: 'google docs real time collaboration tutorial',
-    },
-  ],
-  'Adobe Photoshop': [
-    {
-      id: 'ps1',
-      title: 'Layers & Masks',
-      desc: 'Understand the layer panel, blending modes, and layer masks.',
-      duration: '14 min',
-      level: 'Beginner',
-      youtubeQuery: 'photoshop layers masks beginner tutorial',
-    },
-    {
-      id: 'ps2',
-      title: 'Retouching & Healing',
-      desc: 'Use the healing brush, clone stamp, and content-aware fill.',
-      duration: '16 min',
-      level: 'Intermediate',
-      youtubeQuery: 'photoshop retouching healing brush tutorial',
-    },
-    {
-      id: 'ps3',
-      title: 'Smart Objects & Non-Destructive Editing',
-      desc: 'Work non-destructively with smart objects and smart filters.',
-      duration: '12 min',
-      level: 'Intermediate',
-      youtubeQuery: 'photoshop smart objects non destructive editing tutorial',
-    },
-    {
-      id: 'ps4',
-      title: 'Export for Web & Print',
-      desc: 'Export assets correctly for web, social media, and print.',
-      duration: '9 min',
-      level: 'Beginner',
-      youtubeQuery: 'photoshop export for web print tutorial',
-    },
-  ],
-  'Illustrator': [
-    {
-      id: 'ai1',
-      title: 'Vector Basics & Shapes',
-      desc: 'Understand paths, anchor points, and the shape builder tool.',
-      duration: '12 min',
-      level: 'Beginner',
-      youtubeQuery: 'illustrator vector basics shapes tutorial',
-    },
-    {
-      id: 'ai2',
-      title: 'Mastering the Pen Tool',
-      desc: 'Draw precise curves and complex paths with the pen tool.',
-      duration: '15 min',
-      level: 'Intermediate',
-      youtubeQuery: 'illustrator pen tool mastery tutorial',
-    },
-    {
-      id: 'ai3',
-      title: 'Logo Design Workflow',
-      desc: 'Design a professional logo from concept to final vector.',
-      duration: '22 min',
-      level: 'Intermediate',
-      youtubeQuery: 'illustrator logo design workflow tutorial',
-    },
-    {
-      id: 'ai4',
-      title: 'Export Formats for Clients',
-      desc: 'Export SVG, PDF, PNG, and EPS files correctly for any use case.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'illustrator export formats svg pdf tutorial',
-    },
-  ],
-  'Figma': [
-    {
-      id: 'fg1',
-      title: 'Components & Variants',
-      desc: 'Build reusable components and manage variants in Figma.',
-      duration: '16 min',
-      level: 'Intermediate',
-      youtubeQuery: 'figma components variants tutorial',
-    },
-    {
-      id: 'fg2',
-      title: 'Auto Layout',
-      desc: 'Create responsive frames that adapt to content automatically.',
-      duration: '14 min',
-      level: 'Intermediate',
-      youtubeQuery: 'figma auto layout tutorial',
-    },
-    {
-      id: 'fg3',
-      title: 'Prototyping & Interactions',
-      desc: 'Link frames and add interactions to create clickable prototypes.',
-      duration: '13 min',
-      level: 'Beginner',
-      youtubeQuery: 'figma prototyping interactions tutorial',
-    },
-    {
-      id: 'fg4',
-      title: 'Design Systems',
-      desc: 'Build a scalable design system with tokens, styles, and libraries.',
-      duration: '20 min',
-      level: 'Advanced',
-      youtubeQuery: 'figma design systems tutorial',
-    },
-  ],
-  'Canva': [
-    {
-      id: 'cv1',
-      title: 'Brand Kit Setup',
-      desc: 'Upload your brand colours, fonts, and logos into Canva.',
-      duration: '7 min',
-      level: 'Beginner',
-      youtubeQuery: 'canva brand kit setup tutorial',
-    },
-    {
-      id: 'cv2',
-      title: 'Template Customisation',
-      desc: 'Adapt professional templates to match your client\'s brand.',
-      duration: '10 min',
-      level: 'Beginner',
-      youtubeQuery: 'canva template customization tutorial',
-    },
-    {
-      id: 'cv3',
-      title: 'Export for Print & Digital',
-      desc: 'Choose the right file format and resolution for every output.',
-      duration: '8 min',
-      level: 'Beginner',
-      youtubeQuery: 'canva export print digital tutorial',
-    },
-  ],
+// ── Software display names ─────────────────────────────────────
+const SOFTWARE_LABELS = {
+  davinci_resolve: 'DaVinci Resolve',
+  adobe_premiere_pro: 'Adobe Premiere Pro',
+  final_cut_pro: 'Final Cut Pro',
+  capcut: 'CapCut',
+  blender: 'Blender',
+  cinema_4d: 'Cinema 4D',
+  maya: 'Maya',
+  '3ds_max': '3ds Max',
+  after_effects: 'After Effects',
+  nuke: 'Nuke',
+  fusion: 'Fusion',
+  houdini: 'Houdini',
+  final_draft: 'Final Draft',
+  celtx: 'Celtx',
+  arc_studio: 'Arc Studio',
+  google_docs: 'Google Docs',
+  adobe_photoshop: 'Adobe Photoshop',
+  illustrator: 'Illustrator',
+  figma: 'Figma',
+  canva: 'Canva',
 };
 
-// ── Level badge colours (CSS-variable-safe via inline style) ─────
-const LEVEL_STYLES = {
-  Beginner:     { background: 'rgba(34,197,94,0.15)',  color: '#22c55e' },
-  Intermediate: { background: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
-  Advanced:     { background: 'rgba(239,68,68,0.15)',  color: '#ef4444' },
-};
-
-// ── Sub-components ────────────────────────────────────────────────
-
+// ── Tutorial Card ─────────────────────────────────────────────────
 function TutorialCard({ tutorial, progress, onWatch }) {
-  const levelStyle = LEVEL_STYLES[tutorial.level] || LEVEL_STYLES.Beginner;
-  const isCompleted = progress?.completed ?? false;
-  const pct = progress?.durationSeconds > 0
-    ? Math.min(100, Math.round((progress.watchedSeconds / progress.durationSeconds) * 100))
-    : 0;
+  const isCompleted = progress?.completed;
+  const pct = progress?.percentage || 0;
 
   return (
     <div
-      className="flex flex-col justify-between p-5 rounded-xl border transition-all"
-      style={{
-        background: 'var(--bg-secondary)',
-        borderColor: isCompleted ? 'var(--accent)' : 'var(--border)',
-      }}
+      className="p-4 rounded-lg border transition-all hover:border-accent"
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
     >
-      <div>
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="text-sm font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
             {tutorial.title}
           </h3>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={levelStyle}>
-              {tutorial.level}
-            </span>
-            {isCompleted && (
-              <span className="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full"
-                style={{ background: 'var(--accent)', color: '#fff' }}>
-                <CheckCircle2 size={9} strokeWidth={2.5} /> Done
-              </span>
-            )}
-          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            {tutorial.desc}
+          </p>
         </div>
-        <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
-          {tutorial.desc}
-        </p>
-
-        {/* Progress bar — only show if started */}
-        {pct > 0 && (
-          <div className="mb-3">
-            <div className="flex justify-between mb-1">
-              <span className="text-[9px]" style={{ color: 'var(--text-secondary)' }}>Progress</span>
-              <span className="text-[9px] font-bold" style={{ color: 'var(--accent)' }}>{pct}%</span>
-            </div>
-            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-              <div className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${pct}%`, background: 'var(--accent)' }} />
-            </div>
-          </div>
+        {isCompleted && (
+          <CheckCircle2 size={16} style={{ color: 'var(--accent)' }} className="shrink-0 ml-2" />
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-2">
-        <span className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
-          <Clock size={11} strokeWidth={1.5} />
-          {tutorial.duration}
-        </span>
-        <button
-          onClick={() => onWatch(tutorial)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95"
-          style={{ background: isCompleted ? 'var(--bg-card)' : 'var(--accent)', color: isCompleted ? 'var(--accent)' : '#fff',
-            border: isCompleted ? '1px solid var(--accent)' : 'none' }}
-        >
-          <Play size={11} strokeWidth={2} />
-          {isCompleted ? 'Rewatch' : pct > 0 ? 'Continue' : 'Watch'}
-        </button>
+      <div className="flex items-center gap-2 text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
+        <Clock size={12} />
+        {tutorial.duration}
+        <span>•</span>
+        <span>{tutorial.level}</span>
       </div>
+
+      {pct > 0 && (
+        <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'var(--border)' }}>
+          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+        </div>
+      )}
+
+      <button
+        onClick={() => onWatch(tutorial)}
+        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all hover:scale-[1.02] active:scale-95"
+        style={{ background: 'var(--accent)', color: '#fff' }}
+      >
+        <Play size={10} strokeWidth={2} />
+        {isCompleted ? 'Rewatch' : pct > 0 ? 'Continue' : 'Watch'}
+      </button>
     </div>
   );
 }
 
+// ── Playlist Card ─────────────────────────────────────────────────
+function PlaylistCard({ playlist, onOpen }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      onClick={() => onOpen(playlist)}
+      className="p-4 rounded-lg border cursor-pointer transition-all"
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+            {playlist.title}
+          </h3>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            {playlist.videos?.length || 0} videos
+          </p>
+        </div>
+        <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'var(--accent)', color: '#fff' }}>
+          {playlist.level}
+        </span>
+      </div>
+      <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+        {playlist.description}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Crash Course Card ─────────────────────────────────────────────
+function CrashCourseCard({ course, onOpen }) {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      onClick={() => onOpen(course)}
+      className="p-4 rounded-lg border cursor-pointer transition-all"
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+            {course.title}
+          </h3>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            {course.videos?.length || 0} videos
+          </p>
+        </div>
+        <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'var(--accent)', color: '#fff' }}>
+          {course.level}
+        </span>
+      </div>
+      <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+        {course.description}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Playlist/Course Detail Modal ──────────────────────────────────
+function PlaylistDetailModal({ item, onClose, onWatchVideo }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="w-full max-w-2xl max-h-[80vh] rounded-2xl overflow-hidden flex flex-col"
+        style={{ background: 'var(--bg-secondary)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div
+          className="p-5 border-b flex items-center justify-between"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+              {item.title}
+            </h2>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+              {item.videos?.length || 0} videos
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-opacity-10"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Videos List */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-2">
+          {item.videos && item.videos.length > 0 ? (
+            item.videos.map((video, idx) => (
+              <motion.div
+                key={video.youtubeId}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                onClick={() => onWatchVideo(video)}
+                className="p-3 rounded-lg border cursor-pointer transition-all hover:border-accent"
+                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded flex items-center justify-center shrink-0" style={{ background: 'var(--accent)', color: '#fff' }}>
+                    <Play size={12} strokeWidth={2} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                      {video.title}
+                    </h4>
+                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>
+                      {video.desc}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                      <Clock size={10} />
+                      {video.duration}
+                      <span>•</span>
+                      <span>{video.level}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <p style={{ color: 'var(--text-secondary)' }}>No videos in this collection</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── Supervisor Panel ──────────────────────────────────────────────
 function SupervisorPanel() {
-  const [supervisor, setSupervisor]   = useState(null);
-  const [loading, setLoading]         = useState(true);
-  const [messaging, setMessaging]     = useState(false); // button loading state
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [supervisor, setSupervisor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [messaging, setMessaging] = useState(false);
 
   useEffect(() => {
     api.get('/freelancer/supervisor')
-      .then(res => setSupervisor(res.data?.data ?? null))
-      .catch(() => setSupervisor(null))
+      .then(res => setSupervisor(res.data?.data))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const handleMessageSupervisor = async () => {
-    if (!supervisor?._id) return;
+    if (!supervisor) return;
     setMessaging(true);
     try {
-      // Create or find existing DM conversation with this supervisor
       const res = await api.post('/messaging/conversations', {
         type:    'dm',
         members: [supervisor._id],
@@ -708,7 +275,6 @@ function SupervisorPanel() {
         navigate(`/freelancer/messages?conv=${convId}`);
       }
     } catch {
-      // If messaging fails, still navigate to messages page
       navigate('/freelancer/messages');
     } finally {
       setMessaging(false);
@@ -800,7 +366,7 @@ function SupervisorPanel() {
               style={{ background: 'var(--accent)', color: '#fff' }}
             >
               <MessageSquare size={14} strokeWidth={1.5} />
-              {messaging ? 'Opening chat…' : 'Message Supervisor'}
+              {messaging ? 'Opening chat...' : 'Message Supervisor'}
             </button>
           </>
         )}
@@ -812,7 +378,7 @@ function SupervisorPanel() {
           Learning Tips
         </div>
         {[
-          'Watch tutorials at 1.25× speed to save time.',
+          'Watch tutorials at 1.25x speed to save time.',
           'Practice each technique on a real client brief.',
           'Ask your supervisor to review your first deliverable.',
         ].map((tip, i) => (
@@ -843,27 +409,48 @@ export default function FreelancerLearning() {
   const [progress, setProgress]               = useState({});
   const [playingTutorial, setPlayingTutorial] = useState(null);
   const [catalogue, setCatalogue]             = useState({});
+  const [playlists, setPlaylists]             = useState([]);
+  const [crashCourses, setCrashCourses]       = useState([]);
   const [videosLoading, setVideosLoading]     = useState(true);
+  const [contentType, setContentType]         = useState('tutorials');
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [selectedCourse, setSelectedCourse]   = useState(null);
 
-  // Fetch catalogue + progress on mount
+  // Fetch catalogue, playlists, crash courses, and progress on mount
   useEffect(() => {
     Promise.all([
       api.get('/learning/catalogue'),
       api.get('/freelancer/learning/progress'),
     ]).then(([catRes, progRes]) => {
-      setCatalogue(catRes.data?.data ?? {});
+      // Catalogue now has tutorials, playlists, crash_courses nested
+      const rawCatalogue = catRes.data?.data ?? {};
+      setCatalogue(rawCatalogue);
       setProgress(progRes.data?.data ?? {});
-    }).catch(() => {}).finally(() => setVideosLoading(false));
+    }).catch((err) => {
+      console.error('Error fetching catalogue:', err);
+    }).finally(() => setVideosLoading(false));
   }, []);
+
+  // Fetch playlists and crash courses when skill/software changes
+  useEffect(() => {
+    if (!activeSkill || !activeSoftware) return;
+
+    Promise.all([
+      api.get('/learning/playlists', { params: { skill: activeSkill, software: activeSoftware } }),
+      api.get('/learning/crashcourses', { params: { skill: activeSkill, software: activeSoftware } }),
+    ]).then(([playRes, courseRes]) => {
+      setPlaylists(playRes.data?.data ?? []);
+      setCrashCourses(courseRes.data?.data ?? []);
+    }).catch(() => {});
+  }, [activeSkill, activeSoftware]);
 
   function handleSkillChange(skill) {
     setActiveSkill(skill);
     setActiveSoftware(SKILL_SOFTWARE[skill]?.[0] ?? null);
   }
 
-  // Tutorials come from DB catalogue, not hardcoded data
   const tutorials = (activeSoftware && activeSkill)
-    ? (catalogue[activeSkill]?.[activeSoftware] ?? [])
+    ? (catalogue[activeSkill]?.[activeSoftware]?.tutorials ?? [])
     : [];
 
   // ── No skills set ─────────────────────────────────────────────
@@ -897,193 +484,157 @@ export default function FreelancerLearning() {
     );
   }
 
-  // ── Main layout ───────────────────────────────────────────────
   return (
     <>
       <DashboardHeader title="Learning" />
 
-      <div className="p-6 md:p-8 max-w-6xl mx-auto">
+      <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+
+        {/* ── Skill selector ────────────────────────────────────── */}
+        <div className="flex flex-wrap gap-2">
+          {userSkills.map(skill => (
+            <button
+              key={skill}
+              onClick={() => handleSkillChange(skill)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                activeSkill === skill ? 'scale-105' : 'opacity-60 hover:opacity-100'
+              }`}
+              style={{
+                background: activeSkill === skill ? 'var(--accent)' : 'var(--bg-card)',
+                color: activeSkill === skill ? '#fff' : 'var(--text-primary)',
+                borderColor: 'var(--border)',
+              }}
+            >
+              {SKILL_LABELS[skill]}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Software selector ────────────────────────────────── */}
+        {activeSkill && (
+          <div className="flex flex-wrap gap-2">
+            {SKILL_SOFTWARE[activeSkill]?.map(software => (
+              <button
+                key={software}
+                onClick={() => setActiveSoftware(software)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                  activeSoftware === software ? 'scale-105' : 'opacity-60 hover:opacity-100'
+                }`}
+                style={{
+                  background: activeSoftware === software ? 'var(--accent)' : 'transparent',
+                  color: activeSoftware === software ? '#fff' : 'var(--text-primary)',
+                  borderColor: activeSoftware === software ? 'var(--accent)' : 'var(--border)',
+                }}
+              >
+                {SOFTWARE_LABELS[software] || software}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Content type selector ────────────────────────────── */}
+        <div className="flex gap-2 border-b" style={{ borderColor: 'var(--border)' }}>
+          {[
+            { id: 'tutorials', label: 'Tutorials' },
+            { id: 'playlists', label: 'Playlists' },
+            { id: 'crashcourses', label: 'Crash Courses' },
+          ].map(type => (
+            <button
+              key={type.id}
+              onClick={() => setContentType(type.id)}
+              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
+                contentType === type.id ? 'border-accent' : 'border-transparent opacity-60'
+              }`}
+              style={{
+                color: contentType === type.id ? 'var(--accent)' : 'var(--text-secondary)',
+              }}
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Main content grid ────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* ── Main content — 2 cols ──────────────────────────── */}
-          <div className="lg:col-span-2 space-y-4">
-
-            {/* Selection card: skill tabs + software picker */}
-            <div
-              className="rounded-xl border overflow-hidden"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-            >
-              {/* Skill tabs */}
-              <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-                <div className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-                  Your Skills
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {userSkills.map((skill) => {
-                    const isActive = skill === activeSkill;
-                    return (
-                      <button
-                        key={skill}
-                        onClick={() => handleSkillChange(skill)}
-                        className="px-4 py-2 rounded-full text-xs font-bold border transition-all"
-                        style={{
-                          background: isActive ? 'var(--accent)' : 'var(--bg-card)',
-                          borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                          color: isActive ? '#fff' : 'var(--text-secondary)',
-                        }}
-                      >
-                        {SKILL_LABELS[skill]}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Software picker */}
-              {activeSkill && (
-                <div className="px-5 py-4">
-                  <div className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-                    Select Software
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {(SKILL_SOFTWARE[activeSkill] ?? []).map((sw) => {
-                      const isActive = sw === activeSoftware;
-                      return (
-                        <button
-                          key={sw}
-                          onClick={() => setActiveSoftware(sw)}
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition-all"
-                          style={{
-                            background: isActive ? 'var(--bg-primary)' : 'transparent',
-                            borderColor: isActive ? 'var(--accent)' : 'var(--border)',
-                            color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                          }}
-                        >
-                          <Monitor size={12} strokeWidth={1.5} />
-                          {sw}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Tutorial list */}
-            {activeSoftware && (
-              <div
-                className="rounded-xl border overflow-hidden"
-                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-              >
+          {/* ── Content area ─────────────────────────────────── */}
+          <div className="lg:col-span-2">
+            {videosLoading ? (
+              <SkeletonGrid count={6} />
+            ) : (
+              <div>
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
                     <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                      {activeSoftware}
+                      {contentType === 'tutorials' && `${SOFTWARE_LABELS[activeSoftware] || activeSoftware} - Tutorials`}
+                      {contentType === 'playlists' && `${SOFTWARE_LABELS[activeSoftware] || activeSoftware} - Playlists`}
+                      {contentType === 'crashcourses' && `${SOFTWARE_LABELS[activeSoftware] || activeSoftware} - Crash Courses`}
                     </h2>
+                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {contentType === 'tutorials' && `${tutorials.length} lessons`}
+                      {contentType === 'playlists' && `${playlists.length} playlists`}
+                      {contentType === 'crashcourses' && `${crashCourses.length} courses`}
+                    </span>
                   </div>
-                  <span
-                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border"
-                    style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)', background: 'var(--bg-card)' }}
-                  >
-                    {tutorials.length} lessons
-                  </span>
                 </div>
 
-                {/* Loading state */}
-                {videosLoading ? (
-                  <div className="p-5">
-                    <SkeletonGrid count={4} columns="grid-cols-1" />
+                {/* Content */}
+                {contentType === 'tutorials' ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {tutorials.length > 0 ? (
+                      tutorials.map(tutorial => (
+                        <TutorialCard
+                          key={tutorial.id}
+                          tutorial={tutorial}
+                          progress={progress[tutorial.id]}
+                          onWatch={setPlayingTutorial}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-2 text-center py-8">
+                        <p style={{ color: 'var(--text-secondary)' }}>No tutorials available</p>
+                      </div>
+                    )}
                   </div>
-                ) : tutorials.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No tutorials available yet.</p>
+                ) : contentType === 'playlists' ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {playlists.length > 0 ? (
+                      playlists.map(playlist => (
+                        <PlaylistCard
+                          key={playlist._id}
+                          playlist={playlist}
+                          onOpen={setSelectedPlaylist}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-2 text-center py-8">
+                        <p style={{ color: 'var(--text-secondary)' }}>No playlists available</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div>
-                    {tutorials.map((tutorial, i) => {
-                      const levelStyle = LEVEL_STYLES[tutorial.level] || LEVEL_STYLES.Beginner;
-                      const isLast = i === tutorials.length - 1;
-                      const tProgress = progress[tutorial.id];
-                      const isCompleted = tProgress?.completed ?? false;
-                      const pct = tProgress?.durationSeconds > 0
-                        ? Math.min(100, Math.round((tProgress.watchedSeconds / tProgress.durationSeconds) * 100))
-                        : 0;
-                      return (
-                        <div
-                          key={tutorial.id}
-                          className={`flex items-center gap-4 px-5 py-4 ${!isLast ? 'border-b' : ''}`}
-                          style={{ borderColor: 'var(--border)', background: isCompleted ? 'rgba(96,10,10,0.03)' : 'transparent' }}
-                        >
-                          {/* Icon */}
-                          <div
-                            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                            style={{ background: isCompleted ? 'var(--accent)' : 'var(--bg-card)', color: isCompleted ? '#fff' : 'var(--accent)' }}
-                          >
-                            {isCompleted
-                              ? <CheckCircle2 size={14} strokeWidth={2} />
-                              : <Play size={14} strokeWidth={2} />}
-                          </div>
-
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                              <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                {tutorial.title}
-                              </span>
-                              <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0" style={levelStyle}>
-                                {tutorial.level}
-                              </span>
-                              {isCompleted && (
-                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full shrink-0"
-                                  style={{ background: 'var(--accent)', color: '#fff' }}>
-                                  ✓ Complete
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs truncate mb-1" style={{ color: 'var(--text-secondary)' }}>
-                              {tutorial.desc}
-                            </p>
-                            {/* Inline progress bar */}
-                            {pct > 0 && !isCompleted && (
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)', opacity: 0.7 }} />
-                                </div>
-                                <span className="text-[9px] font-bold shrink-0" style={{ color: 'var(--accent)' }}>{pct}%</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Duration + CTA */}
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="hidden sm:flex items-center gap-1 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-                              <Clock size={11} strokeWidth={1.5} /> {tutorial.duration}
-                            </span>
-                            <button
-                              onClick={() => setPlayingTutorial(tutorial)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 active:scale-95"
-                              style={{
-                                background: isCompleted ? 'transparent' : 'var(--accent)',
-                                color: isCompleted ? 'var(--accent)' : '#fff',
-                                border: isCompleted ? '1px solid var(--accent)' : 'none',
-                              }}
-                            >
-                              <Play size={10} strokeWidth={2} />
-                              {isCompleted ? 'Rewatch' : pct > 0 ? 'Continue' : 'Watch'}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {crashCourses.length > 0 ? (
+                      crashCourses.map(course => (
+                        <CrashCourseCard
+                          key={course._id}
+                          course={course}
+                          onOpen={setSelectedCourse}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-2 text-center py-8">
+                        <p style={{ color: 'var(--text-secondary)' }}>No crash courses available</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* ── Supervisor sidebar — 1 col ─────────────────────── */}
+          {/* ── Supervisor sidebar ────────────────────────────── */}
           <div className="lg:col-span-1">
             <SupervisorPanel />
           </div>
@@ -1091,17 +642,44 @@ export default function FreelancerLearning() {
         </div>
       </div>
 
-      {/* ── Video Player Modal ──────────────────────────────────── */}
+      {/* ── Video Player Modal ────────────────────────────────── */}
       {playingTutorial && (
         <VideoPlayerModal
-          tutorial={playingTutorial}
-          initialProgress={progress[playingTutorial.id]}
+          tutorial={{
+            ...playingTutorial,
+            id: playingTutorial.id || playingTutorial.youtubeId, // Use youtubeId as fallback id
+          }}
+          initialProgress={progress[playingTutorial.id || playingTutorial.youtubeId]}
           onClose={() => setPlayingTutorial(null)}
           onComplete={(tutorialId) => {
             setProgress(prev => ({
               ...prev,
               [tutorialId]: { ...(prev[tutorialId] ?? {}), completed: true },
             }));
+          }}
+        />
+      )}
+
+      {/* ── Playlist Detail Modal ─────────────────────────────── */}
+      {selectedPlaylist && (
+        <PlaylistDetailModal
+          item={selectedPlaylist}
+          onClose={() => setSelectedPlaylist(null)}
+          onWatchVideo={(video) => {
+            setPlayingTutorial(video);
+            setSelectedPlaylist(null);
+          }}
+        />
+      )}
+
+      {/* ── Crash Course Detail Modal ─────────────────────────── */}
+      {selectedCourse && (
+        <PlaylistDetailModal
+          item={selectedCourse}
+          onClose={() => setSelectedCourse(null)}
+          onWatchVideo={(video) => {
+            setPlayingTutorial(video);
+            setSelectedCourse(null);
           }}
         />
       )}
