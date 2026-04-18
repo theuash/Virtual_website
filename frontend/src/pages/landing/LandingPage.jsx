@@ -8,6 +8,9 @@ import {
 import Header from '../../components/landing/Header';
 import PricingStrip from '../../components/landing/PricingStrip';
 import bgVideo from '../../assets/v.mp4';
+
+// If you have a CDN URL, replace the src below with it directly:
+// const bgVideo = 'https://res.cloudinary.com/your-cloud/video/upload/q_auto/v.mp4';
 import logo from '../../assets/logo.png';
 
 // Helper Component for 3D Mesh Layers
@@ -415,6 +418,7 @@ export default function LandingPage() {
               loop
               muted={isMuted}
               playsInline
+              preload="none"
               className="w-full h-full object-cover pointer-events-none"
               style={{
                 opacity: videoOpacity,
