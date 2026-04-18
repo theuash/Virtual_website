@@ -430,7 +430,7 @@ export default function LandingPage() {
               loop
               muted={isMuted}
               playsInline
-              preload="metadata"
+              preload="none"
               className="w-full h-full object-cover pointer-events-none"
               style={{
                 opacity: videoOpacity,

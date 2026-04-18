@@ -14,3 +14,4 @@ yarn-debug.log*
 yarn-error.log*
 .wwebjs_auth/
 .wwebjs_cache/
+frontend/.env
