@@ -32,7 +32,7 @@ function AddMoneyModal({ onClose, onSuccess }) {
 
   const handleAdd = async () => {
     const amt = parseInt(amount);
-    if (!amt || amt < 100) return setError('Minimum add amount is ₹100');
+    if (!amt || amt < 2) return setError('Minimum add amount is ₹100');
     setLoading(true); setError('');
     try {
       await api.post('/client/wallet/add', { amount: amt, method });
