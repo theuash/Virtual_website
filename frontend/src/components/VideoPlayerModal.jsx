@@ -38,7 +38,7 @@ const REPORT_INTERVAL_MS   = 5000; // report progress every 5 seconds
  * VideoPlayerModal
  *
  * Props:
- *   tutorial  — { id, title, desc, duration, level, youtubeQuery }
+ *   tutorial  — { id, title, desc, duration, level, youtubeId, instructor }
  *   onClose   — () => void
  *   onComplete — (tutorialId) => void  — called when 80% threshold crossed
  *   initialProgress — { watchedSeconds, durationSeconds, completed, lastPosition }
@@ -103,11 +103,10 @@ export default function VideoPlayerModal({ tutorial, onClose, onComplete, initia
       playerRef.current = new window.YT.Player(playerDivRef.current, {
         height: '100%',
         width:  '100%',
+        videoId: tutorial.youtubeId,
         playerVars: {
-          listType:   'search',
-          list:       tutorial.youtubeQuery,
-          autoplay:   1,
-          rel:        0,
+          autoplay:       1,
+          rel:            0,
           modestbranding: 1,
           iv_load_policy: 3,
           start: Math.floor(initialProgress?.lastPosition ?? 0),
@@ -191,6 +190,7 @@ export default function VideoPlayerModal({ tutorial, onClose, onComplete, initia
               <div className="flex items-center gap-3 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
                 <span className="flex items-center gap-1"><Clock size={10} /> {tutorial.duration}</span>
                 <span>{tutorial.level}</span>
+                {tutorial.instructor && <span>· {tutorial.instructor}</span>}
               </div>
             </div>
             <button
@@ -213,7 +213,7 @@ export default function VideoPlayerModal({ tutorial, onClose, onComplete, initia
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-8 text-center">
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{error}</p>
                 <a
-                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(tutorial.youtubeQuery)}`}
+                  href={`https://www.youtube.com/watch?v=${tutorial.youtubeId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-semibold"

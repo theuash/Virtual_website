@@ -6,7 +6,9 @@ import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
 import { Project } from '../models/Project.js';
 import { MicroTask } from '../models/MicroTask.js';
 import { Pricing } from '../models/Pricing.js';
+import { LearningVideo } from '../models/LearningVideo.js';
 import { pricingData } from '../data/pricingData.js';
+import { learningVideos } from '../data/learningVideos.js';
 import bcrypt from 'bcryptjs';
 
 export const runSeed = asyncHandler(async (req, res) => {
@@ -19,6 +21,15 @@ export const runSeed = asyncHandler(async (req, res) => {
     await Pricing.findOneAndUpdate(
       { department: dept.department },
       dept,
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  }
+
+  // ── Seed learning videos (safe upsert by id) ──────────────────
+  for (const video of learningVideos) {
+    await LearningVideo.findOneAndUpdate(
+      { id: video.id },
+      video,
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
   }
@@ -42,7 +53,7 @@ export const runSeed = asyncHandler(async (req, res) => {
     });
   }
 
-  res.json(new ApiResponse(200, null, 'Pricing seeded. Maaz account ready.'));
+  res.json(new ApiResponse(200, null, 'Pricing seeded. Learning videos seeded. Maaz account ready.'));
 });
 
 export const clearSeed = asyncHandler(async (req, res) => {

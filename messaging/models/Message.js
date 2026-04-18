@@ -6,10 +6,12 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Conversation',
       required: true,
+      index: true,
     },
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      index: true,
     },
     content: {
       type: String,
@@ -22,12 +24,16 @@ const messageSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true, collection: 'messages' }
+  {
+    timestamps: true,          // adds createdAt + updatedAt
+    collection: 'messages',
+  }
 );
 
-// Fast paginated history: find by conversation, sorted by time
+// Compound index for fast paginated history queries
 messageSchema.index({ conversationId: 1, createdAt: -1 });
-// Unread count queries
+
+// Index for unread count queries
 messageSchema.index({ conversationId: 1, isRead: 1, senderId: 1 });
 
 export const Message = mongoose.model('Message', messageSchema);

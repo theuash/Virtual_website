@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
 import {
   BookOpen, Play, Clock, ExternalLink, ChevronRight,
@@ -679,8 +679,11 @@ function TutorialCard({ tutorial, progress, onWatch }) {
 }
 
 function SupervisorPanel() {
-  const [supervisor, setSupervisor] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [supervisor, setSupervisor]   = useState(null);
+  const [loading, setLoading]         = useState(true);
+  const [messaging, setMessaging]     = useState(false); // button loading state
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     api.get('/freelancer/supervisor')
@@ -688,6 +691,28 @@ function SupervisorPanel() {
       .catch(() => setSupervisor(null))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleMessageSupervisor = async () => {
+    if (!supervisor?._id) return;
+    setMessaging(true);
+    try {
+      // Create or find existing DM conversation with this supervisor
+      const res = await api.post('/messaging/conversations', {
+        type:    'dm',
+        members: [supervisor._id],
+        name:    supervisor.fullName,
+      });
+      const convId = res.data?.data?._id;
+      if (convId) {
+        navigate(`/freelancer/messages?conv=${convId}`);
+      }
+    } catch {
+      // If messaging fails, still navigate to messages page
+      navigate('/freelancer/messages');
+    } finally {
+      setMessaging(false);
+    }
+  };
 
   const initials = supervisor?.fullName
     ? supervisor.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -768,11 +793,13 @@ function SupervisorPanel() {
 
             {/* Message */}
             <button
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold border transition-all hover:scale-[1.02] active:scale-95"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+              onClick={handleMessageSupervisor}
+              disabled={messaging}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: 'var(--accent)', color: '#fff' }}
             >
-              <MessageSquare size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-              Message Supervisor
+              <MessageSquare size={14} strokeWidth={1.5} />
+              {messaging ? 'Opening chat…' : 'Message Supervisor'}
             </button>
           </>
         )}
@@ -808,19 +835,24 @@ export default function FreelancerLearning() {
     ...(Array.isArray(user?.secondarySkills) ? user.secondarySkills : []),
   ].filter((s) => SKILL_LABELS[s]);
 
-  const [activeSkill, setActiveSkill]       = useState(userSkills[0] || null);
-  const [activeSoftware, setActiveSoftware] = useState(
+  const [activeSkill, setActiveSkill]         = useState(userSkills[0] || null);
+  const [activeSoftware, setActiveSoftware]   = useState(
     userSkills[0] ? (SKILL_SOFTWARE[userSkills[0]]?.[0] ?? null) : null
   );
-  // progress map: { [tutorialId]: { watchedSeconds, durationSeconds, completed, lastPosition } }
-  const [progress, setProgress]             = useState({});
+  const [progress, setProgress]               = useState({});
   const [playingTutorial, setPlayingTutorial] = useState(null);
+  const [catalogue, setCatalogue]             = useState({});
+  const [videosLoading, setVideosLoading]     = useState(true);
 
-  // Fetch all progress on mount
+  // Fetch catalogue + progress on mount
   useEffect(() => {
-    api.get('/freelancer/learning/progress')
-      .then(res => setProgress(res.data?.data ?? {}))
-      .catch(() => {});
+    Promise.all([
+      api.get('/learning/catalogue'),
+      api.get('/freelancer/learning/progress'),
+    ]).then(([catRes, progRes]) => {
+      setCatalogue(catRes.data?.data ?? {});
+      setProgress(progRes.data?.data ?? {});
+    }).catch(() => {}).finally(() => setVideosLoading(false));
   }, []);
 
   function handleSkillChange(skill) {
@@ -828,7 +860,10 @@ export default function FreelancerLearning() {
     setActiveSoftware(SKILL_SOFTWARE[skill]?.[0] ?? null);
   }
 
-  const tutorials = activeSoftware ? (SOFTWARE_TUTORIALS[activeSoftware] ?? []) : [];
+  // Tutorials come from DB catalogue, not hardcoded data
+  const tutorials = (activeSoftware && activeSkill)
+    ? (catalogue[activeSkill]?.[activeSoftware] ?? [])
+    : [];
 
   // ── No skills set ─────────────────────────────────────────────
   if (userSkills.length === 0) {

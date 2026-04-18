@@ -1,1 +1,13 @@
-export default function ClientMessages() { return <div className="p-6"><h1 className="text-2xl font-bold mb-4">ClientMessages</h1><p className="text-text-muted">This page is under construction.</p></div>; }
+import DashboardHeader from '../../components/DashboardHeader';
+import MessagingUI from '../../components/MessagingUI';
+
+export default function ClientMessages() {
+  return (
+    <>
+      <DashboardHeader title="Messages" />
+      <div className="p-6 md:p-8 max-w-6xl mx-auto">
+        <MessagingUI />
+      </div>
+    </>
+  );
+}

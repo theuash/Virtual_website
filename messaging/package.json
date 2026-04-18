@@ -1,0 +1,24 @@
+{
+  "name": "virtual-messaging",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node messaging-server.js",
+    "dev": "nodemon messaging-server.js"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1",
+    "morgan": "^1.10.0",
+    "redis": "^4.6.14",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
