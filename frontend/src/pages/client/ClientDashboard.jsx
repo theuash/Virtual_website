@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/roleGuards';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
+import { SkeletonDashboard } from '../../components/SkeletonLoader';
 import { FolderKanban, Clock, Wallet, ArrowRight, PlusCircle, ShieldCheck, Activity } from 'lucide-react';
 
 const STATUS_COLORS = {
@@ -59,10 +60,8 @@ export default function ClientDashboard() {
   if (isLoading) return (
     <>
       <DashboardHeader title="Dashboard" />
-      <div className="p-8 space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-24 rounded-xl animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
-        ))}
+      <div className="p-6 md:p-8 space-y-6 max-w-6xl mx-auto">
+        <SkeletonDashboard />
       </div>
     </>
   );

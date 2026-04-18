@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
+import { SkeletonForm } from '../../components/SkeletonLoader';
 import api from '../../services/api';
 import {
   ArrowRight, ArrowLeft, Info, Clock, Zap, Star, Shield,
@@ -390,13 +391,12 @@ function StepServiceSelection({
 
   if (catalogueLoading) {
     return (
-      <div className="space-y-4">
-        <div className="h-6 w-48 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
-        <div className="grid grid-cols-2 gap-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
-          ))}
+      <div className="space-y-5">
+        <div className="space-y-1">
+          <div className="h-6 w-48 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
+          <div className="h-4 w-64 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
         </div>
+        <SkeletonForm fields={5} />
       </div>
     );
   }

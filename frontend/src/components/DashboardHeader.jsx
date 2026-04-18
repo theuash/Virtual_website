@@ -18,20 +18,20 @@ export default function DashboardHeader({ title }) {
         borderColor: 'var(--border)',
       }}
     >
-      <div className="px-6 py-4 flex items-center justify-between">
+      <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             {title}
           </h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            Welcome back, {user?.fullName || 'User'}
+            Welcome back, {user?.fullName?.split(' ')[0] || 'User'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg border transition-all hover:scale-105"
+            className="p-2.5 rounded-lg border transition-all hover:scale-105"
             style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
             title={isDark ? 'Light Mode' : 'Dark Mode'}
           >
@@ -40,7 +40,7 @@ export default function DashboardHeader({ title }) {
 
           <button
             onClick={() => navigate(`/${user?.role}/settings`)}
-            className="p-2 rounded-lg border transition-all hover:scale-105"
+            className="p-2.5 rounded-lg border transition-all hover:scale-105"
             style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
             title="Settings"
           >
@@ -49,7 +49,7 @@ export default function DashboardHeader({ title }) {
 
           <button
             onClick={() => { logout(); navigate('/login'); }}
-            className="p-2 rounded-lg border transition-all hover:scale-105"
+            className="p-2.5 rounded-lg border transition-all hover:scale-105"
             style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
             title="Logout"
           >

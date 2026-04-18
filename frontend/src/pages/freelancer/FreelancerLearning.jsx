@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
+import { SkeletonGrid } from '../../components/SkeletonLoader';
 import {
   BookOpen, Play, Clock, ExternalLink, ChevronRight,
   MessageSquare, User, Star, Monitor, CheckCircle2,
@@ -772,7 +773,7 @@ function SupervisorPanel() {
 
             {/* Stats — only show if real data exists */}
             {(supervisor.totalReviews > 0 || supervisor.approvalRate > 0) && (
-              <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg" style={{ background: 'var(--bg-card)' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 p-3 rounded-lg" style={{ background: 'var(--bg-card)' }}>
                 <div className="text-center">
                   <div className="text-base font-black" style={{ color: 'var(--accent)' }}>{supervisor.totalReviews}</div>
                   <div className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Reviews</div>
@@ -990,8 +991,12 @@ export default function FreelancerLearning() {
                   </span>
                 </div>
 
-                {/* Rows */}
-                {tutorials.length === 0 ? (
+                {/* Loading state */}
+                {videosLoading ? (
+                  <div className="p-5">
+                    <SkeletonGrid count={4} columns="grid-cols-1" />
+                  </div>
+                ) : tutorials.length === 0 ? (
                   <div className="py-12 text-center">
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No tutorials available yet.</p>
                   </div>

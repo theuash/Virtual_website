@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Sun, Moon } from 'lucide-react';
-import { motion, useScroll, useTransform, useSpring, useVelocity } from 'framer-motion';
-import GetStartedModal from './GetStartedModal';
+import { Sun, Moon, Menu, X } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring, useVelocity, AnimatePresence } from 'framer-motion';
 import logo from '../../assets/logo.png';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
   const navigate = useNavigate();
@@ -44,12 +44,18 @@ export default function Header() {
   };
 
   const scrollTo = (id) => {
+    setMobileMenuOpen(false);
     if (!isLanding) {
       navigate('/');
       setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 300);
     } else {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleNavClick = (path) => {
+    setMobileMenuOpen(false);
+    navigate(path);
   };
 
   const headerStyle = {
@@ -60,7 +66,7 @@ export default function Header() {
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-    padding: '0 2rem',
+    padding: '0 1rem sm:px-8',
     height: '80px',
     display: 'flex',
     alignItems: 'center',
@@ -90,13 +96,13 @@ export default function Header() {
                 : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(40%) contrast(100%)'
             }} />
           </div>
-          <span style={{ fontWeight: 800, fontSize: '2rem', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.5rem sm:text-2xl', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
             irtual
           </span>
         </div>
 
-        {/* Nav */}
-        <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+        {/* Desktop Nav */}
+        <nav style={{ display: 'none', gap: '2rem', alignItems: 'center', '@media (min-width: 768px)': { display: 'flex' } }} className="hidden md:flex">
           {[['How It Works', 'how-it-works'], ['Roles', 'roles']].map(([label, id]) => (
             <button
               key={id}
@@ -134,19 +140,84 @@ export default function Header() {
         </nav>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '1rem sm:gap-1.5rem', alignItems: 'center' }}>
           <button
             onClick={toggleTheme}
-            className="theme-toggle shadow-glow-sm"
+            className="theme-toggle shadow-glow-sm p-2 hover:scale-105 transition-transform"
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {isDark ? <Sun size={20} strokeWidth={1.5} /> : <Moon size={20} strokeWidth={1.5} />}
           </button>
-          <button id="header-get-started" className="btn-primary" onClick={() => navigate('/signup')}>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 hover:scale-105 transition-transform"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Desktop Get Started */}
+          <button 
+            id="header-get-started" 
+            className="btn-primary hidden sm:block"
+            onClick={() => navigate('/signup')}
+          >
             Get Started
           </button>
         </div>
       </motion.header>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-0 right-0 z-50 md:hidden"
+            style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}
+          >
+            <div className="p-4 space-y-3">
+              {[['How It Works', 'how-it-works'], ['Roles', 'roles']].map(([label, id]) => (
+                <button
+                  key={id}
+                  onClick={() => scrollTo(id)}
+                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(110,44,242,0.1)]"
+                  style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 500 }}
+                >
+                  {label}
+                </button>
+              ))}
+              {[
+                ['Pricing', '/pricing'],
+                ['About',   '/about'],
+              ].map(([label, path]) => (
+                <button
+                  key={path}
+                  onClick={() => handleNavClick(path)}
+                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(110,44,242,0.1)]"
+                  style={{ 
+                    color: location.pathname === path ? 'var(--accent)' : 'var(--text-primary)',
+                    fontSize: '0.95rem', 
+                    fontWeight: 500 
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+              <button
+                onClick={() => handleNavClick('/signup')}
+                className="w-full py-2.5 rounded-lg font-semibold transition-all hover:scale-[1.02] active:scale-95"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                Get Started
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

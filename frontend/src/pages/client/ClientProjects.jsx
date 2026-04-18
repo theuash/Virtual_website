@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
+import { SkeletonGrid, SkeletonProjectCard } from '../../components/SkeletonLoader';
 import {
   Search, Filter, Clock, DollarSign, CheckCircle2, 
   XCircle, PlayCircle, Eye, MoreVertical, Calendar,
@@ -233,13 +234,35 @@ export default function ClientProjects() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
-        <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
+      <div className="p-6 space-y-6">
+        {/* Header skeleton */}
+        <div className="space-y-2">
+          <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
+          <div className="h-4 w-64 rounded animate-pulse" style={{ background: 'var(--bg-card)' }} />
+        </div>
+
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="p-4 rounded-xl border animate-pulse" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+              <div className="h-3 w-12 rounded mb-2 animate-pulse" style={{ background: 'var(--border)' }} />
+              <div className="h-6 w-16 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+            </div>
           ))}
         </div>
+
+        {/* Filters skeleton */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 h-10 rounded-xl animate-pulse" style={{ background: 'var(--bg-card)' }} />
+          <div className="flex gap-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-10 w-20 rounded-lg animate-pulse" style={{ background: 'var(--bg-card)' }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Projects grid skeleton */}
+        <SkeletonGrid count={6} columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3" />
       </div>
     );
   }
@@ -358,7 +381,7 @@ export default function ClientProjects() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl"
+              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl sm:mx-0 mx-4"
               style={{ background: 'var(--bg-secondary)' }}
               onClick={e => e.stopPropagation()}
             >

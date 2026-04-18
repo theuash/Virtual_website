@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
+import { SkeletonTable } from '../../components/SkeletonLoader';
 import api from '../../services/api';
 import {
   Wallet, Plus, ArrowDownLeft, ArrowUpRight, ShieldCheck,
@@ -212,8 +213,8 @@ export default function ClientWallet() {
             <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Transaction History</h2>
           </div>
           {loading ? (
-            <div className="p-8 flex justify-center">
-              <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
+            <div className="p-5">
+              <SkeletonTable rows={5} columns={4} />
             </div>
           ) : !wallet?.transactions?.length ? (
             <div className="py-12 text-center">

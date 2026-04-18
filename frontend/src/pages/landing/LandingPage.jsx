@@ -293,11 +293,23 @@ export default function LandingPage() {
   // Start video and keep it playing
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Safe start
-        videoRef.current.muted = true;
-        videoRef.current.play();
-      });
+      // Set up video for optimal playback
+      videoRef.current.muted = true;
+      videoRef.current.volume = 0.5;
+      
+      // Attempt to play with error handling
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Video started playing successfully
+          })
+          .catch(() => {
+            // Autoplay was prevented, ensure muted and try again
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          });
+      }
     }
   }, []);
 
@@ -418,11 +430,18 @@ export default function LandingPage() {
               loop
               muted={isMuted}
               playsInline
-              preload="none"
+              preload="metadata"
               className="w-full h-full object-cover pointer-events-none"
               style={{
                 opacity: videoOpacity,
-                filter: 'brightness(1) contrast(1.1)'
+                filter: 'brightness(1) contrast(1.1)',
+                willChange: 'opacity'
+              }}
+              onLoadedMetadata={() => {
+                // Ensure video starts playing once metadata is loaded
+                if (videoRef.current && !videoRef.current.paused === false) {
+                  videoRef.current.play().catch(() => {});
+                }
               }}
             ></video>
             <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000000 0%, transparent 10%, transparent 90%, #000000 100%)', zIndex: 0 }}></div>

@@ -165,7 +165,7 @@ export default function VideoPlayerModal({ tutorial, onClose, onComplete, initia
         onClick={handleClose}
       >
         <motion.div
-          className="w-full max-w-4xl rounded-2xl overflow-hidden border"
+          className="w-full max-w-4xl rounded-2xl overflow-hidden border sm:mx-0 mx-4"
           style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
           initial={{ scale: 0.92, y: 24 }}
           animate={{ scale: 1, y: 0 }}
