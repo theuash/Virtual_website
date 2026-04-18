@@ -1,6 +1,6 @@
 import * as authService from '../services/auth.service.js';
 import * as googleService from '../services/google.service.js';
-import { getWhatsAppStatus } from '../services/whatsapp.service.js';
+import { isSupabaseConfigured } from '../services/supabase.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -118,7 +118,12 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const getOtpStatus = asyncHandler(async (req, res) => {
-  res.json(new ApiResponse(200, getWhatsAppStatus(), 'OTP service status fetched'));
+  const supabaseConfigured = isSupabaseConfigured();
+  res.json(new ApiResponse(200, {
+    otpService: 'Supabase Email OTP',
+    configured: supabaseConfigured,
+    status: supabaseConfigured ? 'active' : 'inactive'
+  }, 'OTP service status fetched'));
 });
 
 /**
