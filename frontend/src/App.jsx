@@ -20,6 +20,7 @@ import ProjectDetail from './pages/client/ProjectDetail';
 import ClientPayments from './pages/client/ClientPayments';
 import ClientMessages from './pages/client/ClientMessages';
 import ClientSettings from './pages/client/ClientSettings';
+import ClientWallet from './pages/client/ClientWallet';
 
 // Freelancer
 import FreelancerLayout from './pages/freelancer/FreelancerLayout';
@@ -69,6 +70,7 @@ function App() {
         <Route path="post-project" element={<PostProject />} />
         <Route path="projects" element={<ClientProjects />} />
         <Route path="project/:id" element={<ProjectDetail />} />
+        <Route path="wallet" element={<ClientWallet />} />
         <Route path="payments" element={<ClientPayments />} />
         <Route path="messages" element={<ClientMessages />} />
         <Route path="settings" element={<ClientSettings />} />

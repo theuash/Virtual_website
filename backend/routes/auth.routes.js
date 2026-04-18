@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, getMe, getOtpStatus, registerWithOtp, requestOtpLogin, requestOtpSignup, verifyOtpLogin, verifyOtpSignup, signupWithGoogle, loginWithGoogle } from '../controllers/auth.controller.js';
+import { register, login, getMe, getOtpStatus, registerWithOtp, requestOtpLogin, requestOtpSignup, verifyOtpLogin, verifyOtpSignup, signupWithGoogle, loginWithGoogle, refreshToken } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 // Traditional auth routes
 router.post('/register', register);
 router.post('/login', login);
+router.post('/refresh', refreshToken);
 
 // OTP-based auth routes
 router.post('/register-otp', registerWithOtp);

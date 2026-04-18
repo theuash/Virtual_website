@@ -4,6 +4,7 @@ import { getWhatsAppStatus } from '../services/whatsapp.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
+import jwt from 'jsonwebtoken';
 
 /**
  * Traditional register with password
@@ -118,6 +119,32 @@ export const getMe = asyncHandler(async (req, res) => {
 
 export const getOtpStatus = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, getWhatsAppStatus(), 'OTP service status fetched'));
+});
+
+/**
+ * Refresh access token using a valid refresh token.
+ * Body: { refreshToken }
+ */
+export const refreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken: token } = req.body;
+  if (!token) throw new ApiError(400, 'Refresh token is required');
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const { findUserById } = await import('../utils/findUser.js');
+    const user = await findUserById(decoded.id);
+    if (!user) throw new ApiError(401, 'User not found');
+    if (user.isSuspended) throw new ApiError(403, 'Account suspended');
+
+    const newToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+
+    res.json(new ApiResponse(200, { token: newToken }, 'Token refreshed'));
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
+    throw new ApiError(401, 'Invalid or expired refresh token');
+  }
 });
 
 /**

@@ -1,78 +1,274 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
-import { ShieldCheck, Users, MessageSquare, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
+import {
+  ShieldCheck, Users, MessageSquare, CheckCircle2,
+  Clock, ArrowRight, Star, TrendingUp, Zap
+} from 'lucide-react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: (i = 0) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }
+  })
+};
+
+function StatCard({ label, value, icon, i = 0 }) {
+  return (
+    <motion.div
+      custom={i} variants={fadeUp} initial="hidden" animate="show"
+      className="p-5 rounded-xl border"
+      style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center"
+          style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}>
+          {icon}
+        </div>
+        <span className="text-[9px] font-black uppercase tracking-widest"
+          style={{ color: 'var(--text-secondary)' }}>
+          {label}
+        </span>
+      </div>
+      <div className="text-2xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
+        {value ?? '—'}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function SupervisorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [conversations, setConversations] = useState([]);
+  const [convsLoading, setConvsLoading]   = useState(true);
+
+  useEffect(() => {
+    api.get('/messaging/conversations')
+      .then(res => setConversations(res.data?.data ?? []))
+      .catch(() => {})
+      .finally(() => setConvsLoading(false));
+  }, []);
+
+  const unreadTotal = conversations.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+  const firstName   = user?.fullName?.split(' ')[0] || 'Supervisor';
+  const dept        = user?.department?.replace(/_/g, ' ') || null;
 
   return (
     <>
       <DashboardHeader title="Dashboard" />
       <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
 
-        {/* Welcome */}
-        <div className="p-6 rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-          <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>
-            Welcome back
-          </div>
-          <h2 className="text-2xl font-black tracking-tight mb-1" style={{ color: 'var(--text-primary)' }}>
-            {user?.fullName?.split(' ')[0] || 'Supervisor'}
-          </h2>
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            You're logged in as a Momentum Supervisor.
-            {user?.department && ` Department: ${user.department.replace(/_/g, ' ')}.`}
-          </p>
-        </div>
+        {/* ── Hero banner ──────────────────────────────────────── */}
+        <motion.div
+          variants={fadeUp} initial="hidden" animate="show"
+          className="relative overflow-hidden p-6 rounded-2xl border"
+          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+        >
+          {/* Subtle glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none"
+            style={{ background: 'var(--accent)', opacity: 0.06 }} />
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              icon: <ShieldCheck size={20} strokeWidth={1.5} />,
-              label: 'Review Queue',
-              desc: 'Review submitted deliverables from freelancers.',
-              action: null,
-            },
-            {
-              icon: <Users size={20} strokeWidth={1.5} />,
-              label: 'Freelancers',
-              desc: 'View and manage freelancers under your supervision.',
-              action: () => navigate('/supervisor/freelancers'),
-            },
-            {
-              icon: <MessageSquare size={20} strokeWidth={1.5} />,
-              label: 'Messages',
-              desc: 'Communicate with freelancers and clients.',
-              action: () => navigate('/supervisor/messages'),
-            },
-          ].map((card, i) => (
-            <button
-              key={i}
-              onClick={card.action}
-              disabled={!card.action}
-              className="group text-left p-5 rounded-xl border transition-all disabled:opacity-60 disabled:cursor-default"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-              onMouseEnter={e => card.action && (e.currentTarget.style.borderColor = 'var(--accent)')}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}>
-                {card.icon}
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-widest mb-1"
+                style={{ color: 'var(--accent)' }}>
+                Momentum Supervisor
               </div>
-              <div className="text-sm font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{card.label}</div>
-              <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{card.desc}</div>
-              {card.action && (
-                <div className="flex items-center gap-1 mt-3 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ color: 'var(--accent)' }}>
-                  Open <ArrowRight size={12} />
-                </div>
-              )}
-            </button>
-          ))}
+              <h2 className="text-2xl font-black tracking-tight mb-1"
+                style={{ color: 'var(--text-primary)' }}>
+                {firstName}
+              </h2>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                {dept ? `${dept} department` : 'All departments'} · Quality & delivery oversight
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}
+              >
+                <div className="w-2 h-2 rounded-full" style={{ background: '#10b981' }} />
+                Active
+              </div>
+              <button
+                onClick={() => navigate('/supervisor/messages')}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 active:scale-95 relative"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                <MessageSquare size={14} strokeWidth={1.5} />
+                Messages
+                {unreadTotal > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center"
+                    style={{ background: '#ef4444', color: '#fff' }}>
+                    {unreadTotal > 9 ? '9+' : unreadTotal}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Stats ────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <StatCard i={0} label="Total Reviews"   value={user?.totalReviews   ?? 0} icon={<Star size={17} strokeWidth={1.5} />} />
+          <StatCard i={1} label="Approval Rate"   value={user?.approvalRate   ? `${user.approvalRate}%` : '—'} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
+          <StatCard i={2} label="Supervised"      value={user?.supervisedFreelancers?.length ?? 0} icon={<Users size={17} strokeWidth={1.5} />} />
+          <StatCard i={3} label="Unread Messages" value={unreadTotal}          icon={<MessageSquare size={17} strokeWidth={1.5} />} />
         </div>
 
+        {/* ── Main grid ────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Recent conversations — 2 cols */}
+          <motion.div
+            custom={4} variants={fadeUp} initial="hidden" animate="show"
+            className="lg:col-span-2 rounded-xl border overflow-hidden"
+            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b"
+              style={{ borderColor: 'var(--border)' }}>
+              <h2 className="text-sm font-bold flex items-center gap-2"
+                style={{ color: 'var(--text-primary)' }}>
+                <MessageSquare size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                Recent Conversations
+              </h2>
+              <button
+                onClick={() => navigate('/supervisor/messages')}
+                className="text-xs font-semibold flex items-center gap-1 transition-all hover:gap-2"
+                style={{ color: 'var(--accent)' }}
+              >
+                View all <ArrowRight size={12} />
+              </button>
+            </div>
+
+            <div>
+              {convsLoading ? (
+                <div className="p-5 space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-14 rounded-lg animate-pulse"
+                      style={{ background: 'var(--bg-card)' }} />
+                  ))}
+                </div>
+              ) : conversations.length === 0 ? (
+                <div className="py-12 text-center">
+                  <MessageSquare size={28} strokeWidth={1} className="mx-auto mb-2"
+                    style={{ color: 'var(--text-secondary)', opacity: 0.3 }} />
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    No conversations yet.
+                  </p>
+                </div>
+              ) : (
+                conversations.slice(0, 5).map((conv, i) => (
+                  <button
+                    key={conv._id}
+                    onClick={() => navigate(`/supervisor/messages?conv=${conv._id}`)}
+                    className="w-full flex items-center gap-3 px-5 py-3.5 border-b text-left transition-all hover:bg-opacity-50 group"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    {/* Avatar */}
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shrink-0"
+                      style={{ background: 'var(--accent)', color: '#fff' }}>
+                      {(conv.name || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-sm font-semibold truncate"
+                          style={{ color: 'var(--text-primary)' }}>
+                          {conv.name || 'Conversation'}
+                        </span>
+                        {conv.lastMessage?.createdAt && (
+                          <span className="text-[10px] shrink-0 ml-2"
+                            style={{ color: 'var(--text-secondary)' }}>
+                            {new Date(conv.lastMessage.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+                        {conv.lastMessage?.content || 'No messages yet'}
+                      </p>
+                    </div>
+                    {conv.unreadCount > 0 && (
+                      <span className="shrink-0 text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center"
+                        style={{ background: 'var(--accent)', color: '#fff' }}>
+                        {conv.unreadCount > 9 ? '9+' : conv.unreadCount}
+                      </span>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </motion.div>
+
+          {/* Right column — 1 col */}
+          <div className="space-y-4">
+
+            {/* Role info */}
+            <motion.div
+              custom={5} variants={fadeUp} initial="hidden" animate="show"
+              className="p-5 rounded-xl border"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck size={15} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  Your Role
+                </span>
+              </div>
+              <div className="space-y-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                {[
+                  'Review freelancer deliverables before client delivery',
+                  'Enforce quality standards across your department',
+                  'Facilitate dispute resolution meetings',
+                  'Provide structured feedback on revisions',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <CheckCircle2 size={12} strokeWidth={2} className="mt-0.5 shrink-0"
+                      style={{ color: 'var(--accent)' }} />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Quick actions */}
+            <motion.div
+              custom={6} variants={fadeUp} initial="hidden" animate="show"
+              className="p-5 rounded-xl border"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Zap size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  Quick Actions
+                </span>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { label: 'Open Messages',    icon: <MessageSquare size={13} />, path: '/supervisor/messages' },
+                  { label: 'View Freelancers', icon: <Users size={13} />,         path: '/supervisor/freelancers' },
+                ].map((action, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(action.path)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)', background: 'var(--bg-card)' }}
+                  >
+                    <span style={{ color: 'var(--accent)' }}>{action.icon}</span>
+                    {action.label}
+                    <ArrowRight size={12} className="ml-auto opacity-40" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
       </div>
     </>
   );

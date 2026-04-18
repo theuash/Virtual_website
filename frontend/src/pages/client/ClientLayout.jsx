@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X, Wallet } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -17,6 +17,7 @@ export default function ClientLayout() {
     { path: '/client/dashboard',    icon: <LayoutDashboard size={17} strokeWidth={1.5} />, label: 'Dashboard' },
     { path: '/client/post-project', icon: <PlusCircle size={17} strokeWidth={1.5} />,      label: 'Post Project' },
     { path: '/client/projects',     icon: <Folder size={17} strokeWidth={1.5} />,          label: 'My Projects' },
+    { path: '/client/wallet',       icon: <Wallet size={17} strokeWidth={1.5} />,          label: 'Wallet' },
     { path: '/client/payments',     icon: <CreditCard size={17} strokeWidth={1.5} />,      label: 'Payments' },
     { path: '/client/messages',     icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
     { path: '/client/settings',     icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },

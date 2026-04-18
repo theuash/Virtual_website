@@ -116,19 +116,24 @@ function HeroExpandingCTA({ onClick }) {
 
 // Floating Pill — pop-up first, then content reveals after
 function FloatingPill({ splitProgress, navigate, logo }) {
-  const [visible, setVisible] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [visible,   setVisible]   = useState(false);
+  const [expanded,  setExpanded]  = useState(false);
+  const [flashBorder, setFlashBorder] = useState(false);
   const hasShown = useRef(false);
 
   useMotionValueEvent(splitProgress, 'change', (v) => {
     if (v > 0.08 && !hasShown.current) {
       hasShown.current = true;
       setVisible(true);
-      // Expand content 600ms after pill pops in
-      setTimeout(() => setExpanded(true), 600);
+      setFlashBorder(true);
+      // Fade border back after 1.4s
+      setTimeout(() => setFlashBorder(false), 1400);
+      // Expand content after pill lands
+      setTimeout(() => setExpanded(true), 650);
     } else if (v <= 0.04) {
       setVisible(false);
       setExpanded(false);
+      setFlashBorder(false);
       hasShown.current = false;
     }
   });
@@ -138,25 +143,27 @@ function FloatingPill({ splitProgress, navigate, logo }) {
       {visible && (
         <motion.div
           key="floating-pill"
-          className="fixed bottom-6 left-1/2 z-[100] pointer-events-auto"
+          className="fixed bottom-6 left-1/2 z-[100] pointer-events-auto group"
           style={{ x: '-50%' }}
-          initial={{ opacity: 0, y: 48, scale: 0.4 }}
+          initial={{ opacity: 0, y: 40, scale: 0.5 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.7, transition: { duration: 0.2, ease: 'easeIn' } }}
-          transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
+          exit={{ opacity: 0, y: 16, scale: 0.8, transition: { duration: 0.25, ease: 'easeIn' } }}
+          transition={{ type: 'spring', stiffness: 320, damping: 28, mass: 0.9 }}
         >
           <div
-            className="flex items-center rounded-full"
+            className="flex items-center rounded-full relative"
             style={{
               background: 'rgba(10, 10, 10, 0.55)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(255,255,255,0.07), 0 0 40px rgba(100,120,255,0.08)',
               overflow: 'hidden',
+              // Border transitions from white flash → subtle, hover brings back glow
+              border: `1px solid ${flashBorder ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.08)'}`,
+              transition: 'border-color 0.9s ease, box-shadow 0.3s ease',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
-            {/* Logo — always visible */}
+            {/* Logo */}
             <div className="flex items-center shrink-0 pl-3.5 pr-3 py-2.5">
               <div
                 className="w-5 h-5 flex items-center justify-center"
@@ -171,12 +178,15 @@ function FloatingPill({ splitProgress, navigate, logo }) {
               </div>
             </div>
 
-            {/* Expanding content — slides in after pill lands */}
+            {/* Expanding content */}
             <motion.div
               className="flex items-center gap-4 pr-2"
               initial={{ width: 0, opacity: 0 }}
               animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
-              transition={{ width: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.3, delay: 0.15 } }}
+              transition={{
+                width:   { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.35, delay: 0.25 },
+              }}
               style={{ overflow: 'hidden' }}
             >
               <div className="w-px h-3.5 bg-white/10 shrink-0" />
