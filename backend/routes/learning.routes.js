@@ -7,16 +7,16 @@ const router = express.Router();
 
 // GET /api/learning/catalogue - Get all learning content grouped by skill/software
 router.get('/catalogue', asyncHandler(async (req, res) => {
-  const videos = await LearningVideo.find();
+  const videos = await LearningVideo.find().lean();
   
   // Group by skill → software
   const catalogue = {};
   for (const doc of videos) {
     if (!catalogue[doc.skill]) catalogue[doc.skill] = {};
     catalogue[doc.skill][doc.software] = {
-      tutorials: doc.tutorials,
-      playlists: doc.playlists,
-      crash_courses: doc.crash_courses,
+      tutorials: doc.tutorials ?? [],
+      playlists: doc.playlists ?? [],
+      crash_courses: doc.crash_courses ?? [],
     };
   }
   
