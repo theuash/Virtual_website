@@ -1,6 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { RoleGuard } from './utils/roleGuards';
 import PublicRoute from './components/PublicRoute';
+import PageTransition from './components/PageTransition';
 
 // Landing
 import LandingPage from './pages/landing/LandingPage';
@@ -56,70 +58,74 @@ import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminSettings from './pages/admin/AdminSettings';
 
 function App() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      {/* Public — redirect to dashboard if already logged in */}
-      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
-      <Route path="/meet/:meetingId" element={<MeetRoom />} />
-      <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public — redirect to dashboard if already logged in */}
+        <Route path="/" element={<PublicRoute><PageTransition><LandingPage /></PageTransition></PublicRoute>} />
+        <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+        <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
+        <Route path="/login" element={<PublicRoute><PageTransition><LoginPage /></PageTransition></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><PageTransition><SignupPage /></PageTransition></PublicRoute>} />
+        <Route path="/meet/:meetingId" element={<PageTransition><MeetRoom /></PageTransition>} />
+        <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><PageTransition><FreelancerOnboarding /></PageTransition></RoleGuard>} />
 
-      {/* Client — protected */}
-      <Route path="/client" element={<RoleGuard allowedRoles={['client']}><ClientLayout /></RoleGuard>}>
-        <Route index element={<Navigate to="/client/dashboard" replace />} />
-        <Route path="dashboard" element={<ClientDashboard />} />
-        <Route path="post-project" element={<PostProject />} />
-        <Route path="projects" element={<ClientProjects />} />
-        <Route path="project/:id" element={<ProjectDetail />} />
-        <Route path="wallet" element={<ClientWallet />} />
-        <Route path="payments" element={<ClientPayments />} />
-        <Route path="messages" element={<ClientMessages />} />
-        <Route path="meet" element={<ClientMeet />} />
-        <Route path="settings" element={<ClientSettings />} />
-      </Route>
+        {/* Client — protected */}
+        <Route path="/client" element={<RoleGuard allowedRoles={['client']}><ClientLayout /></RoleGuard>}>
+          <Route index element={<Navigate to="/client/dashboard" replace />} />
+          <Route path="dashboard" element={<PageTransition><ClientDashboard /></PageTransition>} />
+          <Route path="post-project" element={<PageTransition><PostProject /></PageTransition>} />
+          <Route path="projects" element={<PageTransition><ClientProjects /></PageTransition>} />
+          <Route path="project/:id" element={<PageTransition><ProjectDetail /></PageTransition>} />
+          <Route path="wallet" element={<PageTransition><ClientWallet /></PageTransition>} />
+          <Route path="payments" element={<PageTransition><ClientPayments /></PageTransition>} />
+          <Route path="messages" element={<PageTransition><ClientMessages /></PageTransition>} />
+          <Route path="meet" element={<PageTransition><ClientMeet /></PageTransition>} />
+          <Route path="settings" element={<PageTransition><ClientSettings /></PageTransition>} />
+        </Route>
 
-      {/* Freelancer — protected */}
-      <Route path="/freelancer" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerLayout /></RoleGuard>}>
-        <Route index element={<Navigate to="/freelancer/dashboard" replace />} />
-        <Route path="dashboard" element={<FreelancerDashboard />} />
-        <Route path="tasks" element={<FreelancerTasks />} />
-        <Route path="task/:id" element={<TaskDetail />} />
-        <Route path="learning" element={<FreelancerLearning />} />
-        <Route path="meet" element={<FreelancerMeet />} />
-        <Route path="earnings" element={<FreelancerEarnings />} />
-        <Route path="progress" element={<FreelancerProgress />} />
-        <Route path="messages" element={<FreelancerMessages />} />
-        <Route path="settings" element={<FreelancerSettings />} />
-      </Route>
+        {/* Freelancer — protected */}
+        <Route path="/freelancer" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerLayout /></RoleGuard>}>
+          <Route index element={<Navigate to="/freelancer/dashboard" replace />} />
+          <Route path="dashboard" element={<PageTransition><FreelancerDashboard /></PageTransition>} />
+          <Route path="tasks" element={<PageTransition><FreelancerTasks /></PageTransition>} />
+          <Route path="task/:id" element={<PageTransition><TaskDetail /></PageTransition>} />
+          <Route path="learning" element={<PageTransition><FreelancerLearning /></PageTransition>} />
+          <Route path="meet" element={<PageTransition><FreelancerMeet /></PageTransition>} />
+          <Route path="earnings" element={<PageTransition><FreelancerEarnings /></PageTransition>} />
+          <Route path="progress" element={<PageTransition><FreelancerProgress /></PageTransition>} />
+          <Route path="messages" element={<PageTransition><FreelancerMessages /></PageTransition>} />
+          <Route path="settings" element={<PageTransition><FreelancerSettings /></PageTransition>} />
+        </Route>
 
-      {/* Supervisor — protected */}
-      <Route path="/supervisor" element={<RoleGuard allowedRoles={['momentum_supervisor']}><SupervisorLayout /></RoleGuard>}>
-        <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
-        <Route path="dashboard"   element={<SupervisorDashboard />} />
-        <Route path="messages"    element={<SupervisorMessages />} />
-        <Route path="freelancers" element={<SupervisorDashboard />} />
-        <Route path="settings"    element={<SupervisorDashboard />} />
-      </Route>
+        {/* Supervisor — protected */}
+        <Route path="/supervisor" element={<RoleGuard allowedRoles={['momentum_supervisor']}><SupervisorLayout /></RoleGuard>}>
+          <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
+          <Route path="dashboard"   element={<PageTransition><SupervisorDashboard /></PageTransition>} />
+          <Route path="messages"    element={<PageTransition><SupervisorMessages /></PageTransition>} />
+          <Route path="freelancers" element={<PageTransition><SupervisorDashboard /></PageTransition>} />
+          <Route path="settings"    element={<PageTransition><SupervisorDashboard /></PageTransition>} />
+        </Route>
 
-      {/* Admin — direct URL only */}
-      <Route path="/admin" element={<RoleGuard allowedRoles={['admin']}><AdminLayout /></RoleGuard>}>
-        <Route index element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="clients" element={<AdminClients />} />
-        <Route path="freelancers" element={<AdminFreelancers />} />
-        <Route path="projects" element={<AdminProjects />} />
-        <Route path="disputes" element={<AdminDisputes />} />
-        <Route path="promotions" element={<AdminPromotions />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
+        {/* Admin — direct URL only */}
+        <Route path="/admin" element={<RoleGuard allowedRoles={['admin']}><AdminLayout /></RoleGuard>}>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
+          <Route path="users" element={<PageTransition><AdminUsers /></PageTransition>} />
+          <Route path="clients" element={<PageTransition><AdminClients /></PageTransition>} />
+          <Route path="freelancers" element={<PageTransition><AdminFreelancers /></PageTransition>} />
+          <Route path="projects" element={<PageTransition><AdminProjects /></PageTransition>} />
+          <Route path="disputes" element={<PageTransition><AdminDisputes /></PageTransition>} />
+          <Route path="promotions" element={<PageTransition><AdminPromotions /></PageTransition>} />
+          <Route path="settings" element={<PageTransition><AdminSettings /></PageTransition>} />
+        </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
 

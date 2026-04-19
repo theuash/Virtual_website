@@ -50,7 +50,7 @@ export default function FreelancerLayout() {
               src={logo}
               alt="Virtual"
               className="w-6 h-6"
-              style={{ filter: isDark ? 'brightness(0) invert(1)' : 'none' }}
+              style={{ filter: 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%)' }}
             />
             <span
               className="font-black text-base"
@@ -62,22 +62,21 @@ export default function FreelancerLayout() {
 
           {/* User card */}
           <div
-            className="flex items-center gap-3 p-3 rounded-xl border"
-            style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+            className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]"
           >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0 shadow-glow-sm"
               style={{ background: 'var(--accent)', color: '#fff' }}
             >
               {initial}
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+              <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>
                 {user?.fullName || 'Freelancer'}
               </div>
               <div
-                className="text-[9px] uppercase tracking-widest font-bold mt-0.5 px-1.5 py-0.5 rounded inline-block"
-                style={{ background: 'var(--accent)', color: '#fff', opacity: 0.9 }}
+                className="text-[9px] uppercase tracking-widest font-black mt-0.5 px-2 py-0.5 rounded-md inline-block shadow-glow-sm"
+                style={{ background: 'var(--accent)', color: '#fff' }}
               >
                 {tierLabel}
               </div>

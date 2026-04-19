@@ -36,22 +36,21 @@ export default function SupervisorLayout() {
         <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-5 cursor-pointer" onClick={() => navigate('/')}>
             <img src={logo} alt="Virtual" className="w-6 h-6"
-              style={{ filter: isDark ? 'brightness(0) invert(1)' : 'none' }} />
+              style={{ filter: 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%)' }} />
             <span className="font-black text-base" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>
               irtual
             </span>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl border"
-            style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0 shadow-glow-sm"
               style={{ background: 'var(--accent)', color: '#fff' }}>
               {initial}
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+              <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>
                 {user?.fullName || 'Supervisor'}
               </div>
-              <div className="text-[9px] uppercase tracking-widest font-bold mt-0.5"
+              <div className="text-[9px] uppercase tracking-widest font-black mt-0.5"
                 style={{ color: 'var(--accent)' }}>
                 Momentum Supervisor
               </div>

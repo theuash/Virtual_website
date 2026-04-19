@@ -92,11 +92,11 @@ export default function Header() {
             <img src={logo} alt="Virtual Logo" style={{
               width: '100%', height: '100%', objectFit: 'contain',
               filter: isDark
-                ? 'brightness(0) invert(1) drop-shadow(0 0 10px rgba(165,129,255,0.3))'
-                : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(40%) contrast(100%)'
+                ? 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%) drop-shadow(0 0 10px rgba(124,58,237,0.4))'
+                : 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(80%) contrast(100%)'
             }} />
           </div>
-          <span style={{ fontWeight: 800, fontSize: '1.5rem sm:text-2xl', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.5rem', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
             irtual
           </span>
         </div>
@@ -184,7 +184,7 @@ export default function Header() {
                 <button
                   key={id}
                   onClick={() => scrollTo(id)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(110,44,242,0.1)]"
+                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(var(--accent-rgb),0.08)]"
                   style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 500 }}
                 >
                   {label}
@@ -197,7 +197,7 @@ export default function Header() {
                 <button
                   key={path}
                   onClick={() => handleNavClick(path)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(110,44,242,0.1)]"
+                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(var(--accent-rgb),0.08)]"
                   style={{ 
                     color: location.pathname === path ? 'var(--accent)' : 'var(--text-primary)',
                     fontSize: '0.95rem', 
@@ -209,7 +209,7 @@ export default function Header() {
               ))}
               <button
                 onClick={() => handleNavClick('/signup')}
-                className="w-full py-2.5 rounded-lg font-semibold transition-all hover:scale-[1.02] active:scale-95"
+                className="w-full py-2.5 rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-glow-sm"
                 style={{ background: 'var(--accent)', color: '#fff' }}
               >
                 Get Started

@@ -37,17 +37,19 @@ export default function AdminLayout() {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="p-6 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-8">
-            <img src={logo} alt="Virtual Ops" className="w-8 h-8" />
-            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-secondary)', fontWeight: 300 }}>Ops</span>
+            <img src={logo} alt="Virtual Ops" className="w-8 h-8" style={{ filter: 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%)' }} />
+            <span className="font-black text-lg tracking-tighter" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em', marginLeft: '-10px' }}>
+              irtual
+            </span>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border flex items-center justify-center font-medium text-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-glow-sm" style={{ background: 'var(--accent)', color: '#fff' }}>
               {user?.name?.charAt(0) || 'A'}
             </div>
-            <div>
-              <div className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Administrator</div>
-              <div className="text-[10px] tracking-widest uppercase font-medium mt-0.5" style={{ color: 'var(--text-secondary)' }}>{user?.email}</div>
+            <div className="min-w-0">
+              <div className="font-bold text-sm truncate" style={{ color: 'var(--text-primary)' }}>Administrator</div>
+              <div className="text-[10px] tracking-widest uppercase font-black opacity-40 mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>{user?.email}</div>
             </div>
           </div>
         </div>
@@ -58,11 +60,7 @@ export default function AdminLayout() {
               key={item.path}
               to={item.path}
               onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => `nav-link group transition-all ${isActive ? 'active' : ''}`}
-              style={({ isActive }) => isActive ? { 
-                backgroundColor: 'var(--accent)',
-                color: 'white'
-              } : {}}
+              className={({ isActive }) => `nav-link group ${isActive ? 'active' : ''}`}
             >
               <span className="opacity-70 group-hover:opacity-100 transition-opacity">{item.icon}</span>
               <span className="text-sm font-medium">{item.label}</span>

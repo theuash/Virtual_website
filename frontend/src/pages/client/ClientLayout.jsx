@@ -45,25 +45,25 @@ export default function ClientLayout() {
               src={logo}
               alt="Virtual"
               className="w-7 h-7"
-              style={{ filter: isDark ? 'brightness(0) invert(1)' : 'none' }}
+              style={{ filter: 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%)' }}
             />
             <span className="font-black text-lg tracking-tighter" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>
               irtual
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 shadow-glow-sm"
               style={{ background: 'var(--accent)', color: '#fff' }}
             >
               {initial}
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+              <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>
                 {user?.fullName || 'Client'}
               </div>
-              <div className="text-[10px] uppercase tracking-widest font-medium" style={{ color: 'var(--text-secondary)' }}>
+              <div className="text-[10px] uppercase tracking-widest font-black opacity-40" style={{ color: 'var(--text-secondary)' }}>
                 {user?.companyName || 'Client Account'}
               </div>
             </div>

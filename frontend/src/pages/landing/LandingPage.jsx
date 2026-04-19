@@ -85,10 +85,10 @@ function HeroExpandingCTA({ onClick }) {
       onClick={onClick}
       className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
       style={{
-        backgroundColor: '#FFFFFF',
-        color: 'var(--accent)',
-        boxShadow: '0 0 40px rgba(255,255,255,0.4)',
-        border: 'none',
+        backgroundColor: 'var(--accent)',
+        color: '#FFFFFF',
+        boxShadow: '0 0 40px rgba(var(--accent-rgb), 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
       }}
       initial={{ scale: 0.4, opacity: 0 }}
       animate={popped ? { scale: 1, opacity: 1 } : { scale: 0.4, opacity: 0 }}
@@ -97,13 +97,13 @@ function HeroExpandingCTA({ onClick }) {
     >
       {/* Arrow — anchor dot */}
       <span className="flex items-center justify-center pl-5 pr-3 py-3.5">
-        <ArrowRight size={16} style={{ color: 'var(--accent)' }} />
+        <ArrowRight size={16} style={{ color: '#FFFFFF' }} />
       </span>
 
       {/* Text expands after pop */}
       <motion.span
         className="text-sm font-bold tracking-widest whitespace-nowrap overflow-hidden pr-6"
-        style={{ color: 'var(--accent)' }}
+        style={{ color: '#FFFFFF' }}
         initial={{ width: 0, opacity: 0 }}
         animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
         transition={{
@@ -156,14 +156,14 @@ function FloatingPill({ splitProgress, navigate, logo }) {
           <div
             className="flex items-center rounded-full relative"
             style={{
-              background: 'rgba(10, 10, 10, 0.55)',
+              background: 'rgba(2, 6, 23, 0.6)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               overflow: 'hidden',
               // Border transitions from white flash → subtle, hover brings back glow
-              border: `1px solid ${flashBorder ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.08)'}`,
-              transition: 'border-color 0.9s ease, box-shadow 0.3s ease',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
+              border: `1px solid ${flashBorder ? 'rgba(var(--accent-rgb), 0.6)' : 'rgba(255,255,255,0.08)'}`,
+              transition: 'all 0.9s ease',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03)',
             }}
           >
             {/* Logo */}
@@ -488,7 +488,7 @@ export default function LandingPage() {
             style={{ opacity: heroOpacity, scale: heroScale, y: heroTextY }}
             className="z-50 flex flex-col items-center max-w-4xl mx-auto mt-10 p-8"
           >
-            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}>
+            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb), 0.2)', background: 'rgba(var(--accent-rgb), 0.05)' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ backgroundColor: 'var(--accent)' }}></span>
               The New Standard
             </div>
@@ -497,7 +497,7 @@ export default function LandingPage() {
               <br />
               <span
                 className="text-transparent bg-clip-text"
-                style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}
+                style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent-light) 100%)' }}
               >
                 had to Build
               </span>
@@ -824,12 +824,12 @@ export default function LandingPage() {
                     animate={{ x: activeFeature === 2 ? 0 : 50, opacity: activeFeature === 2 ? 1 : 0 }}
                     className="flex flex-col items-center gap-6"
                   >
-                    <div className="w-24 h-48 border backdrop-blur-xl relative flex items-center justify-center overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+                    <div className="w-24 h-48 border backdrop-blur-xl relative flex items-center justify-center overflow-hidden" style={{ borderColor: 'var(--border)', background: 'rgba(2, 6, 23, 0.4)' }}>
                       <Users size={40} style={{ color: 'var(--text-secondary)', opacity: 0.2 }} strokeWidth={1} />
                       <motion.div
                         animate={{ y: ['200%', '-100%'] }}
                         transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                        className="absolute inset-x-0 h-10 bg-gradient-to-t from-transparent to-transparent"
+                        className="absolute inset-x-0 h-10"
                         style={{ backgroundImage: 'linear-gradient(to top, transparent, var(--accent), transparent)', opacity: 0.1 }}
                       />
                     </div>
@@ -1044,7 +1044,7 @@ export default function LandingPage() {
                     transition={{ duration: 0.8 }}
                     className="max-w-xl relative z-10"
                   >
-                    <div className="text-xs font-bold uppercase tracking-[0.4em] mb-8 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--accent), var(--forest))` }}>
+                    <div className="text-xs font-bold uppercase tracking-[0.4em] mb-8 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--accent), var(--accent-light))` }}>
                       {item.tag}
                     </div>
                     <h3 className="text-4xl md:text-6xl font-bold mb-10 tracking-tighter leading-[1.1]" style={{ color: 'var(--text-primary)' }}>
@@ -1089,7 +1089,7 @@ export default function LandingPage() {
             <div className="flex-shrink-0 w-[40vw] mr-[5vw]">
               <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 leading-none" style={{ color: 'var(--text-primary)' }}>
                 Mastery in <br /> 
-                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>Action.</span>
+                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--accent-light))' }}>Action.</span>
               </h2>
               <p className="text-xl max-w-md opacity-70 leading-relaxed font-normal" style={{ color: 'var(--text-secondary)' }}>
                 Five independent departments. Each with a designated head, a structured team, and full accountability for every deliverable.
@@ -1180,7 +1180,7 @@ export default function LandingPage() {
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8" style={{ color: 'var(--text-primary)' }}>
               Ready to build with
               <br />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>a real team behind you?</span>
+              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--accent-light))' }}>a real team behind you?</span>
             </h2>
             <p className="text-xl mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
               Post your project and get a structured department working on it — escrow-protected, supervisor-reviewed, and delivered on time.
@@ -1213,8 +1213,8 @@ export default function LandingPage() {
                     alt="Virtual Logo" 
                     className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110" 
                     style={{
-                      // Dynamic Violet Filter (Matching Header)
-                      filter: 'invert(42%) sepia(90%) saturate(1600%) hue-rotate(230deg) brightness(90%) contrast(100%) drop-shadow(0 0 10px rgba(99,102,241,0.3))'
+                      // Dynamic Violet Filter (Matching Header) - Purified for unified theme
+                      filter: 'invert(50%) sepia(80%) saturate(1500%) hue-rotate(240deg) brightness(100%) contrast(100%) drop-shadow(0 0 10px rgba(124,58,237,0.4))'
                     }} 
                   />
                 </div>

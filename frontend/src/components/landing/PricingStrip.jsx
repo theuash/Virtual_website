@@ -41,7 +41,7 @@ function ExpandingCTA({ onClick }) {
       className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
       style={{
         border: '1px solid var(--accent)',
-        background: 'rgba(96,10,10,0.05)',
+        background: 'rgba(var(--accent-rgb), 0.05)',
       }}
       initial={{ scale: 0.4, opacity: 0 }}
       animate={popped ? { scale: 1, opacity: 1 } : { scale: 0.4, opacity: 0 }}
@@ -107,7 +107,7 @@ export default function PricingStrip() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest border rounded-full mb-4"
-            style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.3)', background: 'rgba(96,10,10,0.08)' }}
+            style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb), 0.2)', background: 'rgba(var(--accent-rgb), 0.05)' }}
           >
             <Zap size={13} />
             Transparent Pricing
@@ -136,9 +136,8 @@ export default function PricingStrip() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true }}
-                custom={i}
-                className="h-56 rounded-2xl"
-                style={{ background: 'var(--bg-secondary)' }}
+                                className="h-56 rounded-2xl animate-pulse"
+                style={{ background: 'var(--bg-glass)', border: '1px solid var(--border)' }}
               />
             ))}
           </div>
@@ -159,10 +158,12 @@ export default function PricingStrip() {
                   onClick={() => navigate(`/pricing#${dept.department}`)}
                   className="group relative overflow-hidden rounded-2xl border transition-all duration-300 p-6 flex flex-col justify-between h-full"
                   style={{
-                    background: 'var(--bg-secondary)',
+                    background: 'var(--bg-card)',
                     borderColor: 'var(--border)',
+                    backdropFilter: 'var(--glass-blur)',
+                    WebkitBackdropFilter: 'var(--glass-blur)',
                   }}
-                  whileHover={{ y: -4, borderColor: 'var(--accent)' }}
+                  whileHover={{ y: -8, borderColor: 'var(--accent)', boxShadow: 'var(--glow-primary)' }}
                 >
                   {/* Top accent line on hover */}
                   <div
@@ -213,8 +214,8 @@ export default function PricingStrip() {
                         ₹{dept.startingFrom}
                       </span>
                       <span
-                        className="text-xs font-bold px-2 py-1 rounded"
-                        style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}
+                        className="text-xs font-bold px-2 py-1 rounded-lg"
+                        style={{ background: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent)' }}
                       >
                         Save ₹{savings}
                       </span>
