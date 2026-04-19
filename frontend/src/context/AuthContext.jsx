@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
@@ -25,16 +25,47 @@ const mapSignupPayload = (formData) => ({
   portfolioUrl: formData.portfolioUrl?.trim() || '',
 });
 
+// Decode JWT payload and check expiry — no libraries, just atob
+const isTokenValid = (token) => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.exp) return true; // no expiry claim — treat as valid
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  // loading stays true until the initial token check is complete
+  const [loading, setLoading] = useState(true);
+
+  // On mount: restore session from localStorage if token is still valid
+  useEffect(() => {
     try {
       const stored = localStorage.getItem('virtual_user');
-      return stored ? JSON.parse(stored) : null;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.token && isTokenValid(parsed.token)) {
+          // Token is valid — restore session and set axios header
+          api.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
+          setUser(parsed);
+        } else {
+          // Token missing or expired — clear storage
+          localStorage.removeItem('virtual_user');
+          delete api.defaults.headers.common['Authorization'];
+        }
+      }
     } catch {
-      return null;
+      localStorage.removeItem('virtual_user');
+      delete api.defaults.headers.common['Authorization'];
+    } finally {
+      setLoading(false);
     }
-  });
-  const [loading, setLoading] = useState(false);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
@@ -83,7 +114,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/auth/otp/verify-signup', {
         email: email.trim().toLowerCase(),
         token: otp,
-        signupData, // Pass full signup data so user is created after verification
+        signupData,
       });
       return unwrapResponse(response);
     } catch (error) {
@@ -154,11 +185,10 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('virtual_user');
+    delete api.defaults.headers.common['Authorization'];
   }, []);
 
   const completeAuth = useCallback((authData) => {
-    // Backend returns either { user, token, refreshToken } (password/OTP flow)
-    // or { user, tokens: { token, refreshToken } } (Google flow)
     const token = authData.token ?? authData.tokens?.token;
     const refreshToken = authData.refreshToken ?? authData.tokens?.refreshToken;
     const finalData = {
@@ -168,6 +198,8 @@ export const AuthProvider = ({ children }) => {
     };
     setUser(finalData);
     localStorage.setItem('virtual_user', JSON.stringify(finalData));
+    // Set axios default header so all subsequent requests are authenticated
+    if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return finalData;
   }, []);
 

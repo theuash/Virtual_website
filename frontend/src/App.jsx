@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
 import { RoleGuard } from './utils/roleGuards';
+import PublicRoute from './components/PublicRoute';
 
 // Landing
 import LandingPage from './pages/landing/LandingPage';
@@ -56,16 +56,14 @@ import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminSettings from './pages/admin/AdminSettings';
 
 function App() {
-  const { user } = useAuth();
-
   return (
     <Routes>
-      {/* Public */}
-      <Route path="/" element={<LandingPage />} />
+      {/* Public — redirect to dashboard if already logged in */}
+      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
       <Route path="/meet/:meetingId" element={<MeetRoom />} />
       <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
 
