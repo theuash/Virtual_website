@@ -78,26 +78,41 @@ function VideoPlayer({ video }) {
 
 // Video Card for recommendations
 function VideoCard({ video, onClick, isSelected }) {
+  const thumbnailUrl = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
+  
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       onClick={onClick}
-      className={`p-3 rounded-lg border cursor-pointer transition-all ${isSelected ? 'ring-2' : ''}`}
+      className={`rounded-lg border cursor-pointer transition-all overflow-hidden ${isSelected ? 'ring-2' : ''}`}
       style={{
         background: isSelected ? 'var(--accent)' : 'var(--bg-card)',
         borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
         color: isSelected ? '#fff' : 'var(--text-primary)',
       }}
     >
-      <div className="flex items-start gap-2">
-        <Play size={12} className="mt-0.5 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <h4 className="text-xs font-semibold truncate">{video.title}</h4>
-          <p className="text-[10px] mt-0.5 truncate opacity-80">{video.desc}</p>
-          <div className="flex items-center gap-1 text-[10px] mt-1 opacity-70">
-            <Clock size={10} />
-            {video.duration}
-          </div>
+      {/* Thumbnail */}
+      <div className="relative w-full aspect-video overflow-hidden bg-black">
+        <img
+          src={thumbnailUrl}
+          alt={video.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.style.display = 'none';
+          }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <Play size={24} className="text-white" fill="white" />
+        </div>
+      </div>
+      
+      {/* Info */}
+      <div className="p-2">
+        <h4 className="text-xs font-semibold truncate">{video.title}</h4>
+        <p className="text-[10px] mt-0.5 truncate opacity-80">{video.desc}</p>
+        <div className="flex items-center gap-1 text-[10px] mt-1 opacity-70">
+          <Clock size={10} />
+          {video.duration}
         </div>
       </div>
     </motion.div>
@@ -106,132 +121,142 @@ function VideoCard({ video, onClick, isSelected }) {
 
 // Tutorial Card
 function TutorialCard({ tutorial, onSelect, isSelected }) {
+  const thumbnailUrl = `https://img.youtube.com/vi/${tutorial.youtubeId}/maxresdefault.jpg`;
+  
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       onClick={() => onSelect(tutorial, 'tutorial')}
-      className={`p-4 rounded-lg border cursor-pointer transition-all ${isSelected ? 'ring-2' : ''}`}
+      className={`rounded-lg border cursor-pointer transition-all overflow-hidden ${isSelected ? 'ring-2' : ''}`}
       style={{
         background: isSelected ? 'var(--accent)' : 'var(--bg-card)',
         borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
         color: isSelected ? '#fff' : 'var(--text-primary)',
       }}
     >
-      <h3 className="text-sm font-semibold">{tutorial.title}</h3>
-      <p className="text-xs mt-1 opacity-80">{tutorial.desc}</p>
-      <div className="flex items-center gap-2 text-xs opacity-70 mt-2">
-        <Clock size={12} />
-        {tutorial.duration} • {tutorial.level}
+      {/* Thumbnail */}
+      <div className="relative w-full aspect-video overflow-hidden bg-black">
+        <img
+          src={thumbnailUrl}
+          alt={tutorial.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.style.display = 'none';
+          }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <Play size={32} className="text-white" fill="white" />
+        </div>
+      </div>
+      
+      {/* Info */}
+      <div className="p-3">
+        <h3 className="text-sm font-semibold line-clamp-2">{tutorial.title}</h3>
+        <p className="text-xs mt-1 opacity-80 line-clamp-2">{tutorial.desc}</p>
+        <div className="flex items-center gap-2 text-xs opacity-70 mt-2">
+          <Clock size={12} />
+          {tutorial.duration} • {tutorial.level}
+        </div>
       </div>
     </motion.div>
   );
 }
 
-// Playlist Card
+// Playlist Card - Compact
 function PlaylistCard({ playlist, onToggle, isExpanded, onSelectVideo }) {
+  const firstVideoThumbnail = playlist.videos?.[0]?.youtubeId 
+    ? `https://img.youtube.com/vi/${playlist.videos[0].youtubeId}/maxresdefault.jpg`
+    : null;
+  
+  const handleClick = () => {
+    // Play the first video from the playlist
+    if (playlist.videos?.[0]) {
+      onSelectVideo(playlist.videos[0], 'playlist', playlist);
+    }
+  };
+  
   return (
-    <div>
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        onClick={() => onToggle(playlist.id)}
-        className="p-4 rounded-lg border cursor-pointer transition-all"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-      >
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h3>
-            <p className="text-xs mt-1 opacity-80">{playlist.videos?.length || 0} videos</p>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      onClick={handleClick}
+      className="rounded-lg border cursor-pointer transition-all overflow-hidden"
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+    >
+      {/* Thumbnail */}
+      {firstVideoThumbnail && (
+        <div className="relative w-full aspect-video overflow-hidden bg-black">
+          <img
+            src={firstVideoThumbnail}
+            alt={playlist.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <Play size={24} className="text-white" fill="white" />
           </div>
-          <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'var(--accent)', color: '#fff' }}>
-            {playlist.level}
-          </span>
         </div>
-      </motion.div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-2 space-y-2 pl-4 border-l-2"
-            style={{ borderColor: 'var(--accent)' }}
-          >
-            {playlist.videos?.map((video) => (
-              <motion.div
-                key={video.youtubeId}
-                whileHover={{ scale: 1.02 }}
-                onClick={() => onSelectVideo(video, 'playlist', playlist)}
-                className="p-3 rounded-lg border cursor-pointer"
-                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-              >
-                <div className="flex items-start gap-2">
-                  <Play size={12} className="mt-0.5 shrink-0" style={{ color: 'var(--accent)' }} />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{video.title}</h4>
-                    <p className="text-[10px] mt-0.5 truncate opacity-80">{video.desc}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      )}
+      
+      {/* Info */}
+      <div className="p-2">
+        <h3 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h3>
+        <p className="text-[10px] mt-0.5 opacity-80">{playlist.videos?.length || 0} videos</p>
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded mt-1 inline-block" style={{ background: 'var(--accent)', color: '#fff' }}>
+          {playlist.level}
+        </span>
+      </div>
+    </motion.div>
   );
 }
 
-// Crash Course Card
+// Crash Course Card - Compact
 function CrashCourseCard({ course, onToggle, isExpanded, onSelectVideo }) {
+  const firstVideoThumbnail = course.videos?.[0]?.youtubeId 
+    ? `https://img.youtube.com/vi/${course.videos[0].youtubeId}/maxresdefault.jpg`
+    : null;
+  
+  const handleClick = () => {
+    // Play the first video from the crash course
+    if (course.videos?.[0]) {
+      onSelectVideo(course.videos[0], 'crashcourse', course);
+    }
+  };
+  
   return (
-    <div>
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        onClick={() => onToggle(course.id)}
-        className="p-4 rounded-lg border cursor-pointer transition-all"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-      >
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{course.title}</h3>
-            <p className="text-xs mt-1 opacity-80">{course.videos?.length || 0} videos</p>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      onClick={handleClick}
+      className="rounded-lg border cursor-pointer transition-all overflow-hidden"
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+    >
+      {/* Thumbnail */}
+      {firstVideoThumbnail && (
+        <div className="relative w-full aspect-video overflow-hidden bg-black">
+          <img
+            src={firstVideoThumbnail}
+            alt={course.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <Play size={24} className="text-white" fill="white" />
           </div>
-          <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'var(--accent)', color: '#fff' }}>
-            {course.level}
-          </span>
         </div>
-      </motion.div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-2 space-y-2 pl-4 border-l-2"
-            style={{ borderColor: 'var(--accent)' }}
-          >
-            {course.videos?.map((video) => (
-              <motion.div
-                key={video.youtubeId}
-                whileHover={{ scale: 1.02 }}
-                onClick={() => onSelectVideo(video, 'crashcourse', course)}
-                className="p-3 rounded-lg border cursor-pointer"
-                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-              >
-                <div className="flex items-start gap-2">
-                  <Play size={12} className="mt-0.5 shrink-0" style={{ color: 'var(--accent)' }} />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{video.title}</h4>
-                    <p className="text-[10px] mt-0.5 truncate opacity-80">{video.desc}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      )}
+      
+      {/* Info */}
+      <div className="p-2">
+        <h3 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{course.title}</h3>
+        <p className="text-[10px] mt-0.5 opacity-80">{course.videos?.length || 0} videos</p>
+        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded mt-1 inline-block" style={{ background: 'var(--accent)', color: '#fff' }}>
+          {course.level}
+        </span>
+      </div>
+    </motion.div>
   );
 }
 
@@ -446,7 +471,7 @@ export default function FreelancerLearning() {
           <div className="space-y-6">
             {/* When video is selected - two column layout */}
             {selectedVideo ? (
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Left side - Video player */}
                 <div className="lg:col-span-3">
                   <motion.div
@@ -469,7 +494,7 @@ export default function FreelancerLearning() {
                   initial={{ opacity: 0, x: 100 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}
-                  className="lg:col-span-1 space-y-4"
+                  className="lg:col-span-2 space-y-4 flex flex-col"
                 >
                   {/* Tabs - Horizontal and scrollable */}
                   <div className="flex gap-2 overflow-x-auto pb-2 border-b" style={{ borderColor: 'var(--border)' }}>
@@ -502,12 +527,37 @@ export default function FreelancerLearning() {
                         <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Tutorials</h3>
                         {tutorials.length > 0 ? (
                           tutorials.map(tutorial => (
-                            <VideoCard
+                            <motion.div
                               key={tutorial.youtubeId}
-                              video={tutorial}
+                              whileHover={{ scale: 1.02 }}
                               onClick={() => handleSelectVideo(tutorial, 'tutorial')}
-                              isSelected={selectedVideo.youtubeId === tutorial.youtubeId}
-                            />
+                              className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden transition-all p-2"
+                              style={{
+                                background: selectedVideo?.youtubeId === tutorial.youtubeId ? 'var(--accent)' : 'var(--bg-card)',
+                                borderColor: selectedVideo?.youtubeId === tutorial.youtubeId ? 'var(--accent)' : 'var(--border)',
+                              }}
+                            >
+                              {/* Thumbnail */}
+                              <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                <img
+                                  src={`https://img.youtube.com/vi/${tutorial.youtubeId}/maxresdefault.jpg`}
+                                  alt={tutorial.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                  }}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                  <Play size={12} className="text-white" fill="white" />
+                                </div>
+                              </div>
+                              
+                              {/* Info */}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-semibold line-clamp-2" style={{ color: selectedVideo?.youtubeId === tutorial.youtubeId ? '#fff' : 'var(--text-primary)' }}>{tutorial.title}</h4>
+                                <p className="text-[10px] mt-0.5 opacity-80">{tutorial.duration}</p>
+                              </div>
+                            </motion.div>
                           ))
                         ) : (
                           <p style={{ color: 'var(--text-secondary)' }}>No tutorials available</p>
@@ -522,14 +572,39 @@ export default function FreelancerLearning() {
                               <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--accent)' }}>
                                 {sourceContext.title}
                               </h3>
-                              <div className="space-y-2 pl-2 border-l-2" style={{ borderColor: 'var(--accent)' }}>
+                              <div className="space-y-2">
                                 {sourceContext.videos?.map(video => (
-                                  <VideoCard
+                                  <motion.div
                                     key={video.youtubeId}
-                                    video={video}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => handleSelectVideo(video, 'playlist', sourceContext)}
-                                    isSelected={selectedVideo.youtubeId === video.youtubeId}
-                                  />
+                                    className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden transition-all p-2"
+                                    style={{
+                                      background: selectedVideo?.youtubeId === video.youtubeId ? 'var(--accent)' : 'var(--bg-card)',
+                                      borderColor: selectedVideo?.youtubeId === video.youtubeId ? 'var(--accent)' : 'var(--border)',
+                                    }}
+                                  >
+                                    {/* Thumbnail */}
+                                    <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                      <img
+                                        src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                                        alt={video.title}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          e.target.style.display = 'none';
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                        <Play size={12} className="text-white" fill="white" />
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Info */}
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-xs font-semibold line-clamp-2" style={{ color: selectedVideo?.youtubeId === video.youtubeId ? '#fff' : 'var(--text-primary)' }}>{video.title}</h4>
+                                      <p className="text-[10px] mt-0.5 opacity-80">{video.duration}</p>
+                                    </div>
+                                  </motion.div>
                                 ))}
                               </div>
                             </div>
@@ -540,11 +615,29 @@ export default function FreelancerLearning() {
                                   key={playlist.id}
                                   whileHover={{ scale: 1.02 }}
                                   onClick={() => handleSelectVideo(playlist.videos?.[0], 'playlist', playlist)}
-                                  className="p-2 rounded-lg border cursor-pointer mb-2"
+                                  className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden mb-2 transition-all p-2"
                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                                 >
-                                  <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h4>
-                                  <p className="text-[10px] opacity-70">{playlist.videos?.length || 0} videos</p>
+                                  {/* Thumbnail */}
+                                  <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${playlist.videos?.[0]?.youtubeId}/maxresdefault.jpg`}
+                                      alt={playlist.title}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <Play size={12} className="text-white" fill="white" />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h4>
+                                    <p className="text-[10px] opacity-70">{playlist.videos?.length || 0} videos</p>
+                                  </div>
                                 </motion.div>
                               ))}
                             </div>
@@ -560,11 +653,29 @@ export default function FreelancerLearning() {
                                   key={playlist.id}
                                   whileHover={{ scale: 1.02 }}
                                   onClick={() => handleSelectVideo(playlist.videos?.[0], 'playlist', playlist)}
-                                  className="p-2 rounded-lg border cursor-pointer"
+                                  className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden transition-all p-2"
                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                                 >
-                                  <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h4>
-                                  <p className="text-[10px] opacity-70">{playlist.videos?.length || 0} videos</p>
+                                  {/* Thumbnail */}
+                                  <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${playlist.videos?.[0]?.youtubeId}/maxresdefault.jpg`}
+                                      alt={playlist.title}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <Play size={12} className="text-white" fill="white" />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{playlist.title}</h4>
+                                    <p className="text-[10px] opacity-70">{playlist.videos?.length || 0} videos</p>
+                                  </div>
                                 </motion.div>
                               ))
                             ) : (
@@ -582,14 +693,39 @@ export default function FreelancerLearning() {
                               <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--accent)' }}>
                                 {sourceContext.title}
                               </h3>
-                              <div className="space-y-2 pl-2 border-l-2" style={{ borderColor: 'var(--accent)' }}>
+                              <div className="space-y-2">
                                 {sourceContext.videos?.map(video => (
-                                  <VideoCard
+                                  <motion.div
                                     key={video.youtubeId}
-                                    video={video}
+                                    whileHover={{ scale: 1.02 }}
                                     onClick={() => handleSelectVideo(video, 'crashcourse', sourceContext)}
-                                    isSelected={selectedVideo.youtubeId === video.youtubeId}
-                                  />
+                                    className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden transition-all p-2"
+                                    style={{
+                                      background: selectedVideo?.youtubeId === video.youtubeId ? 'var(--accent)' : 'var(--bg-card)',
+                                      borderColor: selectedVideo?.youtubeId === video.youtubeId ? 'var(--accent)' : 'var(--border)',
+                                    }}
+                                  >
+                                    {/* Thumbnail */}
+                                    <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                      <img
+                                        src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                                        alt={video.title}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          e.target.style.display = 'none';
+                                        }}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                        <Play size={12} className="text-white" fill="white" />
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Info */}
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-xs font-semibold line-clamp-2" style={{ color: selectedVideo?.youtubeId === video.youtubeId ? '#fff' : 'var(--text-primary)' }}>{video.title}</h4>
+                                      <p className="text-[10px] mt-0.5 opacity-80">{video.duration}</p>
+                                    </div>
+                                  </motion.div>
                                 ))}
                               </div>
                             </div>
@@ -600,11 +736,29 @@ export default function FreelancerLearning() {
                                   key={course.id}
                                   whileHover={{ scale: 1.02 }}
                                   onClick={() => handleSelectVideo(course.videos?.[0], 'crashcourse', course)}
-                                  className="p-2 rounded-lg border cursor-pointer mb-2"
+                                  className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden mb-2 transition-all p-2"
                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                                 >
-                                  <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{course.title}</h4>
-                                  <p className="text-[10px] opacity-70">{course.videos?.length || 0} videos</p>
+                                  {/* Thumbnail */}
+                                  <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${course.videos?.[0]?.youtubeId}/maxresdefault.jpg`}
+                                      alt={course.title}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <Play size={12} className="text-white" fill="white" />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{course.title}</h4>
+                                    <p className="text-[10px] opacity-70">{course.videos?.length || 0} videos</p>
+                                  </div>
                                 </motion.div>
                               ))}
                             </div>
@@ -620,11 +774,29 @@ export default function FreelancerLearning() {
                                   key={course.id}
                                   whileHover={{ scale: 1.02 }}
                                   onClick={() => handleSelectVideo(course.videos?.[0], 'crashcourse', course)}
-                                  className="p-2 rounded-lg border cursor-pointer"
+                                  className="flex gap-2 rounded-lg border cursor-pointer overflow-hidden transition-all p-2"
                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                                 >
-                                  <h4 className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{course.title}</h4>
-                                  <p className="text-[10px] opacity-70">{course.videos?.length || 0} videos</p>
+                                  {/* Thumbnail */}
+                                  <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden bg-black rounded">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${course.videos?.[0]?.youtubeId}/maxresdefault.jpg`}
+                                      alt={course.title}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                      <Play size={12} className="text-white" fill="white" />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{course.title}</h4>
+                                    <p className="text-[10px] opacity-70">{course.videos?.length || 0} videos</p>
+                                  </div>
                                 </motion.div>
                               ))
                             ) : (
@@ -666,7 +838,7 @@ export default function FreelancerLearning() {
 
                   {/* Content grid */}
                   {contentType === 'tutorials' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {tutorials.length > 0 ? (
                         tutorials.map(tutorial => (
                           <TutorialCard
@@ -681,7 +853,7 @@ export default function FreelancerLearning() {
                       )}
                     </div>
                   ) : contentType === 'playlists' ? (
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {playlists.length > 0 ? (
                         playlists.map(playlist => (
                           <PlaylistCard
@@ -697,7 +869,7 @@ export default function FreelancerLearning() {
                       )}
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {crashCourses.length > 0 ? (
                         crashCourses.map(course => (
                           <CrashCourseCard

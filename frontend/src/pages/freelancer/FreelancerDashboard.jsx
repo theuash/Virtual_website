@@ -5,10 +5,12 @@ import { formatCurrency, TIER_LABELS } from '../../utils/roleGuards';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
 import LockedBlock from '../../components/LockedBlock';
+import { motion } from 'framer-motion';
 import {
   FolderKanban, CheckCircle2, CircleDollarSign, ArrowRight,
   TrendingUp, Clock, BookOpen, Play, Lock, ChevronRight, Zap
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const TIER_ORDER = ['precrate', 'crate', 'project_initiator', 'momentum_supervisor', 'admin'];
 const TIER_DESCRIPTIONS = {
@@ -28,16 +30,21 @@ const LEARNING_MODULES = [
 
 function StatCard({ label, value, icon, highlight }) {
   return (
-    <div
-      className="p-5 rounded-xl border"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ scale: 1.02, translateY: -4 }}
+      className="p-5 rounded-xl border transition-all"
       style={{
         background: highlight ? 'var(--accent)' : 'var(--bg-secondary)',
         borderColor: highlight ? 'var(--accent)' : 'var(--border)',
+        boxShadow: highlight ? '0 8px 24px rgba(0,0,0,0.2)' : 'none',
       }}
     >
       <div className="flex items-center justify-between mb-3">
         <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center"
+          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
           style={{
             background: highlight ? 'rgba(255,255,255,0.15)' : 'var(--bg-card)',
             color: highlight ? '#fff' : 'var(--accent)',
@@ -54,13 +61,14 @@ function StatCard({ label, value, icon, highlight }) {
         style={{ color: highlight ? '#fff' : 'var(--text-primary)' }}>
         {value}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function FreelancerDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const isPrecrate = !user?.tier || user.tier === 'precrate';
 
@@ -86,12 +94,28 @@ export default function FreelancerDashboard() {
   const nextTierLabel = nextTier ? TIER_LABELS[nextTier] : null;
   const completedModules = LEARNING_MODULES.filter(m => m.completed).length;
 
+  // Persist sidebar state
+  useEffect(() => {
+    const saved = localStorage.getItem('dashboardSidebarOpen');
+    if (saved !== null) setSidebarOpen(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('dashboardSidebarOpen', JSON.stringify(sidebarOpen));
+  }, [sidebarOpen]);
+
   if (isLoading) return (
     <>
       <DashboardHeader title="Dashboard" />
       <div className="p-8 grid grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-28 rounded-xl animate-pulse" style={{ background: 'var(--bg-secondary)' }} />
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="h-28 rounded-xl animate-pulse"
+            style={{ background: 'var(--bg-secondary)' }}
+          />
         ))}
       </div>
     </>
@@ -106,17 +130,47 @@ export default function FreelancerDashboard() {
     </>
   );
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
+  };
+
   return (
     <>
       <DashboardHeader title="Dashboard" />
-      <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      <motion.div
+        className="p-6 md:p-8 max-w-7xl mx-auto space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
 
         {/* ── Greeting + Tier ──────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Greeting */}
-          <div
-            className="md:col-span-2 p-5 rounded-xl border flex flex-col justify-between"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          <motion.div
+            variants={itemVariants}
+            className="md:col-span-2 p-5 rounded-xl border transition-all"
+            style={{
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }}
           >
             <div>
               <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>
@@ -129,7 +183,7 @@ export default function FreelancerDashboard() {
                 {tierDesc}
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-4 flex items-center gap-3 flex-wrap">
               {/* View Projects — locked for precrate */}
               {isPrecrate ? (
                 <div
@@ -140,28 +194,37 @@ export default function FreelancerDashboard() {
                   View Projects
                 </div>
               ) : (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => navigate('/freelancer/tasks')}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-105 active:scale-95"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
                   style={{ background: 'var(--accent)', color: '#fff' }}
                 >
                   <FolderKanban size={14} /> View Projects
-                </button>
+                </motion.button>
               )}
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/freelancer/progress')}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-all hover:scale-105"
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-all"
                 style={{ borderColor: 'var(--border)', color: 'var(--text-primary)', background: 'var(--bg-card)' }}
               >
                 <TrendingUp size={14} /> Career Matrix
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Tier card */}
-          <div
-            className="p-5 rounded-xl border flex flex-col justify-between"
-            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          <motion.div
+            variants={itemVariants}
+            className="p-5 rounded-xl border transition-all"
+            style={{
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            }}
           >
             <div>
               <div className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>
@@ -182,14 +245,25 @@ export default function FreelancerDashboard() {
                 <span className="text-[9px] font-black" style={{ color: 'var(--accent)' }}>{taskPct}%</span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${taskPct}%`, background: 'var(--accent)' }} />
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${taskPct}%` }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  className="h-full rounded-full"
+                  style={{ background: 'var(--accent)' }}
+                />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* ── Stats row ────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        >
           {/* Projects Done — locked */}
           {isPrecrate ? (
             <LockedBlock label="Unlocks at Crate">
@@ -213,7 +287,7 @@ export default function FreelancerDashboard() {
             value={`${completedModules}/${LEARNING_MODULES.length}`}
             icon={<BookOpen size={17} strokeWidth={1.5} />}
           />
-        </div>
+        </motion.div>
 
         {/* ── Main grid ────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -221,7 +295,11 @@ export default function FreelancerDashboard() {
           {/* Active Projects — locked for precrate */}
           {isPrecrate ? (
             <LockedBlock label="Unlocks at Crate" className="lg:col-span-3 rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-              <div className="rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+              <motion.div
+                variants={itemVariants}
+                className="rounded-xl border"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+              >
                 <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
                   <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                     <FolderKanban size={15} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
@@ -236,10 +314,18 @@ export default function FreelancerDashboard() {
                 <div className="px-4 pb-4">
                   <div className="h-10 rounded-lg" style={{ background: 'var(--bg-card)' }} />
                 </div>
-              </div>
+              </motion.div>
             </LockedBlock>
           ) : (
-            <div className="lg:col-span-3 rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+            <motion.div
+              variants={itemVariants}
+              className="lg:col-span-3 rounded-xl border transition-all"
+              style={{
+                background: 'var(--bg-secondary)',
+                borderColor: 'var(--border)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
+            >
               <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
                 <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <FolderKanban size={15} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
@@ -257,7 +343,12 @@ export default function FreelancerDashboard() {
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No active projects right now.</p>
                   </div>
                 ) : projects.slice(0, 4).map((task, i) => (
-                  <div key={task._id || i}
+                  <motion.div
+                    key={task._id || i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 4 }}
                     className="group flex items-center justify-between p-4 rounded-lg border transition-all cursor-pointer"
                     style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                     onClick={() => navigate('/freelancer/tasks')}
@@ -277,17 +368,21 @@ export default function FreelancerDashboard() {
                       </div>
                       <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent)' }} />
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
               <div className="px-4 pb-4">
-                <button onClick={() => navigate('/freelancer/tasks')}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/freelancer/tasks')}
                   className="w-full py-2.5 text-sm font-semibold rounded-lg border transition-all flex items-center justify-center gap-2 hover:gap-3"
-                  style={{ color: 'var(--accent)', borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+                  style={{ color: 'var(--accent)', borderColor: 'var(--border)', background: 'var(--bg-card)' }}
+                >
                   All Projects <ArrowRight size={14} />
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Right column */}
@@ -296,7 +391,11 @@ export default function FreelancerDashboard() {
             {/* Rank Progression — locked for precrate */}
             {isPrecrate ? (
               <LockedBlock label="Unlocks at Crate" className="rounded-xl border p-5" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-                <div className="rounded-xl border p-5" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                <motion.div
+                  variants={itemVariants}
+                  className="rounded-xl border p-5"
+                  style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+                >
                   <h2 className="text-sm font-bold flex items-center gap-2 mb-4" style={{ color: 'var(--text-primary)' }}>
                     <Zap size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} /> Rank Progression
                   </h2>
@@ -310,10 +409,18 @@ export default function FreelancerDashboard() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               </LockedBlock>
             ) : (
-              <div className="rounded-xl border p-5" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+              <motion.div
+                variants={itemVariants}
+                className="rounded-xl border p-5 transition-all"
+                style={{
+                  background: 'var(--bg-secondary)',
+                  borderColor: 'var(--border)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                }}
+              >
                 <h2 className="text-sm font-bold flex items-center gap-2 mb-4" style={{ color: 'var(--text-primary)' }}>
                   <Zap size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} /> Rank Progression
                 </h2>
@@ -324,7 +431,13 @@ export default function FreelancerDashboard() {
                       <span className="text-[9px] font-black" style={{ color: 'var(--accent)' }}>{completedTasks}/{nextTaskTarget}</span>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${taskPct}%`, background: 'var(--accent)' }} />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${taskPct}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className="h-full rounded-full"
+                        style={{ background: 'var(--accent)' }}
+                      />
                     </div>
                   </div>
                   <div>
@@ -333,15 +446,29 @@ export default function FreelancerDashboard() {
                       <span className="text-[9px] font-black" style={{ color: 'var(--accent)' }}>{formatCurrency(totalEarnings)}/{formatCurrency(nextEarnTarget)}</span>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${earnPct}%`, background: 'var(--accent)' }} />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${earnPct}%` }}
+                        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+                        className="h-full rounded-full"
+                        style={{ background: 'var(--accent)' }}
+                      />
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Learning */}
-            <div className="rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+            <motion.div
+              variants={itemVariants}
+              className="rounded-xl border transition-all"
+              style={{
+                background: 'var(--bg-secondary)',
+                borderColor: 'var(--border)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
+            >
               <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
                 <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                   <BookOpen size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} /> Learning
@@ -351,9 +478,14 @@ export default function FreelancerDashboard() {
                 </span>
               </div>
               <div className="p-3 space-y-2">
-                {LEARNING_MODULES.map(module => (
-                  <div key={module.id}
-                    className="flex items-start gap-3 p-3 rounded-lg border"
+                {LEARNING_MODULES.map((module, idx) => (
+                  <motion.div
+                    key={module.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    whileHover={{ x: 4 }}
+                    className="flex items-start gap-3 p-3 rounded-lg border transition-all"
                     style={{
                       background: 'var(--bg-card)',
                       borderColor: module.completed ? 'var(--accent)' : 'var(--border)',
@@ -361,7 +493,7 @@ export default function FreelancerDashboard() {
                       cursor: module.locked ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all"
                       style={{ background: module.completed ? 'var(--accent)' : 'var(--border)', color: module.completed ? '#fff' : 'var(--text-secondary)' }}>
                       {module.locked ? <Lock size={11} strokeWidth={2} /> : module.completed ? <CheckCircle2 size={13} strokeWidth={2} /> : <Play size={11} strokeWidth={2} />}
                     </div>
@@ -372,14 +504,14 @@ export default function FreelancerDashboard() {
                         {module.completed && <span style={{ color: 'var(--accent)' }}>✓ Complete</span>}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }
