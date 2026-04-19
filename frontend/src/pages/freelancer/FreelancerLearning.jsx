@@ -311,10 +311,21 @@ export default function FreelancerLearning() {
   const [expandedCourse, setExpandedCourse] = useState(null);
   const [sourceContext, setSourceContext] = useState(null);
 
+  const [catalogueError, setCatalogueError] = useState(null);
+
   useEffect(() => {
     api.get('/learning/catalogue')
-      .then(res => setCatalogue(res.data?.data ?? {}))
-      .catch((err) => console.error('Error fetching catalogue:', err))
+      .then(res => {
+        const data = res.data?.data ?? {};
+        console.log('[Learning] catalogue keys:', Object.keys(data));
+        console.log('[Learning] user primarySkill:', user?.primarySkill);
+        console.log('[Learning] userSkills:', userSkills);
+        setCatalogue(data);
+      })
+      .catch((err) => {
+        console.error('Error fetching catalogue:', err);
+        setCatalogueError(err?.response?.data?.message || err?.message || 'Unknown error');
+      })
       .finally(() => setVideosLoading(false));
   }, []);
 
@@ -362,6 +373,20 @@ export default function FreelancerLearning() {
     <>
       <DashboardHeader title="Learning" />
       <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+
+        {/* ── DEBUG PANEL — remove after fixing ── */}
+        <div className="p-4 rounded-lg text-xs font-mono space-y-1" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid #f59e0b', color: '#fbbf24' }}>
+          <div><span className="opacity-60">primarySkill:</span> {user?.primarySkill ?? <span className="text-red-400">undefined</span>}</div>
+          <div><span className="opacity-60">secondarySkills:</span> {JSON.stringify(user?.secondarySkills ?? [])}</div>
+          <div><span className="opacity-60">userSkills:</span> {JSON.stringify(userSkills)}</div>
+          <div><span className="opacity-60">activeSkill:</span> {activeSkill ?? 'null'}</div>
+          <div><span className="opacity-60">activeSoftware:</span> {activeSoftware ?? 'null'}</div>
+          <div><span className="opacity-60">catalogue keys:</span> {JSON.stringify(Object.keys(catalogue))}</div>
+          <div><span className="opacity-60">catalogueError:</span> {catalogueError ?? 'none'}</div>
+          <div><span className="opacity-60">content found:</span> {content ? 'yes' : 'no'}</div>
+          <div><span className="opacity-60">tutorials:</span> {tutorials.length} | <span className="opacity-60">playlists:</span> {playlists.length} | <span className="opacity-60">courses:</span> {crashCourses.length}</div>
+        </div>
+        {/* ── END DEBUG PANEL ── */}
         {/* Skill selector */}
         <div className="flex flex-wrap gap-2">
           {userSkills.map(skill => (

@@ -43,28 +43,46 @@ export const AuthProvider = ({ children }) => {
   // loading stays true until the initial token check is complete
   const [loading, setLoading] = useState(true);
 
-  // On mount: restore session from localStorage if token is still valid
+  // On mount: restore session from localStorage if token is still valid,
+  // then fetch fresh user data from /auth/me to pick up any profile changes
+  // (e.g. primarySkill set during onboarding after the original login)
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('virtual_user');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.token && isTokenValid(parsed.token)) {
-          // Token is valid — restore session and set axios header
-          api.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
-          setUser(parsed);
-        } else {
-          // Token missing or expired — clear storage
-          localStorage.removeItem('virtual_user');
-          delete api.defaults.headers.common['Authorization'];
+    const restore = async () => {
+      try {
+        const stored = localStorage.getItem('virtual_user');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.token && isTokenValid(parsed.token)) {
+            // Set header first so the /me request is authenticated
+            api.defaults.headers.common['Authorization'] = `Bearer ${parsed.token}`;
+            // Restore from localStorage immediately (avoids flash)
+            setUser(parsed);
+            // Then fetch fresh data to pick up any changes since last login
+            try {
+              const { data } = await api.get('/auth/me');
+              const fresh = data?.data ?? data;
+              if (fresh) {
+                const updated = { ...parsed, ...fresh };
+                setUser(updated);
+                localStorage.setItem('virtual_user', JSON.stringify(updated));
+              }
+            } catch {
+              // /me failed (e.g. network) — keep the cached user, still usable
+            }
+          } else {
+            // Token missing or expired — clear storage
+            localStorage.removeItem('virtual_user');
+            delete api.defaults.headers.common['Authorization'];
+          }
         }
+      } catch {
+        localStorage.removeItem('virtual_user');
+        delete api.defaults.headers.common['Authorization'];
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      localStorage.removeItem('virtual_user');
-      delete api.defaults.headers.common['Authorization'];
-    } finally {
-      setLoading(false);
-    }
+    };
+    restore();
   }, []);
 
   const login = useCallback(async (email, password) => {
