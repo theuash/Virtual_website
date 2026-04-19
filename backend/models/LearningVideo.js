@@ -52,4 +52,7 @@ const learningVideoSchema = new mongoose.Schema({
 // Ensure unique combination of skill and software
 learningVideoSchema.index({ skill: 1, software: 1 }, { unique: true });
 
+// Remove any existing id index that might be causing conflicts
+learningVideoSchema.index({ id: 1 }, { sparse: true });
+
 export const LearningVideo = mongoose.model('LearningVideo', learningVideoSchema);
