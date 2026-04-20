@@ -5,8 +5,16 @@ import { MicroTask } from '../models/MicroTask.js';
 import { Submission } from '../models/Submission.js';
 import { Project } from '../models/Project.js';
 import { LearningProgress } from '../models/LearningProgress.js';
+import { LearningVideo } from '../models/LearningVideo.js';
 
 const COMPLETION_THRESHOLD = 0.80; // 80% watched = complete
+
+// Promotion requirements
+const PROMO_REQUIREMENTS = {
+  Beginner:     12,
+  Intermediate: 10,
+  Advanced:     8,
+};
 
 // ── GET /freelancer/learning/progress ────────────────────────────
 export const getLearningProgress = asyncHandler(async (req, res) => {
@@ -56,7 +64,7 @@ export const reportWatchProgress = asyncHandler(async (req, res) => {
         ...(justCompleted && { completed: true, completedAt: new Date() }),
       },
     },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   res.json(new ApiResponse(200, {
@@ -66,6 +74,101 @@ export const reportWatchProgress = asyncHandler(async (req, res) => {
     completed:       record.completed,
     justCompleted,
   }, justCompleted ? 'Tutorial marked complete!' : 'Progress saved'));
+});
+
+// ── GET /freelancer/learning/promotion-status ─────────────────────
+// Returns per-software completion counts and overall promotion eligibility
+export const getPromotionStatus = asyncHandler(async (req, res) => {
+  const freelancer = await Freelancer.findById(req.user._id);
+
+  // Get all completed progress records for this user
+  const completedRecords = await LearningProgress.find({
+    freelancerId: req.user._id,
+    completed: true,
+  }).lean();
+
+  const completedIds = new Set(completedRecords.map(r => r.tutorialId));
+
+  // Load all learning videos from DB
+  const allDocs = await LearningVideo.find().lean();
+
+  // Build a map: softwareKey → { Beginner: count, Intermediate: count, Advanced: count }
+  // tutorialId is the youtubeId (used as unique identifier per video)
+  const softwareStats = {};
+
+  for (const doc of allDocs) {
+    const key = `${doc.skill}__${doc.software}`;
+    if (!softwareStats[key]) {
+      softwareStats[key] = { skill: doc.skill, software: doc.software, Beginner: 0, Intermediate: 0, Advanced: 0 };
+    }
+
+    // Collect all videos from tutorials, playlists, crash_courses
+    const allVideos = [
+      ...doc.tutorials.map(t => ({ youtubeId: t.youtubeId, level: t.level })),
+      ...doc.playlists.flatMap(p => p.videos.map(v => ({ youtubeId: v.youtubeId, level: p.level }))),
+      ...doc.crash_courses.flatMap(c => c.videos.map(v => ({ youtubeId: v.youtubeId, level: c.level }))),
+    ];
+
+    // Deduplicate by youtubeId
+    const seen = new Set();
+    for (const v of allVideos) {
+      if (seen.has(v.youtubeId)) continue;
+      seen.add(v.youtubeId);
+      if (completedIds.has(v.youtubeId)) {
+        softwareStats[key][v.level] = (softwareStats[key][v.level] || 0) + 1;
+      }
+    }
+  }
+
+  // Find the software with the maximum completed videos per level
+  // Rule: pick the software that gives the best score per level independently
+  const bestPerLevel = { Beginner: 0, Intermediate: 0, Advanced: 0 };
+  const bestSoftwarePerLevel = { Beginner: null, Intermediate: null, Advanced: null };
+
+  for (const [key, stats] of Object.entries(softwareStats)) {
+    for (const level of ['Beginner', 'Intermediate', 'Advanced']) {
+      if (stats[level] > bestPerLevel[level]) {
+        bestPerLevel[level] = stats[level];
+        bestSoftwarePerLevel[level] = stats.software;
+      }
+    }
+  }
+
+  // Check eligibility
+  const eligible =
+    bestPerLevel.Beginner     >= PROMO_REQUIREMENTS.Beginner &&
+    bestPerLevel.Intermediate >= PROMO_REQUIREMENTS.Intermediate &&
+    bestPerLevel.Advanced     >= PROMO_REQUIREMENTS.Advanced;
+
+  // Update promotionEligible on freelancer if changed
+  if (eligible !== freelancer.promotionEligible) {
+    await Freelancer.findByIdAndUpdate(req.user._id, { promotionEligible: eligible });
+  }
+
+  res.json(new ApiResponse(200, {
+    requirements: PROMO_REQUIREMENTS,
+    progress: bestPerLevel,
+    bestSoftware: bestSoftwarePerLevel,
+    eligible,
+    alreadyApplied: freelancer.promotionApplied ?? false,
+    currentTier: freelancer.tier,
+  }, 'Promotion status fetched'));
+});
+
+// ── POST /freelancer/learning/apply-promotion ─────────────────────
+export const applyForPromotion = asyncHandler(async (req, res) => {
+  const freelancer = await Freelancer.findById(req.user._id);
+
+  if (!freelancer.promotionEligible) {
+    return res.status(400).json(new ApiResponse(400, null, 'You have not met the promotion requirements yet'));
+  }
+  if (freelancer.promotionApplied) {
+    return res.status(400).json(new ApiResponse(400, null, 'You have already applied for promotion'));
+  }
+
+  await Freelancer.findByIdAndUpdate(req.user._id, { promotionApplied: true, promotionAppliedAt: new Date() });
+
+  res.json(new ApiResponse(200, { applied: true }, 'Promotion application submitted! Your supervisor will review it.'));
 });
 
 export const completeOnboarding = asyncHandler(async (req, res) => {

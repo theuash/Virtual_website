@@ -1,10 +1,12 @@
 import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
 import LockedOverlay from '../../components/LockedOverlay';
+import CrateEarnings from './CrateEarnings';
 
 export default function FreelancerEarnings() {
   const { user } = useAuth();
-  const isPrecrate = !user?.tier || user.tier === 'precrate';
+  const tier = user?.tier || 'precrate';
+  const isPrecrate = tier === 'precrate';
 
   if (isPrecrate) {
     return (
@@ -19,14 +21,6 @@ export default function FreelancerEarnings() {
     );
   }
 
-  return (
-    <>
-      <DashboardHeader title="Earnings" />
-      <div className="p-6 md:p-8 max-w-6xl mx-auto">
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Earnings page — coming soon.
-        </p>
-      </div>
-    </>
-  );
+  // Crate and above get the full wallet
+  return <CrateEarnings />;
 }

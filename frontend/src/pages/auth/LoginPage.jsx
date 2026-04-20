@@ -191,7 +191,7 @@ export default function LoginPage() {
               </span>
             </div>
             <h2 className="text-3xl font-black tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>
-              {isVerifying ? 'Two-Step Security' : 'Sign In'}
+              {isVerifying ? 'Two-Step Security' : 'Log In'}
             </h2>
             <p className="text-sm font-light opacity-50" style={{ color: 'var(--text-secondary)' }}>
               {isVerifying
@@ -358,7 +358,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="btn-primary w-full flex items-center justify-center gap-2 py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98]"
               >
-                {loading ? 'Checking Password...' : 'Continue To Phone Verification'}
+                {loading ? 'Checking Password...' : 'Continue'}
               </button>
             </form>
           )}

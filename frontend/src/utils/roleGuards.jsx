@@ -31,6 +31,9 @@ export const getRoleRedirect = (role, user = null) => {
   if (role === 'freelancer' && user && !user.onboardingComplete) {
     return '/freelancer/onboarding';
   }
+  if (role === 'freelancer' && user?.tier === 'project_initiator') {
+    return '/initiator/dashboard';
+  }
   return ROLE_REDIRECTS[role] || '/login';
 };
 

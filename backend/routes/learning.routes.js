@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { LearningVideo } from '../models/LearningVideo.js';
+import { learningVideos } from '../data/learningVideos.js';
 
 const router = express.Router();
 
@@ -111,6 +112,38 @@ router.get('/crashcourses/:id', asyncHandler(async (req, res) => {
   }
   
   res.json(new ApiResponse(200, course, 'Crash course fetched'));
+}));
+
+// POST /api/learning/seed - Reseed the database (admin only)
+router.post('/seed', asyncHandler(async (req, res) => {
+  // Drop the collection entirely to remove old indexes
+  await LearningVideo.collection.drop().catch(() => {
+    console.log('ℹ Collection did not exist, creating fresh');
+  });
+  console.log('✓ Dropped collection and all indexes');
+
+  // Wipe the entire collection (safety measure)
+  await LearningVideo.deleteMany({});
+  console.log('✓ Cleared all learning_videos documents');
+
+  // Insert fresh
+  const results = [];
+  for (const doc of learningVideos) {
+    try {
+      await LearningVideo.create(doc);
+      results.push({ skill: doc.skill, software: doc.software, status: 'success' });
+      console.log(`✓ Created: ${doc.skill} - ${doc.software}`);
+    } catch (error) {
+      results.push({ skill: doc.skill, software: doc.software, status: 'failed', error: error.message });
+      console.error(`❌ Failed to create ${doc.skill} - ${doc.software}:`, error.message);
+    }
+  }
+
+  // Verify
+  const all = await LearningVideo.find().lean();
+  console.log(`\n✅ Total documents: ${all.length}`);
+
+  res.json(new ApiResponse(200, { results, total: all.length }, 'Database seeded successfully'));
 }));
 
 export default router;

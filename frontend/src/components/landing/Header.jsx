@@ -20,8 +20,8 @@ export default function Header() {
     return latestY + (latestVel * 0.2);
   });
   const smoothScrollY = useSpring(effectiveScroll, { stiffness: 150, damping: 25, mass: 0.3 });
-  const headerOpacity = useTransform(smoothScrollY, [100, 400], [0, 1]);
-  const headerY      = useTransform(smoothScrollY, [100, 400], [-80, 0]);
+  const headerOpacity = useTransform(smoothScrollY, [0, 200], [1, 1]);
+  const headerY      = useTransform(smoothScrollY, [0, 200], [0, 0]);
 
   useEffect(() => {
     const isLight = document.documentElement.classList.contains('light');
@@ -96,13 +96,13 @@ export default function Header() {
                 : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(40%) contrast(100%)'
             }} />
           </div>
-          <span style={{ fontWeight: 800, fontSize: '1.5rem sm:text-2xl', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.5rem', color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
             irtual
           </span>
         </div>
 
         {/* Desktop Nav */}
-        <nav style={{ display: 'none', gap: '2rem', alignItems: 'center', '@media (min-width: 768px)': { display: 'flex' } }} className="hidden md:flex">
+        <nav className="hidden md:flex" style={{ gap: '2rem', alignItems: 'center' }}>
           {[['How It Works', 'how-it-works'], ['Roles', 'roles']].map(([label, id]) => (
             <button
               key={id}
@@ -140,7 +140,7 @@ export default function Header() {
         </nav>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '1rem sm:gap-1.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
             onClick={toggleTheme}
             className="theme-toggle shadow-glow-sm p-2 hover:scale-105 transition-transform"
@@ -158,7 +158,21 @@ export default function Header() {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Desktop Get Started */}
+          {/* Desktop auth buttons */}
+          <button
+            className="hidden sm:block"
+            onClick={() => navigate('/login')}
+            style={{
+              background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)',
+              fontFamily: 'inherit', fontSize: '0.9rem', fontWeight: 600,
+              cursor: 'pointer', padding: '0.5rem 1.2rem', borderRadius: '0.5rem',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+          >
+            Log In
+          </button>
           <button 
             id="header-get-started" 
             className="btn-primary hidden sm:block"
@@ -207,6 +221,13 @@ export default function Header() {
                   {label}
                 </button>
               ))}
+              <button
+                onClick={() => handleNavClick('/login')}
+                className="w-full py-2.5 rounded-lg font-semibold transition-all"
+                style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+              >
+                Log In
+              </button>
               <button
                 onClick={() => handleNavClick('/signup')}
                 className="w-full py-2.5 rounded-lg font-semibold transition-all hover:scale-[1.02] active:scale-95"

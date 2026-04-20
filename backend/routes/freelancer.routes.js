@@ -3,6 +3,7 @@ import {
   getDashboardStats, getAvailableTasks, getTaskDetail,
   submitDeliverable, completeOnboarding, getSupervisor,
   getLearningProgress, reportWatchProgress,
+  getPromotionStatus, applyForPromotion,
 } from '../controllers/freelancer.controller.js';
 import {
   getFreelancerMeetings, createFreelancerMeeting, getMeetingDetail,
@@ -20,6 +21,8 @@ router.get('/supervisor', getSupervisor);
 router.post('/onboarding', completeOnboarding);
 router.get('/learning/progress', getLearningProgress);
 router.post('/learning/progress', reportWatchProgress);
+router.get('/learning/promotion-status', getPromotionStatus);
+router.post('/learning/apply-promotion', applyForPromotion);
 router.get('/tasks', getAvailableTasks);
 router.get('/tasks/:id', getTaskDetail);
 router.post('/tasks/:id/submit', submitDeliverable);

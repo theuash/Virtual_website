@@ -45,6 +45,10 @@ const freelancerSchema = new mongoose.Schema({
   teamProjectsCompleted: { type: Number, default: 0 },
   rating:             { type: Number, default: 0 },
   promotionEligible:  { type: Boolean, default: false },
+  promotionApplied:   { type: Boolean, default: false },
+  promotionAppliedAt: { type: Date },
+  // For project_initiator tier — clients assigned to them
+  assignedClients:    [{ type: mongoose.Schema.Types.ObjectId, ref: 'Client' }],
   mentorId:           { type: mongoose.Schema.Types.ObjectId, ref: 'MomentumSupervisor' },
 }, { timestamps: true, collection: 'freelancers' });
 

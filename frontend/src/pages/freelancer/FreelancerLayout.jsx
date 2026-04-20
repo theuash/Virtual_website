@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
-import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -14,13 +14,20 @@ export default function FreelancerLayout() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const navItems = [
+  const tier = user?.tier || 'precrate';
+  const isCratePlus = ['crate', 'project_initiator', 'momentum_supervisor', 'admin'].includes(tier);
+
+  const mainNavItems = [
     { path: '/freelancer/dashboard', icon: <LayoutDashboard size={17} strokeWidth={1.5} />, label: 'Dashboard' },
     { path: '/freelancer/tasks',     icon: <FolderKanban size={17} strokeWidth={1.5} />,    label: 'Projects' },
+    ...(isCratePlus ? [{ path: '/freelancer/team', icon: <Users size={17} strokeWidth={1.5} />, label: 'My Team' }] : []),
     { path: '/freelancer/learning',  icon: <BookOpen size={17} strokeWidth={1.5} />,        label: 'Learning' },
     { path: '/freelancer/meet',      icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/freelancer/earnings',  icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Earnings' },
     { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career Matrix' },
+  ];
+
+  const accountNavItems = [
     { path: '/freelancer/messages',  icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
     { path: '/freelancer/settings',  icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
   ];
@@ -90,7 +97,7 @@ export default function FreelancerLayout() {
           <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2" style={{ color: 'var(--text-secondary)' }}>
             Main
           </div>
-          {navItems.slice(0, 6).map(item => (
+          {mainNavItems.map(item => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -105,7 +112,7 @@ export default function FreelancerLayout() {
           <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2 mt-3" style={{ color: 'var(--text-secondary)' }}>
             Account
           </div>
-          {navItems.slice(6).map(item => (
+          {accountNavItems.map(item => (
             <NavLink
               key={item.path}
               to={item.path}

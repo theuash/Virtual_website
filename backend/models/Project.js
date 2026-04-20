@@ -53,6 +53,14 @@ const projectSchema = new mongoose.Schema({
 
   // ── Assignment ────────────────────────────────────────────────
   assignedInitiatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer' },
+  // For group projects — multiple initiators collaborate
+  coInitiators:        [{ type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer' }],
+  // Project type: 'team' = initiator leads crates, 'group' = multi-initiator, 'personal' = solo initiator
+  projectType:         { type: String, enum: ['team', 'group', 'personal'], default: 'team' },
+  // Deadline extension tracking
+  originalDeadline:    { type: Date },
+  deadlineExtended:    { type: Boolean, default: false },
+  deadlineExtensionReason: { type: String },
   microTasks:          [{ type: mongoose.Schema.Types.ObjectId, ref: 'MicroTask' }],
   deliverableUrl:      { type: String },
   clientApproved:      { type: Boolean, default: false },

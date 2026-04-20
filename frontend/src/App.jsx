@@ -38,6 +38,19 @@ import FreelancerSettings from './pages/freelancer/FreelancerSettings';
 import FreelancerLearning from './pages/freelancer/FreelancerLearning';
 import FreelancerMeet from './pages/freelancer/FreelancerMeet';
 import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
+import CrateMyTeam from './pages/freelancer/CrateMyTeam';
+
+// Initiator
+import InitiatorLayout from './pages/initiator/InitiatorLayout';
+import InitiatorDashboard from './pages/initiator/InitiatorDashboard';
+import InitiatorProjects from './pages/initiator/InitiatorProjects';
+import InitiatorClients from './pages/initiator/InitiatorClients';
+import InitiatorOpenProjects from './pages/initiator/InitiatorOpenProjects';
+import InitiatorWork from './pages/initiator/InitiatorWork';
+import InitiatorMessages from './pages/initiator/InitiatorMessages';
+import InitiatorSettings from './pages/initiator/InitiatorSettings';
+import InitiatorMeet from './pages/initiator/InitiatorMeet';
+import InitiatorEarnings from './pages/initiator/InitiatorEarnings';
 
 // Supervisor
 import SupervisorLayout from './pages/supervisor/SupervisorLayout';
@@ -87,12 +100,27 @@ function App() {
         <Route path="dashboard" element={<FreelancerDashboard />} />
         <Route path="tasks" element={<FreelancerTasks />} />
         <Route path="task/:id" element={<TaskDetail />} />
+        <Route path="team" element={<CrateMyTeam />} />
         <Route path="learning" element={<FreelancerLearning />} />
         <Route path="meet" element={<FreelancerMeet />} />
         <Route path="earnings" element={<FreelancerEarnings />} />
         <Route path="progress" element={<FreelancerProgress />} />
         <Route path="messages" element={<FreelancerMessages />} />
         <Route path="settings" element={<FreelancerSettings />} />
+      </Route>
+
+      {/* Initiator — protected */}
+      <Route path="/initiator" element={<RoleGuard allowedRoles={['freelancer']}><InitiatorLayout /></RoleGuard>}>
+        <Route index element={<Navigate to="/initiator/dashboard" replace />} />
+        <Route path="dashboard"     element={<InitiatorDashboard />} />
+        <Route path="projects"      element={<InitiatorProjects />} />
+        <Route path="clients"       element={<InitiatorClients />} />
+        <Route path="open-projects" element={<InitiatorOpenProjects />} />
+        <Route path="work"          element={<InitiatorWork />} />
+        <Route path="meet"          element={<InitiatorMeet />} />
+        <Route path="earnings"      element={<InitiatorEarnings />} />
+        <Route path="messages"      element={<InitiatorMessages />} />
+        <Route path="settings"      element={<InitiatorSettings />} />
       </Route>
 
       {/* Supervisor — protected */}

@@ -156,14 +156,14 @@ function FloatingPill({ splitProgress, navigate, logo }) {
           <div
             className="flex items-center rounded-full relative"
             style={{
-              background: 'rgba(10, 10, 10, 0.55)',
+              background: 'rgba(36, 36, 36, 0.55)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               overflow: 'hidden',
               // Border transitions from white flash → subtle, hover brings back glow
-              border: `1px solid ${flashBorder ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.08)'}`,
+              border: `1px solid ${flashBorder ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255,255,255,0.08)'}`,
               transition: 'border-color 0.9s ease, box-shadow 0.3s ease',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
+              boxShadow: '0 8px 32px rgba(76, 0, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
             {/* Logo */}

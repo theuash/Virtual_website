@@ -8,10 +8,28 @@ export const learningVideos = [
         id: 'dr-basics',
         title: 'Introduction to DaVinci Resolve Full Course for Beginners',
         desc: 'Basic cutting & assembly Raw footage sorting & syncing Standard editing (cuts, transitions, audio sync)',
-        duration: '~2 hr',
+        duration: '~02 hr',
         level: 'Beginner',
         instructor: 'Casey Faris',
         youtubeId: 'qDHnCFMZ9HA',
+      },
+      {
+        id: 'dr-motion-graphics',
+        title: '5 Motion Graphic Skills All Davinci Resolve Users Should Know',
+        desc: 'Level up your DaVinci Resolve skills with five essential motion graphics techniques. Learn to create custom text paths and animated shapes, then explore 3D text and depth effects. Finally, master camera tracking for seamless graphic integration.',
+        duration: '~07 min',
+        level: 'Intermediate',
+        instructor: 'DuckTUT',
+        youtubeId: '1efaAQEIDTg',
+      },
+      {
+        id: 'dr-motion-graphics',
+        title: '5 Great Beginner Motion Graphics Techniques',
+        desc: 'Level up your DaVinci Resolve skills with five essential motion graphics techniques. Learn to create custom text paths and animated shapes, then explore 3D text and depth effects. Finally, master camera tracking for seamless graphic integration.',
+        duration: '~10 min',
+        level: 'Intermediate',
+        instructor: 'SonduckFilm',
+        youtubeId: 'JSV9uMEosOo',
       },
       {
         id: 'dr-advanced',
@@ -25,24 +43,128 @@ export const learningVideos = [
     ],
     playlists: [
       {
-        id: 'pl-motion-graphics',
+        id: 'dv-motion-graphics-pl',
         title: 'Motion Graphics',
         description: 'Learn motion graphics and animation techniques in DaVinci Resolve',
         level: 'Intermediate',
         videos: [
           {
-            youtubeId: '1efaAQEIDTg',
-            title: 'Motion Graphics Basics',
-            desc: 'Introduction to motion graphics in DaVinci Resolve',
-            duration: '~30 min',
+            youtubeId: 'yh-ilLqKMmM',
+            title: "Motion Graphics: A Beginner's Guide (Everything You Need To Know)",
+            desc: 'This is a short Tutorial on a few basic Motion Graphic Animations in DaVinci Resolve for Beginners.',
+            duration: '~16 min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'vqm5FblRs8s',
+            title: 'Animated TOPOGRAPHY Lines',
+            desc: "You need a fancy background? Try this tutorial where I show how you can create this beautiful animated topography background. It doesn't matter if you need it for Shorts, Reels or as a background for your motion graphics and other information to display. I give you detailed instructions which steps you need to take in fusion to get the result you crave. We only need 3 nodes for this composition and will have a simple result after only 3 minutes. After that we will have a look on what we can improve.",
+            duration: '~7min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'FNgyYYz_1l8',
+            title: 'Magnates Media Style Ink Transition',
+            desc: 'In this tutorial I show how you can create the ink transition effect in DaVinci Resolve 18.',
+            duration: '~02 min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'Q5M6wf2Uf_I',
+            title: 'ANIMATED Paper Background TEXTURE',
+            desc: 'In this tutorial we create a animated texture background with a paper / grunge look in davinci resolve.',
+            duration: '~01 min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'ItFQWn7yYMo',
+            title: 'Ultimate Guide to better TEXT Graphics',
+            desc: 'This is the only text tutorial for DaVinci Resolve you will need. I show how to animate individual characters, create the echo effect and use grain nodes to create shadows. All in all you will learn to create impactful text animations in Fusion.',
+            duration: '~18 min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'N_iUyr2h',
+            title: 'Animated Posters Are the New Carousel – Here’s How to Make Them ',
+            desc: "Are you ready to take your poster designs to the next level? Dive into the exciting world of animated poster design with our comprehensive DaVinci Resolve tutorial! Whether you're a novice or an experienced editor, this tutorial is packed with valuable insights to help you create captivating visuals that will grab your audience's attention. Learn the Beginners of poster animation, explore advanced techniques, and discover efficient workflows for creating multiple versions of your designs effortlessly. With insider tips and tricks, you'll be equipped to produce high-quality animated posters that stand out on social media, websites, and beyond. Don't miss out on this opportunity to unleash your creativity and elevate your poster designs with DaVinci Resolve!",
+            duration: '~8 min',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: '6__O2M8wwlw',
+            title: 'Animate COUNTERS in DaVinci Resolve',
+            desc: 'This simple Counter is great for displaying changing numbers in context. So in this tutorial I show you how to achieve this in DaVinci Resolve and how to safe it as a reusable Preset.',
+            duration: '~08 min',
             level: 'Intermediate',
           },
           {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Advanced Motion Graphics',
-            desc: 'Advanced motion graphics techniques and effects',
-            duration: '~45 min',
+            youtubeId: 'eW0nZC8yIEU',
+            title: 'How to Animate GRAPHS Like VOX',
+            desc: 'In this tutorial I show how to create an animated line graph in DaVinci Resolve 18.',
+            duration: '~14 min',
             level: 'Intermediate',
+          },
+          {
+            youtubeId: 'eW0nZC8yIEU',
+            title: 'How to Animate GRAPHS Like VOX',
+            desc: 'In this tutorial I show how to create an animated line graph in DaVinci Resolve 18.',
+            duration: '~14 min',
+            level: 'Intermediate',
+          },
+          {
+            youtubeId: 'SdPKbYWz5VI',
+            title: 'Create 3D Animated ILLUSTRATIONS with AI',
+            desc: 'Learn how to create these animated 3D worlds from static AI generated images.',
+            duration: '~05 min',
+            level: 'Intermediate',
+          },
+          {
+            youtubeId: 'Ravep5SUwC0',
+            title: 'Edit Like Isaac and EXPLODE Your Channel',
+            desc: 'In this video I break down the techniques Isaac uses to reach 100s of thousands of views on YouTube and recreate the effects in DaVinci Resolve.',
+            duration: '~06 min',
+            level: 'Intermediate',
+          },
+          {
+            youtubeId: 'TYLZuMY22ms',
+            title: 'EDIT like Ali Abdaal',
+            desc: 'In this tutorial I show how you can recreate the animation style of the famous Youtuber Ali Abdaal in Davinci Resolve. Mainly Motion Graphics in the fusion tab.',
+            duration: '~07 min',
+            level: 'Intermediate',
+          },
+          {
+            youtubeId: 'lgG0b6Hg0mE',
+            title: 'How to STAND OUT with LESS',
+            desc: 'Welcome to another exciting journey into the world of video editing! In this tutorial, we dive into the art of crafting mesmerizing motion graphics using DaVinci Resolve, inspired by the distinctive style of the successful Personal Development YouTuber, DAN KOE.',
+            duration: '~26 min',
+            level: 'Advanced',
+          },
+          {
+            youtubeId: '5yL9QUIYgN0',
+            title: '3D ANIMATED Screens in DaVinci Resolve',
+            desc: 'In this tutorial I show how you can create a 3D Effect for Screenshots and Screenrecordings in DaVinci Resolve. Also you will learn how to animate cutout parts in fusion.',
+            duration: '~07 min',
+            level: 'Advanced',
+          },
+          {
+            youtubeId: 'QdzvOq69S7k',
+            title: 'Viral 3D FUSION Animation',
+            desc: 'In this tutorial you will learn to create a modern 3D Scene in Fusion in DaVinci Resolve.',
+            duration: '~ 12 min',
+            level: 'Advanced',
+          },
+          {
+            youtubeId: 'msHVGGAJSpo',
+            title: 'How To Create TRENDING Motion Graphic Reels',
+            desc: 'In this tutorial I show you 3 graphic animations which you can use for your next viral video. Master these 3 Animations and learn to use the Fusion page to create Shorts, Reels or Tik Toks with great Quality and Reach more views on social media platforms. Motion Graphics are the key to unlocking new ways of explaination in your Videos',
+            duration: '~ 21 min',
+            level: 'Advanced',
+          },
+          {
+            youtubeId: 'uAoGlvHKeUw',
+            title: 'How to make Hologram Terrain',
+            desc: 'In this tutorial I show how to create a 3D Terrain Map by displacing Topography lines we have created in the last video. I tried my best to make this video as beginner friendly as I can.',
+            level: 'Advanced',
           },
         ],
       },
@@ -76,14 +198,14 @@ export const learningVideos = [
   // ── VIDEO EDITING - Adobe Premiere Pro ───────────────────────────
   {
     skill: 'video_editing',
-    software: 'premiere_pro',
+    software: 'adobe_premiere_pro',
     tutorials: [
       {
-        id: 'pp-basics',
+        id: 'pp-colour_grading',
         title: 'Get Your OWN Color Grading Style...Doing THIS',
-        desc: 'Hi Ani here, in this video I have shown a very cool trick to play with color grading in premiere pro cc. Cinematic Color grading in video can be monotonous if not keeping the experiments on.. After this video you can easily get your own cinematic color grading styles for videos professionally with professional color grading techniques. Hope you will like the presentation.',
-        duration: '~3 hr',
-        level: 'Beginner',
+        desc: "Hi Ani here, in this video I've shown a very cool trick to play with color grading in premiere pro cc. Cinematic Color grading in video can be monotonous if not keeping the experiments on.. After this video you can easily get your own cinematic color grading styles for videos professionally with professional color grading techniques. Hope you'll like the presentation. ",
+        duration: '~6 min',
+        level: 'Intermediate',
         instructor: 'AniThing',
         youtubeId: 'GbVuDmuL6KA',
       },
@@ -149,7 +271,7 @@ export const learningVideos = [
 
   // ── GRAPHIC DESIGN - Figma ───────────────────────────
   {
-    skill: 'graphic_design',
+    skill: 'graphic_designing',
     software: 'figma',
     tutorials: [
       {
@@ -228,203 +350,48 @@ export const learningVideos = [
     ],
   },
 
-  // ── GRAPHIC DESIGN - Adobe XD ───────────────────────────
+  // ── GRAPHIC DESIGN - Adobe Photoshop ───────────────────────────
   {
-    skill: 'graphic_design',
-    software: 'adobe_xd',
+    skill: 'graphic_designing',
+    software: 'adobe_photoshop',
     tutorials: [
       {
-        id: 'xd-basics',
-        title: 'Adobe XD Beginner Tutorial',
-        desc: 'Learn Adobe XD for UI/UX design including wireframing and prototyping',
-        duration: '~2 hr',
+        id: 'ps-basics',
+        title: 'Adobe Photoshop Beginner Tutorial',
+        desc: 'Learn Photoshop fundamentals including layers, selections, and basic editing',
+        duration: '~2.5 hr',
         level: 'Beginner',
         instructor: 'Adobe Creative Cloud',
         youtubeId: 'qDHnCFMZ9HA',
       },
       {
-        id: 'xd-advanced',
-        title: 'Adobe XD Advanced: Interactive Prototypes',
-        desc: 'Create advanced interactive prototypes and animations',
-        duration: '~1.5 hr',
+        id: 'ps-advanced',
+        title: 'Advanced Photoshop: Photo Editing & Retouching',
+        desc: 'Master professional photo editing and retouching techniques',
+        duration: '~2 hr',
         level: 'Advanced',
-        instructor: 'XD Masters',
+        instructor: 'Phlearn',
         youtubeId: 'b2OYhIUSNpA',
       },
     ],
     playlists: [
       {
-        id: 'pl-xd-design',
-        title: 'UI/UX Design with XD',
-        description: 'Learn UI/UX design principles using Adobe XD',
+        id: 'pl-ps-design',
+        title: 'Graphic Design with Photoshop',
+        description: 'Learn graphic design principles using Adobe Photoshop',
         level: 'Intermediate',
         videos: [
           {
             youtubeId: '1efaAQEIDTg',
-            title: 'Wireframing Basics',
-            desc: 'Create effective wireframes in Adobe XD',
-            duration: '~35 min',
-            level: 'Intermediate',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Interactive Prototyping',
-            desc: 'Build interactive prototypes with animations',
-            duration: '~50 min',
-            level: 'Intermediate',
-          },
-        ],
-      },
-    ],
-    crash_courses: [
-      {
-        id: 'cc-xd-complete',
-        title: 'Adobe XD Complete Course',
-        description: 'Complete Adobe XD course for UI/UX designers',
-        level: 'Beginner',
-        videos: [
-          {
-            youtubeId: 'MCDVcQIA3UM',
-            title: 'XD Essentials',
-            desc: 'Learn XD interface and essential tools',
-            duration: '~2 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'SrJOE2pEp7A',
-            title: 'Design & Prototype',
-            desc: 'Design interfaces and create prototypes',
-            duration: '~2 hr',
-            level: 'Beginner',
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── WEB DEVELOPMENT - React ───────────────────────────
-  {
-    skill: 'web_development',
-    software: 'react',
-    tutorials: [
-      {
-        id: 'react-basics',
-        title: 'React for Beginners - Complete Guide',
-        desc: 'Learn React fundamentals including components, hooks, and state management',
-        duration: '~4 hr',
-        level: 'Beginner',
-        instructor: 'Traversy Media',
-        youtubeId: 'qDHnCFMZ9HA',
-      },
-      {
-        id: 'react-advanced',
-        title: 'Advanced React Patterns & Performance',
-        desc: 'Master advanced React patterns, optimization, and best practices',
-        duration: '~3 hr',
-        level: 'Advanced',
-        instructor: 'Kent C. Dodds',
-        youtubeId: 'b2OYhIUSNpA',
-      },
-    ],
-    playlists: [
-      {
-        id: 'pl-react-hooks',
-        title: 'React Hooks Deep Dive',
-        description: 'Comprehensive guide to React Hooks and custom hooks',
-        level: 'Intermediate',
-        videos: [
-          {
-            youtubeId: '1efaAQEIDTg',
-            title: 'useState & useEffect',
-            desc: 'Master the most common React hooks',
-            duration: '~45 min',
-            level: 'Intermediate',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Custom Hooks & Context',
-            desc: 'Create custom hooks and use Context API',
-            duration: '~50 min',
-            level: 'Intermediate',
-          },
-        ],
-      },
-    ],
-    crash_courses: [
-      {
-        id: 'cc-react-complete',
-        title: 'React Complete Course in 8 Hours',
-        description: 'Complete React course from basics to building real applications',
-        level: 'Beginner',
-        videos: [
-          {
-            youtubeId: 'MCDVcQIA3UM',
-            title: 'React Fundamentals',
-            desc: 'Learn React basics and component structure',
-            duration: '~2.5 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'SrJOE2pEp7A',
-            title: 'State Management & Hooks',
-            desc: 'Master state management with hooks',
-            duration: '~2.5 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Building Real Projects',
-            desc: 'Build complete React applications',
-            duration: '~3 hr',
-            level: 'Beginner',
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── WEB DEVELOPMENT - Vue.js ───────────────────────────
-  {
-    skill: 'web_development',
-    software: 'vue_js',
-    tutorials: [
-      {
-        id: 'vue-basics',
-        title: 'Vue.js 3 Beginner Tutorial',
-        desc: 'Learn Vue.js 3 fundamentals including components, reactivity, and composition API',
-        duration: '~3 hr',
-        level: 'Beginner',
-        instructor: 'Vue Mastery',
-        youtubeId: 'qDHnCFMZ9HA',
-      },
-      {
-        id: 'vue-advanced',
-        title: 'Advanced Vue.js: State Management & Routing',
-        desc: 'Master Pinia, Vue Router, and advanced patterns',
-        duration: '~2.5 hr',
-        level: 'Advanced',
-        instructor: 'Vue School',
-        youtubeId: 'b2OYhIUSNpA',
-      },
-    ],
-    playlists: [
-      {
-        id: 'pl-vue-composition',
-        title: 'Vue Composition API',
-        description: 'Master the Vue Composition API for modern Vue development',
-        level: 'Intermediate',
-        videos: [
-          {
-            youtubeId: '1efaAQEIDTg',
-            title: 'Composition API Basics',
-            desc: 'Learn the fundamentals of Composition API',
+            title: 'Design Fundamentals',
+            desc: 'Learn design principles in Photoshop',
             duration: '~40 min',
             level: 'Intermediate',
           },
           {
             youtubeId: 'JSV9uMEosOo',
-            title: 'Advanced Composition Patterns',
-            desc: 'Advanced patterns and best practices',
+            title: 'Advanced Design Techniques',
+            desc: 'Master advanced design and composition',
             duration: '~50 min',
             level: 'Intermediate',
           },
@@ -433,30 +400,23 @@ export const learningVideos = [
     ],
     crash_courses: [
       {
-        id: 'cc-vue-complete',
-        title: 'Vue.js Complete Course in 7 Hours',
-        description: 'Complete Vue.js course covering all essential concepts',
+        id: 'cc-ps-complete',
+        title: 'Photoshop Complete Course',
+        description: 'Complete Photoshop course for graphic designers',
         level: 'Beginner',
         videos: [
           {
             youtubeId: 'MCDVcQIA3UM',
-            title: 'Vue Fundamentals',
-            desc: 'Learn Vue basics and component system',
+            title: 'Photoshop Essentials',
+            desc: 'Learn Photoshop interface and essential tools',
             duration: '~2 hr',
             level: 'Beginner',
           },
           {
             youtubeId: 'SrJOE2pEp7A',
-            title: 'Reactivity & State',
-            desc: 'Master Vue reactivity system',
-            duration: '~2.5 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Routing & Advanced Topics',
-            desc: 'Learn routing and advanced Vue patterns',
-            duration: '~2.5 hr',
+            title: 'Design & Editing',
+            desc: 'Create designs and edit photos professionally',
+            duration: '~2 hr',
             level: 'Beginner',
           },
         ],
@@ -464,90 +424,9 @@ export const learningVideos = [
     ],
   },
 
-  // ── ANIMATION - Blender ───────────────────────────
+  // ── CGI / VFX - After Effects ───────────────────────────
   {
-    skill: 'animation',
-    software: 'blender',
-    tutorials: [
-      {
-        id: 'blender-basics',
-        title: 'Blender 4.0 Beginner Tutorial',
-        desc: 'Learn Blender basics including modeling, materials, and rendering',
-        duration: '~4 hr',
-        level: 'Beginner',
-        instructor: 'Blender Guru',
-        youtubeId: 'qDHnCFMZ9HA',
-      },
-      {
-        id: 'blender-animation',
-        title: 'Blender Character Animation Masterclass',
-        desc: 'Master character animation, rigging, and motion capture',
-        duration: '~3 hr',
-        level: 'Advanced',
-        instructor: 'CG Masters',
-        youtubeId: 'b2OYhIUSNpA',
-      },
-    ],
-    playlists: [
-      {
-        id: 'pl-blender-modeling',
-        title: 'Blender 3D Modeling',
-        description: 'Complete guide to 3D modeling in Blender',
-        level: 'Intermediate',
-        videos: [
-          {
-            youtubeId: '1efaAQEIDTg',
-            title: '3D Modeling Basics',
-            desc: 'Learn fundamental 3D modeling techniques',
-            duration: '~50 min',
-            level: 'Intermediate',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Advanced Modeling Techniques',
-            desc: 'Master advanced modeling and sculpting',
-            duration: '~60 min',
-            level: 'Intermediate',
-          },
-        ],
-      },
-    ],
-    crash_courses: [
-      {
-        id: 'cc-blender-complete',
-        title: 'Blender Complete Course in 10 Hours',
-        description: 'Comprehensive Blender course covering modeling, animation, and rendering',
-        level: 'Beginner',
-        videos: [
-          {
-            youtubeId: 'MCDVcQIA3UM',
-            title: 'Blender Essentials',
-            desc: 'Learn Blender interface and basic tools',
-            duration: '~3 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'SrJOE2pEp7A',
-            title: 'Modeling & Materials',
-            desc: 'Create 3D models and apply materials',
-            duration: '~3.5 hr',
-            level: 'Beginner',
-          },
-          {
-            youtubeId: 'JSV9uMEosOo',
-            title: 'Animation & Rendering',
-            desc: 'Animate your models and render final output',
-            duration: '~3.5 hr',
-            level: 'Beginner',
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── ANIMATION - After Effects ───────────────────────────
-  {
-    skill: 'animation',
+    skill: 'cgi',
     software: 'after_effects',
     tutorials: [
       {
@@ -619,6 +498,87 @@ export const learningVideos = [
             title: 'Motion Graphics Projects',
             desc: 'Create professional motion graphics projects',
             duration: '~3 hr',
+            level: 'Beginner',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── 3D ANIMATION - Blender ───────────────────────────
+  {
+    skill: '3d_animation',
+    software: 'blender',
+    tutorials: [
+      {
+        id: 'blender-basics',
+        title: 'Blender 4.0 Beginner Tutorial',
+        desc: 'Learn Blender basics including modeling, materials, and rendering',
+        duration: '~4 hr',
+        level: 'Beginner',
+        instructor: 'Blender Guru',
+        youtubeId: 'qDHnCFMZ9HA',
+      },
+      {
+        id: 'blender-animation',
+        title: 'Blender Character Animation Masterclass',
+        desc: 'Master character animation, rigging, and motion capture',
+        duration: '~3 hr',
+        level: 'Advanced',
+        instructor: 'CG Masters',
+        youtubeId: 'b2OYhIUSNpA',
+      },
+    ],
+    playlists: [
+      {
+        id: 'pl-blender-modeling',
+        title: 'Blender 3D Modeling',
+        description: 'Complete guide to 3D modeling in Blender',
+        level: 'Intermediate',
+        videos: [
+          {
+            youtubeId: '1efaAQEIDTg',
+            title: '3D Modeling Basics',
+            desc: 'Learn fundamental 3D modeling techniques',
+            duration: '~50 min',
+            level: 'Intermediate',
+          },
+          {
+            youtubeId: 'JSV9uMEosOo',
+            title: 'Advanced Modeling Techniques',
+            desc: 'Master advanced modeling and sculpting',
+            duration: '~60 min',
+            level: 'Intermediate',
+          },
+        ],
+      },
+    ],
+    crash_courses: [
+      {
+        id: 'cc-blender-complete',
+        title: 'Blender Complete Course in 10 Hours',
+        description: 'Comprehensive Blender course covering modeling, animation, and rendering',
+        level: 'Beginner',
+        videos: [
+          {
+            youtubeId: 'MCDVcQIA3UM',
+            title: 'Blender Essentials',
+            desc: 'Learn Blender interface and basic tools',
+            duration: '~3 hr',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'SrJOE2pEp7A',
+            title: 'Modeling & Materials',
+            desc: 'Create 3D models and apply materials',
+            duration: '~3.5 hr',
+            level: 'Beginner',
+          },
+          {
+            youtubeId: 'JSV9uMEosOo',
+            title: 'Animation & Rendering',
+            desc: 'Animate your models and render final output',
+            duration: '~3.5 hr',
             level: 'Beginner',
           },
         ],
