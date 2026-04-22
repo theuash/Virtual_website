@@ -1,0 +1,10 @@
+name = "virtual"
+compatibility_date = "2024-04-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[[routes]]
+pattern = "virtual.theuash.workers.dev/*"
+zone_name = "workers.dev"
