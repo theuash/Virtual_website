@@ -440,10 +440,10 @@ export default function LandingPage() {
                 top: '50%',
                 left: '50%',
                 width: '100vw',
-                height: '100vh',
-                minWidth: '177.78vh',  /* ensures 16:9 covers height */
-                minHeight: '56.25vw', /* ensures 16:9 covers width */
-                transform: 'translate(-50%, -50%)',
+                height: '56.25vw',
+                minHeight: '100vh',
+                minWidth: '177.78vh',
+                transform: 'translate(-50%, -50%) scale(1.4)',
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
                 willChange: 'opacity',
