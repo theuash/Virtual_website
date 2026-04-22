@@ -1,17 +1,25 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
+﻿import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
-  CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout, ChevronRight, Volume2, VolumeX,
-  Target, ShieldCheck, Zap, Users, Landmark, FileText, Bot, CreditCard, Scale, Bell, BarChart3, TrendingUp
+  CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout, Volume2, VolumeX,
+  ShieldCheck, Users,
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import PricingStrip from '../../components/landing/PricingStrip';
 import bgVideo from '../../assets/v.mp4';
-
-// If you have a CDN URL, replace the src below with it directly:
-// const bgVideo = 'https://res.cloudinary.com/your-cloud/video/upload/q_auto/v.mp4';
 import logo from '../../assets/logo.png';
+
+// Detect mobile once on mount
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < 768);
+    window.addEventListener('resize', fn, { passive: true });
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return mobile;
+}
 
 // Helper Component for 3D Mesh Layers
 const MeshGrid = ({ count = 5, speed = 10 }) => (
@@ -59,7 +67,7 @@ const MeshGrid = ({ count = 5, speed = 10 }) => (
   </div>
 );
 
-// Hero CTA — same pop → expand as floating pill and pricing CTA
+// Hero CTA â€” same pop â†’ expand as floating pill and pricing CTA
 function HeroExpandingCTA({ onClick }) {
   const [popped, setPopped] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -95,7 +103,7 @@ function HeroExpandingCTA({ onClick }) {
       transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
       whileHover={{ scale: 1.05 }}
     >
-      {/* Arrow — anchor dot */}
+      {/* Arrow â€” anchor dot */}
       <span className="flex items-center justify-center pl-5 pr-3 py-3.5">
         <ArrowRight size={16} style={{ color: 'var(--accent)' }} />
       </span>
@@ -117,8 +125,8 @@ function HeroExpandingCTA({ onClick }) {
   );
 }
 
-// Floating Pill — pop-up first, then content reveals after
-function FloatingPill({ splitProgress, navigate, logo }) {
+// Floating Pill â€” pop-up first, then content reveals after
+function FloatingPill({ splitProgress, navigate, logo, isDark }) {
   const [visible,   setVisible]   = useState(false);
   const [expanded,  setExpanded]  = useState(false);
   const [flashBorder, setFlashBorder] = useState(false);
@@ -156,27 +164,36 @@ function FloatingPill({ splitProgress, navigate, logo }) {
           <div
             className="flex items-center rounded-full relative"
             style={{
-              background: 'rgba(36, 36, 36, 0.55)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
+              background: isDark
+                ? 'rgba(30, 20, 60, 0.92)'
+                : 'rgba(255, 255, 255, 0.75)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
               overflow: 'hidden',
-              // Border transitions from white flash → subtle, hover brings back glow
-              border: `1px solid ${flashBorder ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255,255,255,0.08)'}`,
+              border: flashBorder
+                ? '1px solid rgba(110,44,242,0.95)'
+                : `1px solid ${isDark ? 'rgba(140,100,255,0.35)' : 'rgba(110,44,242,0.3)'}`,
               transition: 'border-color 0.9s ease, box-shadow 0.3s ease',
-              boxShadow: '0 8px 32px rgba(76, 0, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
+              boxShadow: isDark
+                ? '0 8px 40px rgba(110,44,242,0.6), inset 0 1px 0 rgba(180,140,255,0.15)'
+                : '0 8px 40px rgba(110,44,242,0.25), inset 0 1px 0 rgba(255,255,255,0.9)',
             }}
           >
             {/* Logo */}
             <div className="flex items-center shrink-0 pl-3.5 pr-3 py-2.5">
               <div
                 className="w-5 h-5 flex items-center justify-center"
-                style={{ filter: 'drop-shadow(0 0 6px rgba(180,190,255,0.5))' }}
+                style={{ filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.5))' }}
               >
                 <img
                   src={logo}
                   alt="V"
                   className="w-full h-full object-contain"
-                  style={{ filter: 'invert(100%) brightness(200%)' }}
+                  style={{
+                    filter: isDark
+                      ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)'
+                      : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)',
+                  }}
                 />
               </div>
             </div>
@@ -192,37 +209,28 @@ function FloatingPill({ splitProgress, navigate, logo }) {
               }}
               style={{ overflow: 'hidden' }}
             >
-              <div className="w-px h-3.5 bg-white/10 shrink-0" />
+              <div className={`w-px h-3.5 shrink-0 ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
 
-              <div className="hidden sm:flex items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-white/40">
-                <button
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="hover:text-white/70 transition-colors whitespace-nowrap"
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="hover:text-white/70 transition-colors whitespace-nowrap"
-                >
-                  Specs
-                </button>
-              </div>
-
-              <div className="w-px h-3.5 bg-white/10 shrink-0 hidden sm:block" />
+              <div className={`w-px h-3.5 shrink-0 ${isDark ? 'bg-white/10' : 'bg-black/10'}`} />
 
               <button
-                onClick={() => navigate('/signup?role=client')}
+                onClick={() => navigate('/signup?role=client&redirect=/client/post-project')}
                 className="py-1.5 px-4 text-[10px] font-semibold uppercase tracking-widest rounded-full transition-all active:scale-95 shrink-0 whitespace-nowrap"
                 style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.85)',
-                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: isDark ? 'rgba(140,100,255,0.3)' : 'rgba(110,44,242,0.1)',
+                  color: isDark ? '#e8d8ff' : 'rgba(80,20,200,1)',
+                  border: `1px solid ${isDark ? 'rgba(180,140,255,0.4)' : 'rgba(110,44,242,0.3)'}`,
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = isDark ? 'rgba(140,100,255,0.5)' : 'rgba(110,44,242,0.18)';
+                  e.currentTarget.style.color = isDark ? '#fff' : 'rgba(60,10,180,1)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = isDark ? 'rgba(140,100,255,0.3)' : 'rgba(110,44,242,0.1)';
+                  e.currentTarget.style.color = isDark ? '#e8d8ff' : 'rgba(80,20,200,1)';
+                }}
               >
-                Hire Elite Talent
+                Post a Project
               </button>
             </motion.div>
           </div>
@@ -234,6 +242,7 @@ function FloatingPill({ splitProgress, navigate, logo }) {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const scrollCueCountRef = useRef(0);
@@ -284,8 +293,10 @@ export default function LandingPage() {
     offset: ["start end", "end start"]
   });
 
-  const leftY = useTransform(splitProgress, [0, 1], [50, -150]);
-  const rightY = useTransform(splitProgress, [0, 1], [-100, 100]);
+  const leftYRaw = useTransform(splitProgress, [0, 1], [50, -150]);
+  const rightYRaw = useTransform(splitProgress, [0, 1], [-100, 100]);
+  const leftY = isMobile ? 0 : leftYRaw;
+  const rightY = isMobile ? 0 : rightYRaw;
   
   // Music Volume: Constant until section enters, then fades out by 20% into the section view
   const musicVolume = useTransform(splitProgress, [0, 0.2], [1, 0]);
@@ -418,11 +429,11 @@ export default function LandingPage() {
     >
       <Header />
 
-      {/* Hero Section (Sticky Parallax) - Reduced height for better scroll tempo */}
+      {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
-          {/* Background Video Container - Anchored to black to prevent bleed */}
-          <div className="absolute inset-0 z-0 bg-[#000000] cursor-pointer" onClick={toggleMute}>
+          {/* Background Video â€” fixed aspect, covers full viewport */}
+          <div className="absolute inset-0 z-0 bg-black cursor-pointer overflow-hidden" onClick={toggleMute}>
             <video
               ref={videoRef}
               src={bgVideo}
@@ -431,36 +442,29 @@ export default function LandingPage() {
               muted={isMuted}
               playsInline
               preload="none"
-              className="w-full h-full object-cover pointer-events-none"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
               style={{
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
-                willChange: 'opacity'
+                willChange: 'opacity',
               }}
               onLoadedMetadata={() => {
-                // Ensure video starts playing once metadata is loaded
-                if (videoRef.current && !videoRef.current.paused === false) {
-                  videoRef.current.play().catch(() => {});
-                }
+                if (videoRef.current) videoRef.current.play().catch(() => {});
               }}
-            ></video>
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000000 0%, transparent 10%, transparent 90%, #000000 100%)', zIndex: 0 }}></div>
-            {/* Text-legibility overlay — darkens in dark mode, lightens in light mode as text arrives */}
+            />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%)', zIndex: 1 }} />
             <motion.div
               className="absolute inset-0 pointer-events-none"
-              style={{
-                opacity: heroOpacity,
-                background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.45)',
-                zIndex: 1,
-              }}
+              style={{ opacity: heroOpacity, background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.45)', zIndex: 2 }}
             />
           </div>
 
+          {/* Mute button â€” bottom-right, safe from floating pill */}
           <button
             onClick={toggleMute}
-            className="absolute bottom-10 right-10 z-50 w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
+            className="absolute bottom-6 right-4 sm:bottom-10 sm:right-10 z-50 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
           >
-            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
 
           <AnimatePresence>
@@ -471,150 +475,201 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16, transition: { duration: 0.35, ease: 'easeOut' } }}
-                className="absolute bottom-10 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white"
-              >
-                
-              </motion.button>
+                className="absolute bottom-6 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white"
+              />
             )}
           </AnimatePresence>
 
-          {/* Full Screen Blur Overlay - Linked to Hero Appearance */}
-          <motion.div 
+          {/* Blur overlay */}
+          <motion.div
             style={{ opacity: heroOpacity }}
             className="absolute inset-0 z-10 backdrop-blur-xl pointer-events-none"
           />
 
+          {/* Hero text */}
           <motion.div
             style={{ opacity: heroOpacity, scale: heroScale, y: heroTextY }}
-            className="z-50 flex flex-col items-center max-w-4xl mx-auto mt-10 p-8"
+            className="relative z-50 flex flex-col items-center w-full max-w-4xl mx-auto px-4 sm:px-8"
           >
             <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" style={{ backgroundColor: 'var(--accent)' }}></span>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
               The New Standard
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center mb-6 leading-[1.08] text-white drop-shadow-2xl">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center mb-4 sm:mb-6 leading-[1.08] text-white drop-shadow-2xl">
               The team you never
               <br />
-              <span
-                className="text-transparent bg-clip-text"
-                style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}
-              >
+              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}>
                 had to Build
               </span>
             </h1>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-medium tracking-wide leading-relaxed text-white/90">
+            <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 font-medium tracking-wide leading-relaxed text-white/90">
               A fully departmentalized creative platform. Structured teams, escrow-protected payments, and a professional chain of command behind every project.
             </p>
-            <HeroExpandingCTA onClick={() => navigate('/signup?role=client')} />
+            <div className="hidden sm:block">
+              <HeroExpandingCTA onClick={() => navigate('/signup?role=client')} />
+            </div>
           </motion.div>
         </div>
-        {/* The Trans-Theme Bridge: Bridging Black video section to themed content below */}
+
+        {/* Theme bridge gradient */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-[800px] pointer-events-none z-10"
-          style={{
-            background: 'linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%)'
-          }}
-        ></div>
+          className="absolute bottom-0 left-0 right-0 h-[400px] sm:h-[800px] pointer-events-none z-10"
+          style={{ background: 'linear-gradient(to bottom, transparent 0%, var(--bg-primary) 100%)' }}
+        />
       </section>
 
       {/* Split Parallax (The Difference) */}
-      <section ref={splitRef} className="pt-16 pb-10 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <section ref={splitRef} className="py-16 sm:pt-16 sm:pb-10 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <motion.div style={{ y: leftY }} className="flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 sm:mb-8" style={{ color: 'var(--text-primary)' }}>
               Not a freelance platform. A structured creative agency.
             </h2>
-            <p className="font-normal leading-relaxed text-lg mb-8 opacity-80" style={{ color: 'var(--text-secondary)' }}>
-              Every category operates as its own department with a designated head — personally accountable for every deliverable. You get a professional chain of command, not a random freelancer.
+            <p className="font-normal leading-relaxed text-base sm:text-lg mb-6 sm:mb-8 opacity-80" style={{ color: 'var(--text-secondary)' }}>
+              Every category operates as its own department with a designated head â€” personally accountable for every deliverable. You get a professional chain of command, not a random freelancer.
             </p>
-            <ul className="space-y-6">
+            <ul className="space-y-4 sm:space-y-6">
               {[
-                "Structured execution — defined chain of command",
-                "Quality assurance — Momentum Supervisor reviews every deliverable",
-                "On-time delivery — timelines tracked live, delays flagged internally"
+                "Structured execution â€” defined chain of command",
+                "Quality assurance â€” Momentum Supervisor reviews every deliverable",
+                "On-time delivery â€” timelines tracked live, delays flagged internally"
               ].map((item, i) => (
-                <li key={i} className="flex items-center gap-4 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  <CheckCircle size={24} style={{ color: 'var(--accent)' }} />
+                <li key={i} className="flex items-start gap-3 sm:gap-4 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <CheckCircle size={20} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                   {item}
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          <motion.div style={{ y: rightY, perspective: 1200 }} className="relative h-[340px] w-full hidden md:flex items-center justify-center overflow-hidden">
-            {/* Deep-Space 3D Parallax Matrix */}
-            <motion.div 
-              style={{ rotateX: 20, rotateY: -10, transformStyle: 'preserve-3d' }}
-              animate={{ 
-                rotateX: [20, 25, 20],
-                rotateY: [-10, -15, -10]
-              }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-              className="relative w-full h-full flex items-center justify-center"
-            >
-               {/* Layer 1: Far Perspective (Dim) */}
-               <div className="absolute inset-0" style={{ transform: 'translateZ(-200px)', opacity: 0.1 }}>
-                  <MeshGrid speed={15} count={4} />
-               </div>
+          <motion.div style={{ y: rightY }} className="relative w-full hidden md:flex flex-col justify-center gap-3 overflow-hidden h-[340px]">
+            {/* Fade masks top/bottom */}
+            <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom, var(--bg-primary), transparent)' }} />
+            <div className="absolute inset-x-0 bottom-0 h-12 z-10 pointer-events-none"
+              style={{ background: 'linear-gradient(to top, var(--bg-primary), transparent)' }} />
+            {/* Fade masks left/right */}
+            <div className="absolute inset-y-0 left-0 w-10 z-10 pointer-events-none"
+              style={{ background: 'linear-gradient(to right, var(--bg-primary), transparent)' }} />
+            <div className="absolute inset-y-0 right-0 w-10 z-10 pointer-events-none"
+              style={{ background: 'linear-gradient(to left, var(--bg-primary), transparent)' }} />
 
-               {/* Layer 2: Mid Perspective (Active) */}
-               <div className="absolute inset-0" style={{ transform: 'translateZ(0px)', opacity: 0.3 }}>
-                  <MeshGrid speed={10} count={6} />
-               </div>
-
-               {/* Layer 3: Near Perspective (Glow) */}
-               <div className="absolute inset-0" style={{ transform: 'translateZ(200px)', opacity: 0.15 }}>
-                  <MeshGrid speed={6} count={3} />
-               </div>
-
-               {/* 3D Stage Text Layer */}
-               <div className="absolute inset-0 flex flex-col items-center justify-center text-center" style={{ transform: 'translateZ(100px)' }}>
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    className="space-y-3"
+            {[
+              {
+                dir: 1, speed: 30,
+                items: [
+                  { label: 'Micro-Task Distribution', href: '/how-it-works#core-platform', available: true },
+                  { label: 'Escrow Protection',        href: '/about#escrow-protection',       available: true },
+                  { label: 'Quality Assurance',        href: '/about#quality-assurance',       available: true },
+                  { label: 'Structured Teams',         href: '/about#structured-teams',        available: true },
+                ],
+              },
+              {
+                dir: -1, speed: 24,
+                items: [
+                  { label: 'Project Initiator',    href: '/roles#project-initiator',    available: true },
+                  { label: 'Momentum Supervisor',  href: '/roles#momentum-supervisor',  available: true },
+                  { label: 'Earn While You Learn', href: '/about#earn-while-you-learn', available: true },
+                  { label: 'Crate',                href: '/roles#crate',                available: true },
+                ],
+              },
+              {
+                dir: 1, speed: 36,
+                items: [
+                  { label: 'Video Editing',   href: '/pricing#video_editing',    available: true },
+                  { label: 'Graphic Design',  href: '/pricing#graphic_designing', available: true },
+                  { label: '3D Animation',    href: '/pricing#3d_animation',     available: true },
+                  { label: 'CGI & VFX',       href: '/pricing#cgi',              available: true },
+                  { label: 'Script Writing',  href: '/pricing#script_writing',   available: true },
+                ],
+              },
+              {
+                dir: -1, speed: 28,
+                items: [
+                  { label: 'Merit-Based Promotion', href: '/roles#merit-based-promotion',   available: true },
+                  { label: 'Real Portfolio Work',   href: '/about#real-portfolio-work',     available: true },
+                  { label: 'Chain of Command',      href: '/about#chain-of-command',        available: true },
+                  { label: 'How a Project Works',   href: '/how-it-works#how-a-project-works', available: true },
+                ],
+              },
+            ].map((row, rowIdx) => {
+              const doubled = [...row.items, ...row.items, ...row.items];
+              return (
+                <div key={rowIdx} className="flex overflow-hidden">
+                  <motion.div
+                    className="flex gap-3 shrink-0"
+                    animate={{ x: row.dir === 1 ? ['0%', '-33.33%'] : ['-33.33%', '0%'] }}
+                    transition={{ duration: row.speed, repeat: Infinity, ease: 'linear' }}
                   >
-                    <div className="text-[9px] uppercase font-black tracking-[0.5em] opacity-30" style={{ color: 'var(--text-primary)' }}>Department Model</div>
-                    <div className="text-3xl md:text-4xl font-black uppercase tracking-tighter mix-blend-difference" style={{ color: 'var(--text-primary)' }}>
-                       <AnimatePresence mode="wait">
-                          <motion.span
-                             key={Math.floor(Date.now() / 3000) % 3}
-                             initial={{ y: 20, opacity: 0 }}
-                             animate={{ y: 0, opacity: 1 }}
-                             exit={{ y: -20, opacity: 0 }}
-                             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                             className="block"
-                          >
-                             {["Structure", "Quality", "Delivery"][Math.floor(Date.now() / 3000) % 3]}
-                          </motion.span>
-                       </AnimatePresence>
-                    </div>
-                    {/* 3D Scanning Line */}
-                    <motion.div 
-                       animate={{ top: ['-20%', '120%'], opacity: [0, 1, 0] }}
-                       transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                       className="absolute left-0 right-0 h-px z-20"
-                       style={{ background: 'linear-gradient(to right, transparent, var(--accent), transparent)', boxShadow: '0 0 20px var(--accent)' }}
-                    />
+                    {doubled.map((item, i) => (
+                      item.available ? (
+                        <a key={i} href={item.href}
+                          className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all hover:scale-105 cursor-pointer"
+                          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--bg-secondary)'; }}
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <span key={i}
+                          className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap opacity-30 cursor-not-allowed"
+                          style={{ border: '1px dashed var(--border)', color: 'var(--text-secondary)', background: 'transparent' }}
+                          title="Coming soon"
+                        >
+                          {item.label}
+                        </span>
+                      )
+                    ))}
                   </motion.div>
-               </div>
-            </motion.div>
+                </div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Strip — right after split section */}
+      {/* Pricing Strip â€” right after split section */}
       <PricingStrip />
 
-      {/* The Core Engine (Sticky Parallax Showcase) */}
-      <section className="relative lg:py-0 z-20" style={{ background: 'var(--bg-primary)' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-20">
-            {/* Left side: Immersive Full-Screen Graphics */}
-            <div className="hidden lg:block lg:w-1/2 h-screen sticky top-0 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
-              {/* Light Mode Depth Textures */}
-              <div className="light-texture"></div>
-              <div className="light-vignette"></div>
+      {/* The Core Engine */}
+      <section className="relative z-20" style={{ background: 'var(--bg-primary)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+          {/* Mobile: simple stacked cards */}
+          <div className="lg:hidden py-12 space-y-10">
+            {[
+              { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist â€” not just whoever is available." },
+              { tag: "Security", title: "Wallet & Escrow Protection", desc: "Funds lock into escrow when a project is posted. Released only after you formally approve the completed work." },
+              { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "Every dispute is handled by a trained Dispute Handler â€” not a chatbot. A structured meeting with all parties inside Virtual's own video meet window." },
+              { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement is driven by data â€” accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically." },
+              { tag: "Visibility", title: "Live Command Dashboard", desc: "See every micro-task in real time â€” in progress, under review, completed. Communicate directly with your Project Initiator." },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                className="p-6 rounded-2xl border"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+              >
+                <div className="text-xs font-bold uppercase tracking-[0.3em] mb-3 bg-clip-text text-transparent"
+                  style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>
+                  {item.tag}
+                </div>
+                <h3 className="text-xl font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed opacity-80" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Desktop: original sticky parallax layout */}
+          <div className="hidden lg:flex flex-row gap-20">
+            {/* Left sticky graphics panel */}
+            <div className="lg:w-1/2 h-screen sticky top-0 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+              <div className="light-texture" />
+              <div className="light-vignette" />
               
               {/* Feature 0 Overlay: Blocked Task Distribution (The Fragmentation Engine) */}
               <motion.div
@@ -1003,7 +1058,7 @@ export default function LandingPage() {
                 {
                   tag: "Intelligence",
                   title: "Micro-Task Distribution Engine",
-                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist — not just whoever is available.",
+                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist â€” not just whoever is available.",
                   color: "from-accent to-forest"
                 },
                 {
@@ -1015,19 +1070,19 @@ export default function LandingPage() {
                 {
                   tag: "Accountability",
                   title: "Human-Led Dispute Resolution",
-                  desc: "Every dispute is handled by a trained Dispute Handler — not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
+                  desc: "Every dispute is handled by a trained Dispute Handler â€” not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
                   color: "from-accent to-forest"
                 },
                 {
                   tag: "Meritocracy",
                   title: "Algorithmic Growth System",
-                  desc: "Advancement is driven by data — accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
+                  desc: "Advancement is driven by data â€” accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
                   color: "from-forest to-accent"
                 },
                 {
                   tag: "Visibility",
                   title: "Live Command Dashboard",
-                  desc: "See every micro-task in real time — in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
+                  desc: "See every micro-task in real time â€” in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
                   color: "from-accent to-forest"
                 }
               ].map((item, i) => (
@@ -1073,203 +1128,76 @@ export default function LandingPage() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </div>{/* end desktop flex */}
         </div>
       </section>
 
-      {/* Mastery in Action (Horizontal Scroll Overhaul) */}
-      <section id="roles" ref={masteryRef} className="relative z-20" style={{ height: '500vh' }}>
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center">
-          {/* Horizontal Slide Container */}
-          <motion.div 
-            style={{ x: masteryX }} 
-            className="flex px-[10vw] gap-[5vw] items-center"
-          >
-            {/* Introductory Title Card */}
-            <div className="flex-shrink-0 w-[40vw] mr-[5vw]">
-              <h2 className="text-6xl md:text-8xl font-bold tracking-tighter mb-6 leading-none" style={{ color: 'var(--text-primary)' }}>
-                Mastery in <br /> 
-                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>Action.</span>
-              </h2>
-              <p className="text-xl max-w-md opacity-70 leading-relaxed font-normal" style={{ color: 'var(--text-secondary)' }}>
-                Five independent departments. Each with a designated head, a structured team, and full accountability for every deliverable.
-              </p>
-              <div className="mt-12 flex items-center gap-4">
-                <div className="w-12 h-px bg-accent" style={{ background: 'var(--accent)' }}></div>
-                <span className="text-xs font-bold uppercase tracking-widest opacity-50">Scroll to Explore</span>
-              </div>
-            </div>
-
-            {/* Segment Cards */}
-            {[
-              { 
-                icon: <Video size={32} />, 
-                title: "Video Editing", 
-                desc: "A dedicated department managing every cut, grade, and sequence — with a department head accountable for every frame delivered.",
-                details: ["Cinematic Cuts", "Color Grading", "Motion Titles", "Commercial Edits"]
-              },
-              { 
-                icon: <Cuboid size={32} />, 
-                title: "3D Animation", 
-                desc: "From character rigging to architectural visualization — structured, reviewed, and delivered by a team with a clear chain of command.",
-                details: ["Character Rigging", "Environment Design", "Product Renders", "VFX Integration"]
-              },
-              { 
-                icon: <MonitorPlay size={32} />, 
-                title: "CGI & VFX", 
-                desc: "Cinematic visual effects handled by a dedicated department. Every composite and simulation passes through supervisor review before delivery.",
-                details: ["Green Screen", "Compositing", "Fluid Sims", "3D Projection"]
-              },
-              { 
-                icon: <PenTool size={32} />, 
-                title: "Script Writing", 
-                desc: "Narratives and structural frameworks built by a writing department — not a solo freelancer. Department-reviewed before it reaches you.",
-                details: ["Storyboarding", "Brand Voice", "Concept Dev", "Ad Copy"]
-              },
-              { 
-                icon: <Layout size={32} />, 
-                title: "Graphic Design", 
-                desc: "Brand identity, design systems, and visual assets — managed by a full design department with a head overseeing every output.",
-                details: ["UI Architecture", "Design Systems", "Brand Manuals", "Asset Libraries"]
-              }
-            ].map((role, i) => (
-              <div 
-                key={i} 
-                className="flex-shrink-0 w-[60vw] md:w-[28vw] aspect-[5/6] border rounded-[2rem] p-8 flex flex-col justify-between group transition-all duration-500 hover:scale-[1.02]" 
-                style={{ 
-                  background: 'var(--bg-glass)', 
-                  borderColor: 'var(--border)',
-                  backdropFilter: 'blur(30px)',
-                  boxShadow: 'var(--anim-shadow)'
-                }}
-              >
-                <div>
-                   <div 
-                     className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110" 
-                     style={{ background: 'var(--bg-secondary)', color: 'var(--accent)', border: '1px solid var(--border)' }}
-                   >
-                     {role.icon}
-                   </div>
-                   <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>{role.title}</h3>
-                   <p className="text-base opacity-70 font-normal leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{role.desc}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mt-8">
-                   {role.details.map((detail, dIdx) => (
-                     <div key={dIdx} className="flex items-center gap-2">
-                        <div className="w-1 h-1 rounded-full bg-accent" style={{ background: 'var(--accent)' }}></div>
-                        <span className="text-[9px] font-bold uppercase tracking-widest opacity-60" style={{ color: 'var(--text-primary)' }}>{detail}</span>
-                     </div>
-                   ))}
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
       {/* Apple-Style Floating Action Bar (Pill) */}
       <AnimatePresence>
-        <FloatingPill splitProgress={splitProgress} navigate={navigate} logo={logo} />
+        <FloatingPill splitProgress={splitProgress} navigate={navigate} logo={logo} isDark={isDark} />
       </AnimatePresence>
 
       {/* Final Call to Action */}
-      <section className="py-40 relative z-20 overflow-hidden border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
-        <div className="max-w-5xl mx-auto px-6 text-center">
+      <section className="py-20 sm:py-40 relative z-20 overflow-hidden border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter mb-6 sm:mb-8" style={{ color: 'var(--text-primary)' }}>
               Ready to build with
               <br />
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>a real team behind you?</span>
             </h2>
-            <p className="text-xl mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
-              Post your project and get a structured department working on it — escrow-protected, supervisor-reviewed, and delivered on time.
+            <p className="text-base sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
+              Post your project and get a structured department working on it â€” escrow-protected, supervisor-reviewed, and delivered on time.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button className="btn-primary py-4 px-10 text-base font-bold tracking-wide">Post a Project</button>
-              <button className="btn-ghost py-4 px-10 text-base font-bold tracking-wide">Contact Agency Team</button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+              <button onClick={() => navigate('/signup?role=client&redirect=/client/post-project')} className="btn-primary w-full sm:w-auto py-4 px-8 text-base font-bold tracking-wide">Post a Project</button>
+              <button className="btn-ghost w-full sm:w-auto py-4 px-8 text-base font-bold tracking-wide">Contact Agency Team</button>
             </div>
           </motion.div>
         </div>
-        {/* Animated Background Gradients */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 flex justify-center items-center">
-          <div className="w-[800px] h-[400px] opacity-[0.07] rounded-full blur-[120px] animate-pulse" style={{ background: 'var(--accent)' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 flex justify-center items-center pointer-events-none">
+          <div className="w-[400px] sm:w-[800px] h-[200px] sm:h-[400px] opacity-[0.07] rounded-full blur-[80px] sm:blur-[120px] animate-pulse" style={{ background: 'var(--accent)' }} />
         </div>
       </section>
 
-      {/* Footer (Apple-Inspired Premium Overhaul) */}
-      <footer className="pt-32 pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
+      {/* Footer */}
+      <footer className="pt-16 sm:pt-32 pb-12 sm:pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-16 mb-12 sm:mb-24">
             <div className="md:col-span-4">
-              {/* Logo - Exact Match to Header */}
-              <div
-                className="flex items-center gap-3 mb-8 cursor-pointer group"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              >
-                <div className="w-11 h-11 flex items-center justify-center">
-                  <img 
-                    src={logo} 
-                    alt="Virtual Logo" 
-                    className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110" 
-                    style={{
-                      // Dynamic Violet Filter (Matching Header)
-                      filter: 'invert(42%) sepia(90%) saturate(1600%) hue-rotate(230deg) brightness(90%) contrast(100%) drop-shadow(0 0 10px rgba(99,102,241,0.3))'
-                    }} 
-                  />
+              <div className="flex items-end mb-6 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <div className="w-9 h-9 flex items-center justify-center">
+                  <img src={logo} alt="V" className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110"
+                    style={{ filter: isDark ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)' : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)' }} />
                 </div>
-                <span className="font-extrabold text-3xl tracking-tighter" style={{ color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '-15px' }}>
-                  irtual
-                </span>
+                <span className="font-extrabold text-2xl" style={{ color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '1px' }}>irtual</span>
               </div>
-              <p className="font-normal text-base leading-relaxed mb-8 max-w-xs opacity-60" style={{ color: 'var(--text-secondary)' }}>
+              <p className="font-normal text-sm leading-relaxed mb-6 max-w-xs opacity-60" style={{ color: 'var(--text-secondary)' }}>
                 The elite architecture for the creative economy. Managed execution for world-class visions.
               </p>
-              <div className="flex gap-4">
-                {['Twitter', 'LinkedIn', 'Instagram'].map(social => (
-                  <a 
-                    key={social} 
-                    href="#" 
-                    className="w-10 h-10 rounded-full border flex items-center justify-center transition-all hover:scale-110 hover:border-accent hover:text-accent" 
-                    style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--text-primary)' }}
-                  >
-                    <span className="text-xs font-bold uppercase tracking-tighter">{social[0]}</span>
+              <div className="flex gap-3">
+                {['T', 'L', 'I'].map((s, i) => (
+                  <a key={i} href="#" className="w-9 h-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
+                    style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--text-primary)' }}>
+                    <span className="text-xs font-bold">{s}</span>
                   </a>
                 ))}
               </div>
             </div>
 
-            <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-12">
+            <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
               {[
-                {
-                  title: "Platform",
-                  links: ["Talent Directory", "Managed Services", "Pricing Structure"]
-                },
-                {
-                  title: "Resources",
-                  links: ["Escrow Protection", "Skill Tiers", "API Docs"]
-                },
-                {
-                  title: "Company",
-                  links: ["About Virtual", "Legal Framework", "Contact"]
-                },
-                {
-                  title: "Support",
-                  links: ["Dispute Center", "Help Articles", "System Status"]
-                }
-              ].map((column) => (
-                <div key={column.title} className="space-y-6">
-                  <h4 className="font-bold text-[10px] uppercase tracking-[0.3em] opacity-40" style={{ color: 'var(--text-primary)' }}>{column.title}</h4>
-                  <div className="flex flex-col gap-4 text-sm font-normal">
-                    {column.links.map(link => (
-                      <a 
-                        key={link} 
-                        href="#" 
-                        className="transition-all duration-300 hover:text-white opacity-50 hover:opacity-100" 
-                        style={{ color: 'var(--text-secondary)' }}
-                      >
-                        {link}
-                      </a>
+                { title: "Platform", links: ["Talent Directory", "Managed Services", "Pricing Structure"] },
+                { title: "Resources", links: ["Escrow Protection", "Skill Tiers", "API Docs"] },
+                { title: "Company", links: ["About Virtual", "Legal Framework", "Contact"] },
+                { title: "Support", links: ["Dispute Center", "Help Articles", "System Status"] },
+              ].map(col => (
+                <div key={col.title} className="space-y-4">
+                  <h4 className="font-bold text-[10px] uppercase tracking-[0.3em] opacity-40" style={{ color: 'var(--text-primary)' }}>{col.title}</h4>
+                  <div className="flex flex-col gap-3 text-sm">
+                    {col.links.map(link => (
+                      <a key={link} href="#" className="opacity-50 hover:opacity-100 transition-opacity" style={{ color: 'var(--text-secondary)' }}>{link}</a>
                     ))}
                   </div>
                 </div>
@@ -1277,11 +1205,11 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-12 border-t flex flex-col sm:flex-row justify-between items-center gap-6" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
+          <div className="pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+            <div className="text-[10px] font-medium uppercase tracking-[0.2em] opacity-30 text-center sm:text-left" style={{ color: 'var(--text-primary)' }}>
               &copy; {new Date().getFullYear()} Virtual Inc. Defined by Excellence.
             </div>
-            <div className="flex gap-8 text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
+            <div className="flex gap-6 text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
               <a href="#" className="hover:opacity-100 transition-opacity">Privacy</a>
               <a href="#" className="hover:opacity-100 transition-opacity">Terms</a>
               <a href="#" className="hover:opacity-100 transition-opacity">Cookies</a>

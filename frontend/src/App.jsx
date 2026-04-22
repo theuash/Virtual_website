@@ -6,6 +6,8 @@ import PublicRoute from './components/PublicRoute';
 import LandingPage from './pages/landing/LandingPage';
 import AboutPage from './pages/landing/AboutPage';
 import PricingPage from './pages/landing/PricingPage';
+import HowItWorksPage from './pages/landing/HowItWorksPage';
+import RolesPage from './pages/landing/RolesPage';
 
 // Auth
 import LoginPage from './pages/auth/LoginPage';
@@ -75,6 +77,8 @@ function App() {
       <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/how-it-works" element={<HowItWorksPage />} />
+      <Route path="/roles" element={<RolesPage />} />
       <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
       <Route path="/meet/:meetingId" element={<MeetRoom />} />

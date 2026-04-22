@@ -46,10 +46,10 @@ export default function InitiatorLayout() {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         {/* Logo */}
         <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: 'var(--border)' }}>
-          <div className="flex items-center gap-2 mb-5 cursor-pointer" onClick={() => navigate('/')}>
-            <img src={logo} alt="Virtual" className="w-6 h-6"
+          <div className="flex items-end mb-5 cursor-pointer" onClick={() => navigate('/')}>
+            <img src={logo} alt="V" className="w-7 h-7"
               style={{ filter: isDark ? 'brightness(0) invert(1)' : 'none' }} />
-            <span className="font-black text-base" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>
+            <span className="font-black text-lg" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em', marginLeft: '1px' }}>
               irtual
             </span>
           </div>

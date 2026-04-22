@@ -40,14 +40,14 @@ export default function ClientLayout() {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         {/* Logo + user */}
         <div className="p-5 border-b" style={{ borderColor: 'var(--border)' }}>
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-end mb-6">
             <img
               src={logo}
-              alt="Virtual"
+              alt="V"
               className="w-7 h-7"
               style={{ filter: isDark ? 'brightness(0) invert(1)' : 'none' }}
             />
-            <span className="font-black text-lg tracking-tighter" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>
+            <span className="font-black text-lg" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em', marginLeft: '1px' }}>
               irtual
             </span>
           </div>

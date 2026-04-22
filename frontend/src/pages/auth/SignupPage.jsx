@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
@@ -8,6 +8,7 @@ import { SKILLS, SKILL_LABELS } from '../../utils/roleGuards';
 import signupArt from '../../assets/auth/signup_art.jpg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
+import ThemeToggle from '../../components/ThemeToggle';
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {
@@ -49,6 +50,7 @@ function Field({ label, icon: Icon, children }) {
 export default function SignupPage() {
   const [params] = useSearchParams();
   const roleParam = params.get('role');
+  const redirectTo = params.get('redirect') || null;
   const navigate = useNavigate();
   const { signup, loading, verifySignupOTP, requestSignupOTP, completeAuth, signupWithGoogle } = useAuth();
 
@@ -61,11 +63,6 @@ export default function SignupPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [otp, setOtp] = useState('');
   const [pendingUser, setPendingUser] = useState(null);
-
-  const { scrollY } = useScroll();
-  const contentOpacity = useTransform(scrollY, [0, 200], [0, 1]);
-  const contentY = useTransform(scrollY, [0, 200], [40, 0]);
-  const blurOverlayOpacity = useTransform(scrollY, [0, 200], [0, 0.9]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -89,7 +86,7 @@ export default function SignupPage() {
         }
         const response = await signupWithGoogle(token, role);
         const user = completeAuth(response);
-        navigate(getRoleRedirect(user.role, user));
+        navigate(redirectTo || getRoleRedirect(user.role, user));
       } catch (err) {
         setError(err?.message || 'Google signup failed. Please try again.');
       }
@@ -127,7 +124,7 @@ export default function SignupPage() {
       };
       const verifiedAuth = await verifySignupOTP(pendingUser.user.email, otp, signupDataForVerification);
       const user = completeAuth(verifiedAuth);
-      navigate(getRoleRedirect(user.role, user));
+      navigate(redirectTo || getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
     }
@@ -157,13 +154,14 @@ export default function SignupPage() {
         <motion.div variants={containerVariants} initial="hidden" animate="visible"
           className="relative z-10 w-full max-w-3xl px-4 py-12 text-center">
 
-          {/* Back */}
-          <motion.div variants={itemVariants} className="flex justify-start mb-10">
+          {/* Back + theme toggle */}
+          <motion.div variants={itemVariants} className="flex items-center justify-between mb-10">
             <button onClick={() => navigate('/')}
               className="inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
               style={{ color: 'var(--text-secondary)' }}>
               <ArrowLeft size={12} strokeWidth={3} /> Back to Home
             </button>
+            <ThemeToggle variant="pill" />
           </motion.div>
 
           {/* Logo + heading */}
@@ -243,41 +241,81 @@ export default function SignupPage() {
           src={signupArt}
           className="w-full h-full object-cover"
           alt="Nexus Onboarding"
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
+          initial={{ scale: 1.08, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
         />
-        <motion.div
-          style={{ opacity: blurOverlayOpacity, background: 'var(--bg-primary)' }}
-          className="absolute inset-0 backdrop-blur-xl z-10 transition-colors duration-300"
-        />
-        <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20">
-          <motion.div style={{ opacity: contentOpacity, y: contentY }} className="flex flex-col items-start gap-6">
-            <img src={logo} className="w-16 h-16" style={{ filter: 'var(--logo-filter)' }} alt="Virtual Logo" />
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
-                <span className="text-[9px] uppercase font-black tracking-[0.3em]" style={{ color: 'var(--text-secondary)' }}>
-                  Protocol Registry
-                </span>
-              </div>
-              <h1 className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.9] capitalize" style={{ color: 'var(--text-primary)' }}>
-                Begin Your <br />
-                <span className="text-transparent bg-clip-text"
-                  style={{ backgroundImage: `linear-gradient(to right, var(--text-primary), ${accentColor})` }}>
-                  {role} Era.
-                </span>
-              </h1>
-              <p className="max-w-sm text-sm font-light leading-relaxed opacity-60" style={{ color: 'var(--text-secondary)' }}>
-                Initialize your profile and enter the production matrix.
-              </p>
-            </div>
+
+        {/* Static gradient overlay */}
+        <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)' }} />
+
+        {/* Staggered content */}
+        <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20 overflow-hidden">
+
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-5 w-fit"
+          >
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
+            <span className="text-[9px] uppercase font-black tracking-[0.3em] text-white/60">
+              Protocol Registry
+            </span>
           </motion.div>
+
+          {/* Heading reveals as logo moves up */}
+          <div className="relative overflow-hidden mb-4">
+            <motion.h1
+              className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.95] capitalize text-white"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Begin Your <br />
+              <span className="text-transparent bg-clip-text"
+                style={{ backgroundImage: `linear-gradient(to right, #fff, ${accentColor})` }}>
+                {role || 'New'} Era.
+              </span>
+            </motion.h1>
+          </div>
+
+          {/* Logo moves up */}
+          <motion.img
+            src={logo}
+            className="absolute"
+            style={{
+              width: 56, height: 56,
+              filter: 'brightness(0) invert(1)',
+              bottom: '5rem',
+              left: '3rem',
+            }}
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ y: -220, opacity: 1 }}
+            transition={{ duration: 1.0, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            alt="Virtual Logo"
+          />
+
+          <motion.p
+            className="max-w-sm text-sm font-light leading-relaxed text-white/50 mt-2"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Initialize your profile and enter the production matrix.
+          </motion.p>
         </div>
-        <div className="absolute bottom-6 left-8 right-8 z-20 flex justify-between opacity-20">
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">Registry: New_Identity</span>
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white">Role: {role?.toUpperCase()}</span>
-        </div>
+
+        <motion.div
+          className="absolute bottom-6 left-8 right-8 z-20 flex justify-between text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.2 }}
+          transition={{ duration: 1, delay: 1.4 }}
+        >
+          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Registry: New_Identity</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Role: {role?.toUpperCase() || '—'}</span>
+        </motion.div>
       </div>
 
       {/* ── Right Form Panel ── */}

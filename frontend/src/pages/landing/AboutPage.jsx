@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  CheckCircle, ArrowRight, ShieldCheck, Users, BarChart3, MonitorPlay, Scale, ChevronLeft
+  CheckCircle, ArrowRight, ShieldCheck, Users, MonitorPlay, Scale, ChevronLeft
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import { useEffect } from 'react';
@@ -9,20 +9,24 @@ import { useEffect } from 'react';
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   show: (i = 0) => ({
-    opacity: 1,
-    y: 0,
+    opacity: 1, y: 0,
     transition: { duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }
   })
 };
 
 export default function AboutPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
+    if (location.hash) {
+      setTimeout(() => {
+        document.querySelector(location.hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [location.hash]);
 
   return (
     <div
@@ -80,7 +84,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Department Structure ──────────────────────────────────── */}
-      <section className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+      <section id="quality-assurance" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-16">
             <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>
@@ -123,7 +127,7 @@ export default function AboutPage() {
       </section>
 
       {/* ── Wallet & Escrow ───────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+      <section id="escrow-protection" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
             <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>
@@ -224,51 +228,135 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Platform Features ─────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+      {/* ── Structured Teams ──────────────────────────────────────── */}
+      <section id="structured-teams" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
-            <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>
-              Core Platform
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-              How the platform works
+            <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>Structured Teams</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>
+              Not a group of freelancers.<br />A structured team.
             </h2>
+            <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+              Every project on Virtual is executed by a structured team — not a random collection of individuals. Each team is built around a Project Initiator who owns the project outcome, a set of Crate-level specialists who execute the micro-tasks, and a Momentum Supervisor who reviews quality before anything reaches the client.
+            </p>
           </motion.div>
-
-          <div className="space-y-px" style={{ borderColor: 'var(--border)' }}>
+          <div className="grid md:grid-cols-3 gap-4">
             {[
-              {
-                tag: "Micro-Task Distribution",
-                title: "Every project is broken down, not handed off whole.",
-                desc: "Virtual's Project Initiators fragment every incoming project into precision-scoped micro-tasks. Each task is sized and defined based on the skill it requires, the complexity it carries, and the tier of specialist best suited to execute it. Work is matched to specialists through AI-driven mastery tiers — the system knows who is ready for what, and assigns accordingly."
-              },
-              {
-                tag: "Algorithmic Growth",
-                title: "Advancement is earned, not given.",
-                desc: "Growth on Virtual is triggered entirely by performance data. The algorithm tracks three variables that cannot be faked: accuracy of deliverables, speed of completion, and volume of work processed. When a freelancer's data crosses a promotion threshold, the system flags them automatically. No subjective bias. Your ascent is a direct reflection of your output."
-              },
-              {
-                tag: "Live Command Dashboard",
-                title: "You always know exactly where your project stands.",
-                desc: "Clients have access to a command center that gives total transparency over every project in real time. The dashboard displays the full micro-task breakdown — which tasks are in progress, under review, and completed — live, as it happens. Clients can communicate directly with their assigned Project Initiator from inside the dashboard. No ambiguity, no waiting for updates."
-              }
+              { label: 'Defined Roles', desc: 'Every team member has a clear role — Crate executes, Initiator leads, Supervisor reviews. No ambiguity about who is responsible for what.' },
+              { label: 'Accountability at Every Level', desc: 'The Project Initiator is personally accountable for the team\'s output. If a task fails quality review, it goes back — not to the client.' },
+              { label: 'Scalable by Design', desc: 'Teams are assembled per project based on skill requirements. The right people are matched to the right work, every time.' },
             ].map((item, i) => (
-              <motion.div
-                key={i}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                className="py-8 border-t grid md:grid-cols-3 gap-6"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: 'var(--accent)' }}>{item.tag}</div>
+              <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
+                className="p-6 rounded-2xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                <CheckCircle size={20} className="mb-4" style={{ color: 'var(--accent)' }} />
+                <div className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{item.label}</div>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Earn While You Learn ──────────────────────────────────── */}
+      <section id="earn-while-you-learn" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
+            <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>Earn While You Learn</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>
+              The learning process pays you.
+            </h2>
+            <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+              Traditional skill development costs money — courses, bootcamps, certifications. Virtual flips this entirely. From your very first micro-task as a Precrate, you are earning real compensation for real work delivered to real clients.
+            </p>
+            <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+              Every task you complete builds your portfolio, your earnings, and your tier progression simultaneously. There is no separation between learning and earning — they happen in the same moment, on the same task.
+            </p>
+            <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              The more you improve, the more complex the tasks you receive, and the higher the compensation. Growth is not just career advancement — it is a direct increase in your income.
+            </p>
+          </motion.div>
+          <motion.div custom={1} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
+            <div className="space-y-4">
+              {[
+                { step: '01', title: 'Start as Precrate', desc: 'Complete foundational modules and receive your first paid micro-task.' },
+                { step: '02', title: 'Earn on Every Task', desc: 'Each completed and approved task adds directly to your wallet. No waiting, no thresholds.' },
+                { step: '03', title: 'Grow Your Tier', desc: 'Performance data drives promotion. Higher tier = more complex work = higher pay.' },
+                { step: '04', title: 'Build a Real Portfolio', desc: 'Every task is real client work. Your portfolio builds itself as you earn.' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                  <div className="text-2xl font-black opacity-20 shrink-0 w-8" style={{ color: 'var(--accent)' }}>{item.step}</div>
+                  <div>
+                    <p className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{item.title}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+                  </div>
                 </div>
-                <div className="md:col-span-2">
-                  <div className="font-semibold text-lg mb-3" style={{ color: 'var(--text-primary)' }}>{item.title}</div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Real Portfolio Work ───────────────────────────────────── */}
+      <section id="real-portfolio-work" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
+            <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>Real Portfolio Work</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>
+              Every task is real work.<br />For real clients.
+            </h2>
+            <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+              Nothing on Virtual is simulated. Every micro-task you complete is part of an actual client project — real briefs, real deadlines, real deliverables. When you finish a task, it goes into a real product that a real client receives and pays for.
+            </p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { label: 'Client-Grade Deliverables', desc: 'Your work meets the same quality bar as any professional agency output. Momentum Supervisors review everything before it ships.' },
+              { label: 'Attributable Work History', desc: 'Every completed task is logged to your profile — the skill, the complexity, the client category, and the outcome. Your track record builds automatically.' },
+              { label: 'No Spec Work', desc: 'You are never asked to work for free "to prove yourself." Every task is compensated from the moment it is assigned.' },
+              { label: 'Portfolio That Speaks for Itself', desc: 'When you apply for higher-tier work or external opportunities, your Virtual portfolio shows verified, real-world output — not personal projects or course assignments.' },
+            ].map((item, i) => (
+              <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
+                className="p-6 rounded-2xl border flex gap-4" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                <CheckCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                <div>
+                  <div className="font-semibold mb-1.5" style={{ color: 'var(--text-primary)' }}>{item.label}</div>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Chain of Command ──────────────────────────────────────── */}
+      <section id="chain-of-command" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
+            <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>Chain of Command</div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6" style={{ color: 'var(--text-primary)' }}>
+              Accountability flows in one direction.
+            </h2>
+            <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+              Virtual operates on a strict chain of command. Every person in the system reports to someone above them, and is responsible for someone below them. This is not bureaucracy — it is the mechanism that makes quality and accountability possible at scale.
+            </p>
+          </motion.div>
+          <div className="space-y-3">
+            {[
+              { tier: 'Admin', color: '#ef4444', desc: 'Sets platform standards, approves Momentum Supervisors, and maintains overall integrity.' },
+              { tier: 'Momentum Supervisor', color: '#f59e0b', desc: 'Oversees 5+ Project Initiators. Reviews all deliverables before client delivery. Manages quality across departments.' },
+              { tier: 'Project Initiator', color: '#8b5cf6', desc: 'Owns the project outcome. Fragments work into micro-tasks, assigns to Crates, and is personally accountable for the final deliverable.' },
+              { tier: 'Crate', color: '#3b82f6', desc: 'Executes assigned micro-tasks under direct supervision. Builds skills and portfolio through real client work.' },
+              { tier: 'Precrate', color: '#6b7280', desc: 'Completes foundational training and verification. Receives first paid tasks upon promotion to Crate.' },
+            ].map((item, i) => (
+              <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
+                className="flex items-start gap-4 p-5 rounded-xl border"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', borderLeft: `3px solid ${item.color}` }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0"
+                  style={{ background: item.color + '22', color: item.color }}>
+                  {i + 1}
+                </div>
+                <div>
+                  <p className="font-bold text-sm mb-1" style={{ color: item.color }}>{item.tier}</p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
                 </div>
               </motion.div>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import authArt from '../../assets/auth/login_art.jpg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
+import ThemeToggle from '../../components/ThemeToggle';
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {
@@ -21,6 +22,8 @@ const inputStyle = {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || null;
   const { login, loading, requestLoginOTP, verifyLoginOTP, completeAuth, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,9 +32,6 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
   const [pendingPhone, setPendingPhone] = useState('');
-
-  const { scrollY } = useScroll();
-  const blurOverlayOpacity = useTransform(scrollY, [0, 150], [0, 0.85]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
         }
         const response = await loginWithGoogle(token);
         const user = completeAuth(response);
-        navigate(getRoleRedirect(user.role, user));
+        navigate(redirectTo || getRoleRedirect(user.role, user));
       } catch (err) {
         setError(err?.message || 'Google login failed. Please try again.');
       }
@@ -70,7 +70,7 @@ export default function LoginPage() {
         return;
       }
       const user = completeAuth(response);
-      navigate(getRoleRedirect(user.role, user));
+      navigate(redirectTo || getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     }
@@ -82,7 +82,7 @@ export default function LoginPage() {
     try {
       const response = await verifyLoginOTP(pendingEmail, otp);
       const user = completeAuth(response);
-      navigate(getRoleRedirect(user.role, user));
+      navigate(redirectTo || getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
     }
@@ -116,49 +116,81 @@ export default function LoginPage() {
           src={authArt}
           className="w-full h-full object-cover"
           alt="Nexus Authentication"
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
+          initial={{ scale: 1.08, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
         />
 
-        {/* Theme-aware blur overlay */}
-        <motion.div
-          style={{ opacity: blurOverlayOpacity, background: 'var(--bg-primary)' }}
-          className="absolute inset-0 backdrop-blur-xl z-10 transition-colors duration-300"
-        />
+        {/* Static dark overlay for text legibility */}
+        <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)' }} />
 
-        {/* Scroll-reveal content — bottom-anchored */}
-        <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20">
+        {/* Content — logo moves up, text reveals behind it */}
+        <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20 overflow-hidden">
+
+          {/* Badge — fades in first */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-            className="flex flex-col items-start gap-6"
+            transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 mb-5 w-fit"
           >
-            <img src={logo} className="w-16 h-16" style={{ filter: 'var(--logo-filter)' }} alt="Virtual Logo" />
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                <span className="text-[9px] uppercase font-black tracking-[0.3em]" style={{ color: 'var(--text-secondary)' }}>
-                  Secure Gateway Protocol
-                </span>
-              </div>
-              <h1 className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.9]" style={{ color: 'var(--text-primary)' }}>
-                Access <br />
-                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--text-primary), var(--accent))' }}>
-                  The Nexus.
-                </span>
-              </h1>
-              <p className="max-w-sm text-sm font-light leading-relaxed opacity-60" style={{ color: 'var(--text-secondary)' }}>
-                Re-establish your connection to the global production matrix.
-              </p>
-            </div>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+            <span className="text-[9px] uppercase font-black tracking-[0.3em] text-white/60">
+              Secure Gateway Protocol
+            </span>
           </motion.div>
+
+          {/* Logo moves up from below, text reveals underneath */}
+          <div className="relative overflow-hidden mb-4">
+            {/* Heading — starts hidden below logo, revealed as logo moves up */}
+            <motion.h1
+              className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.95] text-white"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Access <br />
+              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, #fff, var(--accent))' }}>
+                The Nexus.
+              </span>
+            </motion.h1>
+          </div>
+
+          {/* Logo — moves up over the heading */}
+          <motion.img
+            src={logo}
+            className="absolute"
+            style={{
+              width: 56, height: 56,
+              filter: 'brightness(0) invert(1)',
+              bottom: '5rem',
+              left: '3rem',
+            }}
+            initial={{ y: 0, opacity: 1 }}
+            animate={{ y: -220, opacity: 1 }}
+            transition={{ duration: 1.0, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            alt="Virtual Logo"
+          />
+
+          {/* Subtext */}
+          <motion.p
+            className="max-w-sm text-sm font-light leading-relaxed text-white/50 mt-2"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Re-establish your connection to the global production matrix.
+          </motion.p>
         </div>
 
-        <div className="absolute top-8 left-8 z-20 text-[9px] font-black tracking-[0.3em] opacity-20 text-white">
+        <motion.div
+          className="absolute top-8 left-8 z-20 text-[9px] font-black tracking-[0.3em] text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.2 }}
+          transition={{ duration: 1, delay: 1.4 }}
+        >
           CORE_OPERATIONS_HUB
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Right Form Panel ── */}
@@ -173,14 +205,17 @@ export default function LoginPage() {
           className="w-full"
           style={{ maxWidth: 420 }}
         >
-          {/* Back link */}
-          <button
-            onClick={() => isVerifying ? setIsVerifying(false) : navigate('/')}
-            className="inline-flex items-center gap-2 mb-10 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Login' : 'Return to Home'}
-          </button>
+          {/* Back link + theme toggle row */}
+          <div className="flex items-center justify-between mb-10">
+            <button
+              onClick={() => isVerifying ? setIsVerifying(false) : navigate('/')}
+              className="inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Login' : 'Return to Home'}
+            </button>
+            <ThemeToggle variant="pill" />
+          </div>
 
           {/* Heading */}
           <div className="mb-8">
