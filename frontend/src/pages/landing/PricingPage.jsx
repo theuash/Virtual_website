@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Sparkles, X, ArrowRight, ChevronLeft } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import { getAllPricing } from '../../services/pricing';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const DISCOUNT = 0.15;
 const TABS = [
@@ -22,8 +23,10 @@ const fadeUp = {
   })
 };
 
-function ServiceBox({ item, index, showDiscount }) {
-  const discounted = Math.round(item.rate * (1 - DISCOUNT));
+function ServiceBox({ item, index, showDiscount, convert }) {
+  const discountedInr = item.rate * (1 - DISCOUNT); // keep as float for accurate 2dp
+  const normal = convert(item.rate, false);           // whole number
+  const discounted = convert(discountedInr, true);    // 2 decimal places
   return (
     <motion.div
       custom={index}
@@ -51,10 +54,10 @@ function ServiceBox({ item, index, showDiscount }) {
           {showDiscount ? (
             <div>
               <div className="text-xs line-through opacity-40" style={{ color: 'var(--text-secondary)' }}>
-                ₹{item.rate}
+                {normal.display}
               </div>
               <div className="text-2xl font-black" style={{ color: 'var(--accent)' }}>
-                ₹{discounted}
+                {discounted.display}
               </div>
               <div className="text-[9px] mt-1 flex items-center gap-1" style={{ color: 'var(--accent)', opacity: 0.7 }}>
                 <Sparkles size={8} /> 15% off
@@ -62,7 +65,7 @@ function ServiceBox({ item, index, showDiscount }) {
             </div>
           ) : (
             <div className="text-2xl font-black" style={{ color: 'var(--text-primary)' }}>
-              ₹{item.rate}
+              {normal.display}
             </div>
           )}
           <span className="text-xs font-semibold ml-auto" style={{ color: 'var(--text-secondary)' }}>
@@ -77,6 +80,7 @@ function ServiceBox({ item, index, showDiscount }) {
 export default function PricingPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { convert } = useCurrency();
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(TABS[0].key);
@@ -253,7 +257,7 @@ export default function PricingPage() {
                   </div>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {searchResults.map((item, i) => (
-                      <ServiceBox key={`${item.department}-${item.name}`} item={item} index={i} showDiscount={showDiscount} />
+                      <ServiceBox key={`${item.department}-${item.name}`} item={item} index={i} showDiscount={showDiscount} convert={convert} />
                     ))}
                   </div>
                 </>
@@ -326,7 +330,7 @@ export default function PricingPage() {
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                         Starting from{' '}
                         <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-                          ₹{dept.startingFrom}/{dept.startingUnit}
+                          {convert(dept.startingFrom).display}/{dept.startingUnit}
                         </span>
                       </p>
                     </div>
@@ -342,7 +346,7 @@ export default function PricingPage() {
                         </div>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                           {dept.popularFormats.map((item, i) => (
-                            <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} />
+                            <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} convert={convert} />
                           ))}
                         </div>
                       </div>
@@ -358,7 +362,7 @@ export default function PricingPage() {
                       </div>
                       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {dept.generalServices.map((item, i) => (
-                          <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} />
+                          <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} convert={convert} />
                         ))}
                       </div>
                     </div>

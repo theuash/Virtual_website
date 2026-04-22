@@ -214,7 +214,7 @@ export default function LoginPage() {
             >
               <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Login' : 'Return to Home'}
             </button>
-            <ThemeToggle variant="pill" />
+            <ThemeToggle  />
           </div>
 
           {/* Heading */}

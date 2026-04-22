@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useVelocity, AnimatePresence } from 'framer-motion';
 import logo from '../../assets/logo.png';
 import ThemeToggle from '../ThemeToggle';
+import CountrySelector from '../CountrySelector';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Header() {
@@ -124,8 +125,9 @@ export default function Header() {
         </nav>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <ThemeToggle variant="pill" />
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <CountrySelector />
+          <ThemeToggle  />
 
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 hover:scale-105 transition-transform"

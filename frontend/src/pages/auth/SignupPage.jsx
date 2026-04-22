@@ -161,7 +161,7 @@ export default function SignupPage() {
               style={{ color: 'var(--text-secondary)' }}>
               <ArrowLeft size={12} strokeWidth={3} /> Back to Home
             </button>
-            <ThemeToggle variant="pill" />
+            <ThemeToggle  />
           </motion.div>
 
           {/* Logo + heading */}

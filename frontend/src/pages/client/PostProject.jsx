@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonForm } from '../../components/SkeletonLoader';
+import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import {
   ArrowRight, ArrowLeft, Info, Clock, Zap, Star, Shield,
@@ -35,9 +36,6 @@ const DEPOSIT_RATE          = 0.30;
 const FIRST_PROJECT_DISCOUNT = 0.15;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function fmt(n) {
-  return '₹' + Number(n).toLocaleString('en-IN');
-}
 
 function minDate(timeSensitive = false) {
   const d = new Date();
@@ -145,7 +143,7 @@ const inputStyle = {
 };
 
 // ─── Receipt Panel ────────────────────────────────────────────────────────────
-function ReceiptPanel({ selectedService, form, pricing }) {
+function ReceiptPanel({ selectedService, form, pricing, convert }) {
   const hasService  = !!selectedService;
   const hasQuantity = hasService && form.quantity && parseFloat(form.quantity) > 0;
 
@@ -153,6 +151,11 @@ function ReceiptPanel({ selectedService, form, pricing }) {
     color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
     opacity: active ? 1 : 0.45,
   });
+
+  const fmt = (n) => {
+    const converted = convert(n);
+    return converted.display;
+  };
 
   return (
     <div
@@ -377,7 +380,7 @@ function StepServiceSelection({
   catalogue, catalogueLoading,
   selectedDept, setSelectedDept,
   selectedService, setSelectedService,
-  form, setForm, errors,
+  form, setForm, errors, convert
 }) {
   const dept = catalogue.find(c => c.department === selectedDept) || catalogue[0];
 
@@ -474,7 +477,7 @@ function StepServiceSelection({
                 </div>
                 <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
                   <span className="font-bold text-sm" style={{ color: active ? 'var(--accent)' : 'var(--text-primary)' }}>
-                    ₹{svc.rate}
+                    {convert(svc.rate).display}
                   </span>
                   <span>/ {svc.unit}</span>
                 </div>
@@ -1065,7 +1068,12 @@ function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing,
 }
 
 // ─── Step 4 – Review & Submit ─────────────────────────────────────────────────
-function StepReview({ form, mode, selectedService, pricing, loading, error, onSubmit }) {
+function StepReview({ form, mode, selectedService, pricing, loading, error, onSubmit, convert }) {
+  const fmt = (n) => {
+    const converted = convert(n);
+    return converted.display;
+  };
+
   const rows = [
     { label: 'Base Amount',        value: fmt(pricing.base) },
     ...(pricing.timeFee > 0 ? [{ label: 'Time-Sensitive (+60%)', value: fmt(pricing.timeFee), accent: '#f59e0b' }] : []),
@@ -1218,6 +1226,7 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostProject() {
   const navigate = useNavigate();
+  const { convert } = useCurrency();
 
   const [mode,            setMode]            = useState(null);   // 'service' | 'open'
   const [step,            setStep]            = useState(0);      // 0 = choose path
@@ -1488,6 +1497,7 @@ export default function PostProject() {
                         form={form}
                         setForm={setForm}
                         errors={errors}
+                        convert={convert}
                       />
                     )}
                     {isServiceMode && step === 2 && (
@@ -1504,7 +1514,7 @@ export default function PostProject() {
                       <StepReview
                         form={form} mode={mode} selectedService={selectedService}
                         pricing={pricing} loading={loading} error={error}
-                        onSubmit={handleSubmit}
+                        onSubmit={handleSubmit} convert={convert}
                       />
                     )}
 
@@ -1526,7 +1536,7 @@ export default function PostProject() {
                       <StepReview
                         form={form} mode={mode} selectedService={selectedService}
                         pricing={pricing} loading={loading} error={error}
-                        onSubmit={handleSubmit}
+                        onSubmit={handleSubmit} convert={convert}
                       />
                     )}
                   </motion.div>
@@ -1576,6 +1586,7 @@ export default function PostProject() {
                     selectedService={selectedService}
                     form={form}
                     pricing={pricing}
+                    convert={convert}
                   />
                 </div>
               </div>

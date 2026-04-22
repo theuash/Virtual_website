@@ -2,12 +2,11 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
-  CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout, Volume2, VolumeX,
+  CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout,
   ShieldCheck, Users,
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import PricingStrip from '../../components/landing/PricingStrip';
-import bgVideo from '../../assets/v.mp4';
 import logo from '../../assets/logo.png';
 
 // Detect mobile once on mount
@@ -432,41 +431,35 @@ export default function LandingPage() {
       {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
-          {/* Background Video â€” fixed aspect, covers full viewport */}
-          <div className="absolute inset-0 z-0 bg-black cursor-pointer overflow-hidden" onClick={toggleMute}>
-            <video
-              ref={videoRef}
-              src={bgVideo}
-              autoPlay
-              loop
-              muted={isMuted}
-              playsInline
-              preload="none"
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          {/* Background — YouTube embed, autoplay muted loop, no controls */}
+          <div className="absolute inset-0 z-0 bg-black overflow-hidden">
+            <iframe
+              className="absolute pointer-events-none"
               style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '100vw',
+                height: '100vh',
+                minWidth: '177.78vh',  /* ensures 16:9 covers height */
+                minHeight: '56.25vw', /* ensures 16:9 covers width */
+                transform: 'translate(-50%, -50%)',
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
                 willChange: 'opacity',
+                border: 'none',
               }}
-              onLoadedMetadata={() => {
-                if (videoRef.current) videoRef.current.play().catch(() => {});
-              }}
+              src="https://www.youtube.com/embed/74jcQfhdtUw?autoplay=1&mute=1&loop=1&playlist=74jcQfhdtUw&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&fs=0&vq=hd1080"
+              title="Background"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
             />
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%)', zIndex: 1 }} />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%)", zIndex: 1 }} />
             <motion.div
               className="absolute inset-0 pointer-events-none"
-              style={{ opacity: heroOpacity, background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.45)', zIndex: 2 }}
+              style={{ opacity: heroOpacity, background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.45)", zIndex: 2 }}
             />
           </div>
-
-          {/* Mute button â€” bottom-right, safe from floating pill */}
-          <button
-            onClick={toggleMute}
-            className="absolute bottom-6 right-4 sm:bottom-10 sm:right-10 z-50 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white transition-all hover:bg-black/60 hover:scale-110"
-          >
-            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-          </button>
-
           <AnimatePresence>
             {showScrollCue && (
               <motion.button

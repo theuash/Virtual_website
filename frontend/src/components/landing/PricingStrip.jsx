@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Zap, TrendingDown } from 'lucide-react';
 import { getPricingSummary } from '../../services/pricing';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const FIRST_PROJECT_DISCOUNT = 0.15;
 
@@ -72,6 +73,7 @@ function ExpandingCTA({ onClick }) {
 
 export default function PricingStrip() {
   const navigate = useNavigate();
+  const { convert } = useCurrency();
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -147,6 +149,9 @@ export default function PricingStrip() {
             {departments.map((dept, i) => {
               const discountedPrice = discounted(dept.startingFrom);
               const savings = dept.startingFrom - discountedPrice;
+              const convertedNormal = convert(dept.startingFrom);
+              const convertedDiscounted = convert(discountedPrice);
+              const convertedSavings = convertedNormal.value - convertedDiscounted.value;
               
               return (
                 <motion.button
@@ -193,7 +198,7 @@ export default function PricingStrip() {
                           className="text-5xl font-black tracking-tight"
                           style={{ color: 'var(--accent)' }}
                         >
-                          ₹{discountedPrice}
+                          {convertedDiscounted.symbol}{convertedDiscounted.value}
                         </span>
                         <span
                           className="text-sm font-bold"
@@ -210,13 +215,13 @@ export default function PricingStrip() {
                         className="text-sm line-through opacity-40"
                         style={{ color: 'var(--text-secondary)' }}
                       >
-                        ₹{dept.startingFrom}
+                        {convertedNormal.symbol}{convertedNormal.value}
                       </span>
                       <span
                         className="text-xs font-bold px-2 py-1 rounded"
                         style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}
                       >
-                        Save ₹{savings}
+                        Save {convertedNormal.symbol}{convertedSavings}
                       </span>
                     </div>
 
