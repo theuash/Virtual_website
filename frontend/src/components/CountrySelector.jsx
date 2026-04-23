@@ -210,19 +210,19 @@ function detectCountryFromLocale() {
 }
 
 export default function CountrySelector() {
-  const { setIsIndia } = useCurrency();
+  const { setDetectedCountry, setIsIndia } = useCurrency();
   const [selected, setSelected] = useState(() => detectCountryFromLocale());
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Set initial currency on mount
+  // Set initial currency on mount from locale
   useEffect(() => {
-    setIsIndia(selected?.code === 'IN');
+    setDetectedCountry(selected);
   }, []);
 
-  // Auto-detect via backend geo endpoint — API key stays server-side
+  // Auto-detect via backend geo endpoint — overrides locale on response
   useEffect(() => {
     const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     fetch(`${BASE}/geo/country`)
@@ -236,7 +236,7 @@ export default function CountrySelector() {
         console.log('[geo] matched country:', match?.name);
         if (match) {
           setSelected(match);
-          setIsIndia(match.code === 'IN');
+          setDetectedCountry(match);
         }
       })
       .catch(err => console.log('[geo] fetch error:', err));
@@ -244,7 +244,7 @@ export default function CountrySelector() {
 
   const handleSelect = (c) => {
     setSelected(c);
-    setIsIndia(c.code === 'IN');
+    setDetectedCountry(c);
     setOpen(false);
     setQuery('');
   };
