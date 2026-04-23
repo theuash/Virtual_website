@@ -1074,8 +1074,8 @@ export default function LandingPage() {
                   {/* Wired central mesh interconnects */}
                   <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ stroke: 'var(--accent)' }} strokeWidth="1">
                     <circle cx="50%" cy="50%" r="40" fill="none" strokeDasharray="4 4" className="animate-spin-slow" />
-                    <path d="M 0 50% L 100% 50%" strokeOpacity="0.2" />
-                    <path d="M 50% 0 L 50% 100%" strokeOpacity="0.2" />
+                    <line x1="0" y1="50%" x2="100%" y2="50%" strokeOpacity="0.2" />
+                    <line x1="50%" y1="0" x2="50%" y2="100%" strokeOpacity="0.2" />
                   </svg>
                 </div>
               </motion.div>

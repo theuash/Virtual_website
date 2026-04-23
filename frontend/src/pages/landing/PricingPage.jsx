@@ -351,6 +351,64 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
   );
 }
 
+
+// ── Service card ──────────────────────────────────────────────────
+function ServiceBox({ item, index, showDiscount, convert, onSelect }) {
+  const discountedInr = item.rate * (1 - DISCOUNT);
+  const normal     = convert(item.rate, false);
+  const discounted = convert(discountedInr, true);
+  return (
+    <motion.div
+      custom={index}
+      variants={fadeUp}
+      initial="hidden"
+      animate="show"
+      onClick={() => onSelect(item)}
+      className="group relative overflow-hidden rounded-xl border transition-all duration-300 p-5 cursor-pointer"
+      style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
+      whileHover={{ y: -3, borderColor: "var(--accent)", boxShadow: "0 12px 24px rgba(96,10,10,0.1)" }}
+    >
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-8 transition-opacity pointer-events-none"
+        style={{ background: "linear-gradient(135deg, var(--accent), transparent)" }} />
+      <div className="relative z-10">
+        <div className="text-sm font-semibold mb-3 leading-tight" style={{ color: "var(--text-primary)" }}>
+          {item.name}
+        </div>
+        {item.tolerance && (
+          <div className="text-[10px] mb-3 opacity-50" style={{ color: "var(--text-secondary)" }}>
+            {item.tolerance}
+          </div>
+        )}
+        <div className="flex items-baseline gap-1.5">
+          {showDiscount ? (
+            <div>
+              <div className="text-xs line-through opacity-40" style={{ color: "var(--text-secondary)" }}>
+                {normal.display}
+              </div>
+              <div className="text-2xl font-black" style={{ color: "var(--accent)" }}>
+                {discounted.display}
+              </div>
+              <div className="text-[9px] mt-1 flex items-center gap-1" style={{ color: "var(--accent)", opacity: 0.7 }}>
+                <Sparkles size={8} /> 15% off
+              </div>
+            </div>
+          ) : (
+            <div className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
+              {normal.display}
+            </div>
+          )}
+          <span className="text-xs font-semibold ml-auto" style={{ color: "var(--text-secondary)" }}>
+            /{item.unit}
+          </span>
+        </div>
+        <div className="mt-3 text-[10px] font-semibold opacity-0 group-hover:opacity-60 transition-opacity flex items-center gap-1"
+          style={{ color: "var(--accent)" }}>
+          <Info size={10} /> Tap for details
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 export default function PricingPage() {
   const navigate = useNavigate();
   const location = useLocation();
