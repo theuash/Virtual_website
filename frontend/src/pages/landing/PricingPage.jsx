@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, X, ArrowRight, ChevronLeft, CheckCircle2, Info } from 'lucide-react';
+import { Search, Sparkles, X, ArrowRight, ChevronLeft, CheckCircle2, Info, PlayCircle } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import { getAllPricing } from '../../services/pricing';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -14,6 +14,14 @@ const TABS = [
   { key: 'cgi',               label: 'CGI / VFX' },
   { key: 'script_writing',    label: 'Script Writing' },
 ];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: (i = 0) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.5, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
 
 // â”€â”€ Rich metadata for each service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SERVICE_META = {
@@ -305,7 +313,7 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
               {meta.youtubeExamples.map((ch, i) => (
                 <div key={i} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
                   style={{ background: 'var(--bg-card)' }}>
-                  <Youtube size={14} style={{ color: '#ef4444' }} />
+                  <PlayCircle size={14} style={{ color: '#ef4444' }} />
                   <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{ch}</span>
                 </div>
               ))}
