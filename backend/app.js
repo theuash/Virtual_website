@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://virtual-core.onrender.com', // Add your local dev port too
+  origin: process.env.CLIENT_URL, // Add your local dev port too
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
