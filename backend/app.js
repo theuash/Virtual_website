@@ -10,12 +10,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: (origin, callback) => {
-    const allowed = (process.env.CLIENT_URL || '').split(',').map(u => u.trim());
-    if (!origin || allowed.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: process.env.CLIENT_URL || 'https://virtual-core.onrender.com', // Add your local dev port too
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow frontend to load assets
