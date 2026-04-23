@@ -5,6 +5,7 @@ import { TIER_LABELS } from '../../utils/roleGuards';
 import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
+import AvatarCircle, { resolveAvatar } from '../../components/AvatarCircle';
 
 export default function FreelancerLayout() {
   const { user, logout } = useAuth();
@@ -72,12 +73,17 @@ export default function FreelancerLayout() {
             className="flex items-center gap-3 p-3 rounded-xl border"
             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
           >
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
-              style={{ background: 'var(--accent)', color: '#fff' }}
-            >
-              {initial}
-            </div>
+            {/* Avatar — shared AvatarCircle component */}
+            {user?.avatar ? (
+              <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={36} />
+            ) : (
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+                style={{ background: 'var(--accent)', color: '#fff' }}
+              >
+                {initial}
+              </div>
+            )}
             <div className="min-w-0">
               <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                 {user?.fullName || 'Freelancer'}

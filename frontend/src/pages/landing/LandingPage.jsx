@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout,
-  ShieldCheck, Users,
+  ShieldCheck, Users, Volume2, VolumeX,
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import PricingStrip from '../../components/landing/PricingStrip';
@@ -431,9 +431,15 @@ export default function LandingPage() {
       {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
-          {/* Background — YouTube embed, autoplay muted loop, no controls */}
+          {/* Background — video served from backend */}
           <div className="absolute inset-0 z-0 bg-black overflow-hidden">
-            <iframe
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              preload="auto"
               className="absolute pointer-events-none"
               style={{
                 position: 'absolute',
@@ -443,22 +449,60 @@ export default function LandingPage() {
                 height: '56.25vw',
                 minHeight: '100vh',
                 minWidth: '177.78vh',
-                transform: 'translate(-50%, -50%) scale(1.4)',
+                transform: 'translate(-50%, -50%)',
+                objectFit: 'cover',
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
                 willChange: 'opacity',
-                border: 'none',
               }}
-              src="https://www.youtube.com/embed/74jcQfhdtUw?autoplay=1&mute=1&loop=1&playlist=74jcQfhdtUw&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&disablekb=1&fs=0&vq=hd1080"
-              title="Background"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-            />
+            >
+              <source src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001'}/assets/v.mp4`} type="video/mp4" />
+            </video>
             <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%)", zIndex: 1 }} />
             <motion.div
               className="absolute inset-0 pointer-events-none"
               style={{ opacity: heroOpacity, background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.45)", zIndex: 2 }}
             />
+          </div>
+
+          {/* Sound toggle — bottom right */}
+          <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 z-50 flex flex-col items-end gap-2">
+            {/* Tooltip — shown when muted */}
+            <AnimatePresence>
+              {isMuted && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-semibold pointer-events-none"
+                  style={{
+                    background: 'rgba(0,0,0,0.6)',
+                    backdropFilter: 'blur(8px)',
+                    color: 'rgba(255,255,255,0.8)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--accent)' }} />
+                  Click to enable sound
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <button
+              onClick={toggleMute}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              style={{
+                background: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#fff',
+              }}
+              title={isMuted ? 'Enable sound' : 'Mute'}
+            >
+              {isMuted ? <VolumeX size={16} strokeWidth={1.5} /> : <Volume2 size={16} strokeWidth={1.5} />}
+            </button>
           </div>
           <AnimatePresence>
             {showScrollCue && (

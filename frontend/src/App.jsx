@@ -58,6 +58,16 @@ import InitiatorEarnings from './pages/initiator/InitiatorEarnings';
 import SupervisorLayout from './pages/supervisor/SupervisorLayout';
 import SupervisorDashboard from './pages/supervisor/SupervisorDashboard';
 import SupervisorMessages from './pages/supervisor/SupervisorMessages';
+import SupervisorProjects from './pages/supervisor/SupervisorProjects';
+import SupervisorDispatch from './pages/supervisor/SupervisorDispatch';
+import SupervisorTeams from './pages/supervisor/SupervisorTeams';
+import SupervisorPrecrates from './pages/supervisor/SupervisorPrecrates';
+import SupervisorGroupProjects from './pages/supervisor/SupervisorGroupProjects';
+import SupervisorClients from './pages/supervisor/SupervisorClients';
+import SupervisorPayouts from './pages/supervisor/SupervisorPayouts';
+import SupervisorEarnings from './pages/supervisor/SupervisorEarnings';
+import SupervisorWallet from './pages/supervisor/SupervisorWallet';
+import SupervisorSettings from './pages/supervisor/SupervisorSettings';
 
 // Admin
 import AdminLayout from './pages/admin/AdminLayout';
@@ -130,10 +140,18 @@ function App() {
       {/* Supervisor — protected */}
       <Route path="/supervisor" element={<RoleGuard allowedRoles={['momentum_supervisor']}><SupervisorLayout /></RoleGuard>}>
         <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
-        <Route path="dashboard"   element={<SupervisorDashboard />} />
-        <Route path="messages"    element={<SupervisorMessages />} />
-        <Route path="freelancers" element={<SupervisorDashboard />} />
-        <Route path="settings"    element={<SupervisorDashboard />} />
+        <Route path="dashboard"     element={<SupervisorDashboard />} />
+        <Route path="messages"      element={<SupervisorMessages />} />
+        <Route path="projects"      element={<SupervisorProjects />} />
+        <Route path="dispatch/:id"  element={<SupervisorDispatch />} />
+        <Route path="teams"         element={<SupervisorTeams />} />
+        <Route path="precrates"     element={<SupervisorPrecrates />} />
+        <Route path="group-projects" element={<SupervisorGroupProjects />} />
+        <Route path="clients"       element={<SupervisorClients />} />
+        <Route path="payouts"       element={<SupervisorPayouts />} />
+        <Route path="earnings"      element={<SupervisorEarnings />} />
+        <Route path="wallet"        element={<SupervisorWallet />} />
+        <Route path="settings"      element={<SupervisorSettings />} />
       </Route>
 
       {/* Admin — direct URL only */}

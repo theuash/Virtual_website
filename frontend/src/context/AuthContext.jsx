@@ -59,10 +59,18 @@ export const AuthProvider = ({ children }) => {
             setUser(parsed);
             // Then fetch fresh data to pick up any changes since last login
             try {
-              const { data } = await api.get('/auth/me');
+              const { data } = await api.get('/auth/me', {
+                headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+              });
               const fresh = data?.data ?? data;
               if (fresh) {
-                const updated = { ...parsed, ...fresh };
+                // Preserve auth tokens — /auth/me response doesn't include them
+                const updated = {
+                  ...parsed,
+                  ...fresh,
+                  token:        parsed.token,
+                  refreshToken: parsed.refreshToken,
+                };
                 setUser(updated);
                 localStorage.setItem('virtual_user', JSON.stringify(updated));
               }

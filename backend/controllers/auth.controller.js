@@ -111,10 +111,16 @@ export const verifyOtpSignup = asyncHandler(async (req, res) => {
 });
 
 /**
- * Get current user
+ * Get current user — always fetches fresh from DB so avatar/profile changes are reflected
  */
 export const getMe = asyncHandler(async (req, res) => {
-  res.json(new ApiResponse(200, req.user));
+  // Prevent browser caching so profile updates (avatar etc.) are always fresh
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  const { findUserById } = await import('../utils/findUser.js');
+  const fresh = await findUserById(req.user._id);
+  if (!fresh) throw new ApiError(404, 'User not found');
+  res.json(new ApiResponse(200, fresh));
 });
 
 export const getOtpStatus = asyncHandler(async (req, res) => {

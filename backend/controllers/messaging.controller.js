@@ -2,6 +2,9 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { Message } from '../models/Message.js';
 import { Conversation } from '../models/Conversation.js';
+import { Freelancer } from '../models/Freelancer.js';
+import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { Team } from '../models/Team.js';
 import { findUserById } from '../utils/findUser.js';
 
 // ── Helper: resolve display name for a conversation ───────────────
@@ -97,4 +100,54 @@ export const createConversation = asyncHandler(async (req, res) => {
 
   const resolvedName = await resolveConvName(conv.toObject(), req.user._id);
   res.status(201).json(new ApiResponse(201, { ...conv.toObject(), name: resolvedName }, 'Conversation created'));
+});
+
+// ── GET /api/messaging/default-conversation ───────────────────────
+// Returns (or creates) the pre-seeded conversation for the current user:
+//   precrate → DM with their assigned Momentum Supervisor (mentorId)
+//   crate    → DM with their Project Initiator (via Team)
+//   others   → null (they manage their own chats)
+export const getDefaultConversation = asyncHandler(async (req, res) => {
+  const me = req.user;
+  const myId = me._id.toString();
+  let partnerId = null;
+  let partnerName = null;
+
+  if (me.tier === 'precrate') {
+    // Use mentorId if set, else pick the first available supervisor
+    if (me.mentorId) {
+      partnerId = me.mentorId.toString();
+      const sup = await MomentumSupervisor.findById(me.mentorId).select('fullName').lean();
+      partnerName = sup?.fullName || 'Momentum Supervisor';
+    } else {
+      const sup = await MomentumSupervisor.findOne({ isSuspended: { $ne: true } }).select('_id fullName').lean();
+      if (sup) { partnerId = sup._id.toString(); partnerName = sup.fullName; }
+    }
+  } else if (me.tier === 'crate') {
+    // Find the team this crate belongs to and get the initiator
+    const team = await Team.findOne({ members: me._id })
+      .populate('initiatorId', 'fullName _id')
+      .lean();
+    if (team?.initiatorId) {
+      partnerId = team.initiatorId._id.toString();
+      partnerName = team.initiatorId.fullName;
+    }
+  }
+
+  if (!partnerId) {
+    return res.json(new ApiResponse(200, null, 'No default conversation partner'));
+  }
+
+  // Find or create the DM
+  const allMembers = [myId, partnerId];
+  let conv = await Conversation.findOne({
+    type: 'dm',
+    members: { $all: allMembers, $size: 2 },
+  }).lean();
+
+  if (!conv) {
+    conv = (await Conversation.create({ type: 'dm', members: allMembers })).toObject();
+  }
+
+  res.json(new ApiResponse(200, { ...conv, name: partnerName }, 'Default conversation ready'));
 });

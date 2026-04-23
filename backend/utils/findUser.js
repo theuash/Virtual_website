@@ -22,7 +22,7 @@ export const findUserByEmail = async (email) => {
  */
 export const findUserById = async (id) => {
   for (const Model of MODELS) {
-    const doc = await Model.findById(id).select('-passwordHash -otpCodeHash');
+    const doc = await Model.findById(id).select('-passwordHash -otpCodeHash -otpExpiresAt -otpSentAt -loginOtpPending');
     if (doc) return doc;
   }
   return null;
