@@ -198,8 +198,8 @@ const COUNTRIES = [
   { code: 'SC', name: 'Seychelles', flag: '🇸🇨' },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-// Detect country from browser locale
-function detectCountry() {
+// Detect country from browser locale (instant fallback)
+function detectCountryFromLocale() {
   try {
     const locale = navigator.language || 'en-US';
     const region = new Intl.Locale(locale).region;
@@ -211,7 +211,7 @@ function detectCountry() {
 
 export default function CountrySelector() {
   const { setIsIndia } = useCurrency();
-  const [selected, setSelected] = useState(() => detectCountry());
+  const [selected, setSelected] = useState(() => detectCountryFromLocale());
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const dropdownRef = useRef(null);
@@ -220,6 +220,23 @@ export default function CountrySelector() {
   // Set initial currency on mount
   useEffect(() => {
     setIsIndia(selected?.code === 'IN');
+  }, []);
+
+  // Auto-detect via backend geo endpoint — API key stays server-side
+  useEffect(() => {
+    const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${BASE}/geo/country`)
+      .then(r => r.json())
+      .then(data => {
+        const code = data?.data?.country_code;
+        if (!code) return;
+        const match = COUNTRIES.find(c => c.code === code);
+        if (match) {
+          setSelected(match);
+          setIsIndia(match.code === 'IN');
+        }
+      })
+      .catch(() => {}); // silently fall back to locale detection
   }, []);
 
   const handleSelect = (c) => {
