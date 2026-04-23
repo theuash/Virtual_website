@@ -228,15 +228,18 @@ export default function CountrySelector() {
     fetch(`${BASE}/geo/country`)
       .then(r => r.json())
       .then(data => {
+        console.log('[geo] response:', data);
         const code = data?.data?.country_code;
+        console.log('[geo] country_code:', code);
         if (!code) return;
         const match = COUNTRIES.find(c => c.code === code);
+        console.log('[geo] matched country:', match?.name);
         if (match) {
           setSelected(match);
           setIsIndia(match.code === 'IN');
         }
       })
-      .catch(() => {}); // silently fall back to locale detection
+      .catch(err => console.log('[geo] fetch error:', err));
   }, []);
 
   const handleSelect = (c) => {
