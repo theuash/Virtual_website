@@ -10,10 +10,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL, // Add your local dev port too
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Parse comma-separated CLIENT_URL, strip trailing slashes from each
+    const allowed = (process.env.CLIENT_URL || '')
+      .split(',')
+      .map(u => u.trim().replace(/\/$/, ''));
+    if (allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow frontend to load assets
