@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, X, ArrowRight, ChevronLeft, CheckCircle2, Youtube, Info } from 'lucide-react';
+import { Search, Sparkles, X, ArrowRight, ChevronLeft, CheckCircle2, Info } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import { getAllPricing } from '../../services/pricing';
 import { useCurrency } from '../../context/CurrencyContext';
