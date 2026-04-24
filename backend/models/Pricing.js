@@ -2,19 +2,10 @@ import mongoose from 'mongoose';
 
 const serviceItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  rate: { type: Number, required: true },
-  unit: { type: String, required: true },
-  tolerance: { type: String },
-  isPopular: { type: Boolean, default: false },
-  // Rich metadata for the sidebar
-  details: {
-    description:      { type: String, default: '' },
-    includes:         [{ type: String }],
-    bestFor:          [{ type: String }],
-    youtubeExamples:  [{ type: String }],
-    deliverable:      { type: String, default: '' },
-    turnaround:       { type: String, default: '' },
-  },
+  rate: { type: Number, required: true },       // base rate in ₹
+  unit: { type: String, required: true },        // e.g. "min", "sec", "design", "concept"
+  tolerance: { type: String },                   // e.g. "+/- 30 sec", "+/- 2"
+  isPopular: { type: Boolean, default: false },  // popular format highlight
 }, { _id: true });
 
 const pricingSchema = new mongoose.Schema({

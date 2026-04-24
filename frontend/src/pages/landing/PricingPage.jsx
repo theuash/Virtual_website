@@ -144,7 +144,7 @@ function getMetaForItem(item) {
 }
 
 // â”€â”€ Service Detail Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// ── Service Detail Sidebar — data from DB ────────────────────────
+// Service Detail Sidebar - data from DB
 function ServiceSidebar({ item, onClose, convert, showDiscount }) {
   const navigate = useNavigate();
   const discountedInr = item.rate * (1 - DISCOUNT);
@@ -152,12 +152,9 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
   const discounted = convert(discountedInr, true);
   const d = item.details || {};
   const hasDetails = d.description || d.includes?.length || d.bestFor?.length;
-
   return (
     <motion.div
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "100%", opacity: 0 }}
+      initial={{ x: "100%", opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: "100%", opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed top-0 right-0 h-full z-[200] flex flex-col border-l overflow-hidden"
       style={{ width: "min(440px, 100vw)", background: "var(--bg-secondary)", borderColor: "var(--border)", boxShadow: "-8px 0 40px rgba(0,0,0,0.2)" }}
@@ -168,12 +165,10 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
           <h2 className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)" }}>{item.name}</h2>
           {item.tolerance && <p className="text-[10px] mt-1 opacity-50" style={{ color: "var(--text-secondary)" }}>Tolerance: {item.tolerance}</p>}
         </div>
-        <button onClick={onClose} className="p-2 rounded-xl border shrink-0 transition-all hover:scale-105"
-          style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>
+        <button onClick={onClose} className="p-2 rounded-xl border shrink-0 transition-all hover:scale-105" style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>
           <X size={16} strokeWidth={1.5} />
         </button>
       </div>
-
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
         <div className="p-4 rounded-2xl" style={{ background: "var(--bg-card)" }}>
           <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>Pricing</p>
@@ -183,10 +178,7 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
                 <p className="text-xs line-through opacity-40" style={{ color: "var(--text-secondary)" }}>{normal.display}</p>
                 <p className="text-3xl font-black" style={{ color: "var(--accent)" }}>{discounted.display}</p>
               </div>
-              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full mb-1"
-                style={{ background: "var(--accent)22", color: "var(--accent)" }}>
-                <Sparkles size={9} /> 15% off
-              </span>
+              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full mb-1" style={{ background: "var(--accent)22", color: "var(--accent)" }}><Sparkles size={9} /> 15% off</span>
               <p className="text-sm mb-1 ml-auto" style={{ color: "var(--text-secondary)" }}>per {item.unit}</p>
             </div>
           ) : (
@@ -197,17 +189,15 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
           )}
           {d.turnaround && <p className="text-[10px] mt-2 font-semibold" style={{ color: "var(--text-secondary)" }}>⏱ {d.turnaround}</p>}
         </div>
-
         {d.description && (
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-secondary)" }}>What is this?</p>
             <p className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>{d.description}</p>
           </div>
         )}
-
         {d.includes?.length > 0 && (
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>{"What's Included"}</p>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>{"What is Included"}</p>
             <div className="space-y-2">
               {d.includes.map((inc, i) => (
                 <div key={i} className="flex items-start gap-2.5">
@@ -218,19 +208,16 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
             </div>
           </div>
         )}
-
         {d.bestFor?.length > 0 && (
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>Best For</p>
             <div className="flex flex-wrap gap-2">
               {d.bestFor.map((b, i) => (
-                <span key={i} className="px-3 py-1.5 rounded-full text-xs font-semibold border"
-                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>{b}</span>
+                <span key={i} className="px-3 py-1.5 rounded-full text-xs font-semibold border" style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>{b}</span>
               ))}
             </div>
           </div>
         )}
-
         {d.youtubeExamples?.length > 0 && (
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>YouTube References</p>
@@ -244,90 +231,31 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
             </div>
           </div>
         )}
-
         {d.deliverable && (
           <div className="p-4 rounded-xl border" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
             <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>Deliverable</p>
             <p className="text-sm" style={{ color: "var(--text-primary)" }}>{d.deliverable}</p>
           </div>
         )}
-
         {!hasDetails && (
           <div className="flex items-start gap-3 p-4 rounded-xl" style={{ background: "var(--bg-card)" }}>
             <Info size={16} className="shrink-0 mt-0.5" style={{ color: "var(--accent)" }} />
-            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Detailed information for this service is being added. Contact us for a full breakdown.</p>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Detailed information for this service is being added.</p>
           </div>
         )}
       </div>
-
       <div className="px-6 py-5 border-t shrink-0" style={{ borderColor: "var(--border)" }}>
         <button onClick={() => navigate("/signup?role=client&redirect=/client/post-project")}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{ background: "var(--accent)", color: "#fff" }}>
           Post a Project <ArrowRight size={15} />
         </button>
-        <p className="text-[10px] text-center mt-2" style={{ color: "var(--text-secondary)" }}>First project gets 15% off — applied automatically</p>
+        <p className="text-[10px] text-center mt-2" style={{ color: "var(--text-secondary)" }}>First project gets 15% off</p>
       </div>
     </motion.div>
   );
 }
 
-
-// ── Service card ──────────────────────────────────────────────────
-function ServiceBox({ item, index, showDiscount, convert, onSelect }) {
-  const discountedInr = item.rate * (1 - DISCOUNT);
-  const normal     = convert(item.rate, false);
-  const discounted = convert(discountedInr, true);
-  return (
-    <motion.div
-      custom={index}
-      variants={fadeUp}
-      initial="hidden"
-      animate="show"
-      onClick={() => onSelect(item)}
-      className="group relative overflow-hidden rounded-xl border transition-all duration-300 p-5 cursor-pointer"
-      style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
-      whileHover={{ y: -3, borderColor: "var(--accent)", boxShadow: "0 12px 24px rgba(96,10,10,0.1)" }}
-    >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-8 transition-opacity pointer-events-none"
-        style={{ background: "linear-gradient(135deg, var(--accent), transparent)" }} />
-      <div className="relative z-10">
-        <div className="text-sm font-semibold mb-3 leading-tight" style={{ color: "var(--text-primary)" }}>
-          {item.name}
-        </div>
-        {item.tolerance && (
-          <div className="text-[10px] mb-3 opacity-50" style={{ color: "var(--text-secondary)" }}>
-            {item.tolerance}
-          </div>
-        )}
-        <div className="flex items-baseline gap-1.5">
-          {showDiscount ? (
-            <div>
-              <div className="text-xs line-through opacity-40" style={{ color: "var(--text-secondary)" }}>
-                {normal.display}
-              </div>
-              <div className="text-2xl font-black" style={{ color: "var(--accent)" }}>
-                {discounted.display}
-              </div>
-              <div className="text-[9px] mt-1 flex items-center gap-1" style={{ color: "var(--accent)", opacity: 0.7 }}>
-                <Sparkles size={8} /> 15% off
-              </div>
-            </div>
-          ) : (
-            <div className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
-              {normal.display}
-            </div>
-          )}
-          <span className="text-xs font-semibold ml-auto" style={{ color: "var(--text-secondary)" }}>
-            /{item.unit}
-          </span>
-        </div>
-        <div className="mt-3 text-[10px] font-semibold opacity-0 group-hover:opacity-60 transition-opacity flex items-center gap-1"
-          style={{ color: "var(--accent)" }}>
-          <Info size={10} /> Tap for details
-        </div>
-      </div>
-    </motion.div>
   );
 }
 export default function PricingPage() {
