@@ -106,10 +106,6 @@ export const useCurrency = () => {
       {children}
     </CurrencyContext.Provider>
   );
-};
 
-export const useCurrency = () => {
-  const ctx = useContext(CurrencyContext);
-  if (!ctx) throw new Error('useCurrency must be used within CurrencyProvider');
-  return ctx;
-};
+
+
