@@ -256,8 +256,6 @@ function ServiceSidebar({ item, onClose, convert, showDiscount }) {
   );
 }
 
-  );
-}
 export default function PricingPage() {
   const navigate = useNavigate();
   const location = useLocation();
