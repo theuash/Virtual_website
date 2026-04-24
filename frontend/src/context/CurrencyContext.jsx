@@ -55,10 +55,10 @@ export const CurrencyProvider = ({ children }) => {
 
   return (
     <CurrencyContext.Provider value={{
-      country,           // full country object { code, name, flag }
-      setDetectedCountry,// call this once from CountrySelector
+      country,           
+      setDetectedCountry,
       isIndia,
-      setIsIndia,        // kept for manual override from dropdown
+      setIsIndia,        
       convert,
       rateLoaded,
     }}>
@@ -72,40 +72,3 @@ export const useCurrency = () => {
   if (!ctx) throw new Error('useCurrency must be used within CurrencyProvider');
   return ctx;
 };
-
-  /**
-   * Convert a price (always stored in INR) to display currency.
-   * India  → return INR as-is, symbol ₹, whole numbers
-   * Others → convert INR→USD, apply 40% markup, round up to nearest dollar
-   * 
-   * @param {number} inrAmount - price in INR
-   * @param {boolean} isDiscounted - if true, show 2 decimals; if false, whole number
-   */
-  const convert = useCallback((inrAmount, isDiscounted = false) => {
-    if (isIndia) {
-      const value = Math.round(inrAmount);
-      return {
-        symbol: '₹',
-        value,
-        display: isDiscounted
-          ? `₹${value.toFixed(2)}`
-          : `₹${value.toLocaleString('en-IN')}`,
-      };
-    }
-    const raw = inrAmount * inrToUsd * MARKUP;
-    const value = isDiscounted ? parseFloat(raw.toFixed(2)) : Math.ceil(raw);
-    return {
-      symbol: '$',
-      value,
-      display: isDiscounted ? `$${value.toFixed(2)}` : `$${Math.ceil(raw)}`,
-    };
-  }, [isIndia, inrToUsd]);
-
-  return (
-    <CurrencyContext.Provider value={{ isIndia, setIsIndia, convert, rateLoaded }}>
-      {children}
-    </CurrencyContext.Provider>
-  );
-
-
-
