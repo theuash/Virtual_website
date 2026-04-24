@@ -9,6 +9,27 @@ import signupArt from '../../assets/auth/signup_art.jpg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
 import ThemeToggle from '../../components/ThemeToggle';
+import { useCurrency } from '../../context/CurrencyContext';
+
+// Country code → dial code map (major countries)
+const DIAL_CODES = {
+  IN: '+91', US: '+1', GB: '+44', CA: '+1', AU: '+61', DE: '+49', FR: '+33',
+  NL: '+31', SE: '+46', NO: '+47', DK: '+45', FI: '+358', CH: '+41', AT: '+43',
+  BE: '+32', ES: '+34', IT: '+39', PT: '+351', PL: '+48', CZ: '+420', HU: '+36',
+  RO: '+40', BG: '+359', HR: '+385', SK: '+421', SI: '+386', LT: '+370', LV: '+371',
+  EE: '+372', GR: '+30', IE: '+353', NZ: '+64', SG: '+65', HK: '+852', JP: '+81',
+  KR: '+82', TW: '+886', CN: '+86', PH: '+63', ID: '+62', MY: '+60', TH: '+66',
+  VN: '+84', BD: '+880', PK: '+92', LK: '+94', NP: '+977', AE: '+971', SA: '+966',
+  IL: '+972', TR: '+90', EG: '+20', MA: '+212', NG: '+234', GH: '+233', KE: '+254',
+  ZA: '+27', BR: '+55', MX: '+52', AR: '+54', CO: '+57', CL: '+56', PE: '+51',
+  RU: '+7', UA: '+380', KZ: '+7', GE: '+995', AM: '+374', AZ: '+994', RS: '+381',
+  IQ: '+964', JO: '+962', LB: '+961', KW: '+965', QA: '+974', BH: '+973', OM: '+968',
+  DZ: '+213', TN: '+216', ET: '+251', TZ: '+255', UG: '+256', RW: '+250', SN: '+221',
+};
+
+function getDialCode(countryCode) {
+  return DIAL_CODES[countryCode] || '+1';
+}
 
 /* ── Shared input style helper ───────────────────────────────────────── */
 const inputStyle = {

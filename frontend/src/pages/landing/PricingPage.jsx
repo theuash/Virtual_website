@@ -24,140 +24,109 @@ const fadeUp = {
 };
 
 // â”€â”€ Rich metadata for each service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Rich metadata for every service ─────────────────────────────
 const SERVICE_META = {
-  // Video Editing
-  'Documentary': {
-    description: 'Full documentary-style editing with narrative structure, interview cuts, B-roll integration, and cinematic pacing. Ideal for long-form storytelling content.',
-    includes: ['Multi-camera interview editing', 'B-roll & archival footage integration', 'Narrative pacing & story structure', 'Color grading (documentary look)', 'Ambient sound design', 'Lower thirds & title cards'],
-    bestFor: ['YouTube documentary channels', 'Investigative journalism', 'Brand story films', 'Educational deep-dives'],
-    youtubeExamples: ['Wendover Productions', 'Johnny Harris', 'Kurzgesagt', 'Vice'],
-    deliverable: 'Final cut in 4K/1080p with project files',
+
+  // ── VIDEO EDITING — General Services ─────────────────────────
+  'Basic Cutting & Assembly': {
+    description: 'The foundation of any edit. Raw footage is sorted, synced, and assembled into a clean, watchable sequence. No effects — just precise, professional cuts.',
+    includes: ['Footage sorting & organisation', 'Sync multi-camera or audio tracks', 'Clean cut assembly', 'Removal of dead air & mistakes', 'Basic pacing adjustments'],
+    bestFor: ['Raw interview footage', 'Event coverage', 'Simple explainer videos', 'First-pass edits before refinement'],
+    youtubeExamples: ['Interview channels', 'Event recap videos', 'Simple talking-head content'],
+    deliverable: '1080p/4K export, timeline project file',
   },
+  'Standard Editing (cuts, transitions, audio sync)': {
+    description: 'A complete edit with smooth transitions, synced audio, and polished pacing. The go-to for most YouTube and social media content.',
+    includes: ['Jump cuts & smooth transitions', 'Audio sync & leveling', 'Background music integration', 'Basic text overlays', 'Intro/outro placement', 'Pacing & rhythm editing'],
+    bestFor: ['YouTube videos', 'Social media content', 'Brand videos', 'Tutorial content'],
+    youtubeExamples: ['Ali Abdaal', 'Thomas Frank', 'Matt D\'Avella'],
+    deliverable: '1080p/4K export, optimised for platform',
+  },
+  'Advanced Editing (effects, keyframes, multi-cam)': {
+    description: 'High-production editing with keyframe animations, multi-camera switching, and custom effects. For creators who want cinematic quality.',
+    includes: ['Multi-camera editing & switching', 'Keyframe animations', 'Custom transitions & effects', 'Advanced audio design', 'Motion blur & speed effects', 'Colour-matched multi-cam footage'],
+    bestFor: ['High-production YouTube channels', 'Corporate films', 'Event highlight reels', 'Cinematic content'],
+    youtubeExamples: ['Peter McKinnon', 'Sam Kolder', 'Matti Haapoja'],
+    deliverable: '4K export with project files',
+  },
+  'Color Correction (basic look)': {
+    description: 'Fixes exposure, white balance, and colour inconsistencies across your footage so every shot looks clean and consistent.',
+    includes: ['Exposure & contrast balancing', 'White balance correction', 'Shot-to-shot consistency', 'Skin tone normalisation', 'Basic LUT application'],
+    bestFor: ['Raw footage cleanup', 'Interview content', 'Corporate videos', 'Any footage before grading'],
+    youtubeExamples: ['Educational channels', 'Corporate content', 'Interview-based shows'],
+    deliverable: 'Colour-corrected video export',
+  },
+  'Color Grading (cinematic look)': {
+    description: 'Transforms your footage with a signature cinematic look — moody, warm, cool, or stylised. Elevates production value dramatically.',
+    includes: ['Custom LUT creation or application', 'Scene-by-scene grading', 'Cinematic colour palette', 'Highlight & shadow control', 'Skin tone preservation', 'HDR-ready output'],
+    bestFor: ['Short films', 'Music videos', 'Travel content', 'Brand films', 'High-end YouTube'],
+    youtubeExamples: ['Sam Kolder', 'Finn Harries', 'Ben Brown'],
+    deliverable: 'Graded export + LUT file',
+  },
+  'Audio Cleanup (noise reduction, leveling)': {
+    description: 'Removes background noise, hiss, hum, and inconsistent audio levels. Makes dialogue clear and professional.',
+    includes: ['Noise reduction & removal', 'Audio leveling & normalisation', 'De-hum & de-hiss', 'Room reverb reduction', 'Dialogue clarity enhancement'],
+    bestFor: ['Podcasts', 'Interviews', 'Tutorials', 'Any footage with background noise'],
+    youtubeExamples: ['Podcast channels', 'Interview shows', 'Educational content'],
+    deliverable: 'Clean audio track + video export',
+  },
+  'Voiceover Syncing & Pacing': {
+    description: 'Syncs recorded voiceover to visuals with precise timing, natural pacing, and smooth transitions between cuts.',
+    includes: ['Voiceover-to-visual sync', 'Pacing adjustments', 'Breath & pause editing', 'Music bed balancing', 'Cut-to-beat alignment'],
+    bestFor: ['Explainer videos', 'Documentary narration', 'Corporate presentations', 'Ad voiceovers'],
+    youtubeExamples: ['Kurzgesagt', 'Wendover Productions', 'Real Engineering'],
+    deliverable: 'Synced video export',
+  },
+
+  // ── VIDEO EDITING — Popular Formats ──────────────────────────
   'Vlog (basic cuts + color grading)': {
-    description: 'Clean, fast-paced vlog editing with jump cuts, color grading, and basic transitions. Perfect for daily/weekly YouTube content creators.',
-    includes: ['Jump cut editing', 'Color grading (warm/cinematic look)', 'Background music sync', 'Basic text overlays', 'Intro/outro integration'],
+    description: 'Clean, fast-paced vlog editing with jump cuts, colour grading, and basic transitions. Perfect for daily/weekly YouTube content creators.',
+    includes: ['Jump cut editing', 'Colour grading (warm/cinematic look)', 'Background music sync', 'Basic text overlays', 'Intro/outro integration', 'Pacing for engagement'],
     bestFor: ['Daily vloggers', 'Travel content', 'Lifestyle channels', 'Personal brand content'],
-    youtubeExamples: ['Casey Neistat', 'David Dobrik', 'Emma Chamberlain'],
-    deliverable: '1080p/4K export, optimized for YouTube',
+    youtubeExamples: ['Casey Neistat', 'David Dobrik', 'Emma Chamberlain', 'Nas Daily'],
+    deliverable: '1080p/4K export, YouTube-optimised',
+  },
+  'Documentary': {
+    description: 'Full documentary-style editing with narrative structure, interview cuts, B-roll integration, and cinematic pacing. Ideal for long-form storytelling.',
+    includes: ['Multi-camera interview editing', 'B-roll & archival footage integration', 'Narrative pacing & story structure', 'Colour grading (documentary look)', 'Ambient sound design', 'Lower thirds & title cards', 'Chapter markers'],
+    bestFor: ['YouTube documentary channels', 'Investigative journalism', 'Brand story films', 'Educational deep-dives', 'Social impact content'],
+    youtubeExamples: ['Wendover Productions', 'Johnny Harris', 'Kurzgesagt', 'Vice', 'DW Documentary'],
+    deliverable: 'Final cut in 4K/1080p with project files',
   },
   'Motion Graphics': {
     description: 'Animated graphics, kinetic typography, and visual effects integrated into video. Elevates production value significantly.',
-    includes: ['Animated lower thirds', 'Kinetic typography', 'Logo animations', 'Transition effects', 'Infographic animations', 'Screen recordings with callouts'],
-    bestFor: ['Tech channels', 'Educational content', 'Corporate videos', 'Product explainers'],
-    youtubeExamples: ['MKBHD', 'Linus Tech Tips', 'Fireship'],
+    includes: ['Animated lower thirds', 'Kinetic typography', 'Logo animations', 'Transition effects', 'Infographic animations', 'Screen recordings with callouts', 'Custom icon animations'],
+    bestFor: ['Tech channels', 'Educational content', 'Corporate videos', 'Product explainers', 'News-style content'],
+    youtubeExamples: ['MKBHD', 'Linus Tech Tips', 'Fireship', 'Vox'],
     deliverable: 'Rendered video with motion graphics embedded',
   },
   'Music Video (basic cuts & effects)': {
-    description: 'Rhythm-synced editing with creative cuts, color grading, and visual effects timed to the music.',
-    includes: ['Beat-synced cuts', 'Color grading (mood-based)', 'Speed ramps & slow motion', 'Light leaks & overlays', 'Lyric animations (optional)'],
-    bestFor: ['Independent artists', 'Record labels', 'Music promotion'],
-    youtubeExamples: ['Official music video channels', 'Indie artist channels'],
+    description: 'Rhythm-synced editing with creative cuts, colour grading, and visual effects timed to the music.',
+    includes: ['Beat-synced cuts', 'Colour grading (mood-based)', 'Speed ramps & slow motion', 'Light leaks & overlays', 'Lyric animations (optional)', 'Multi-location cut sync'],
+    bestFor: ['Independent artists', 'Record labels', 'Music promotion', 'Live performance edits'],
+    youtubeExamples: ['Official music video channels', 'Indie artist channels', 'Vevo'],
     deliverable: '4K export, aspect ratio variants (16:9, 9:16)',
   },
   'Gaming Montage / Highlights': {
     description: 'High-energy gaming content with fast cuts, effects, and hype music sync. Built for engagement and virality.',
-    includes: ['Fast-paced cut editing', 'Kill/highlight sync', 'Sound effects & music', 'Zoom effects & transitions', 'Scoreboard/stats overlays'],
-    bestFor: ['Gaming YouTubers', 'Twitch streamers', 'Esports teams'],
-    youtubeExamples: ['Shroud', 'Ninja', 'Typical Gamer'],
-    deliverable: '1080p/4K, YouTube & Shorts optimized',
+    includes: ['Fast-paced cut editing', 'Kill/highlight sync', 'Sound effects & music', 'Zoom effects & transitions', 'Scoreboard/stats overlays', 'Reaction cam integration'],
+    bestFor: ['Gaming YouTubers', 'Twitch streamers', 'Esports teams', 'Clip channels'],
+    youtubeExamples: ['Shroud', 'Ninja', 'Typical Gamer', 'Faze Clan'],
+    deliverable: '1080p/4K, YouTube & Shorts optimised',
   },
   'Subtitling / Captioning (burnt-in)': {
     description: 'Accurate, styled captions burned directly into the video. Increases accessibility and watch time significantly.',
-    includes: ['Manual transcription', 'Styled caption design', 'Speaker identification', 'Timing accuracy Â±0.5s', 'Multiple language support (on request)'],
-    bestFor: ['Educational channels', 'Podcasts', 'Interview content', 'Accessibility compliance'],
-    youtubeExamples: ['TED', 'Lex Fridman', 'Andrew Huberman'],
+    includes: ['Manual transcription', 'Styled caption design', 'Speaker identification', 'Timing accuracy ±0.5s', 'Multiple language support (on request)', 'Auto-highlight keywords'],
+    bestFor: ['Educational channels', 'Podcasts', 'Interview content', 'Accessibility compliance', 'Silent-watch social content'],
+    youtubeExamples: ['TED', 'Lex Fridman', 'Andrew Huberman', 'Diary of a CEO'],
     deliverable: 'Video with burnt-in captions + SRT file',
   },
   'Podcast Video Snippet (waveform + graphics)': {
     description: 'Audiogram-style video snippets with animated waveforms, speaker photos, and branded graphics for social sharing.',
-    includes: ['Animated waveform', 'Speaker photo/logo', 'Quote text animation', 'Brand color scheme', 'Square & vertical formats'],
-    bestFor: ['Podcast promotion', 'LinkedIn/Instagram clips', 'Twitter/X content'],
-    youtubeExamples: ['Joe Rogan clips', 'Huberman Lab clips', 'Tim Ferriss clips'],
+    includes: ['Animated waveform', 'Speaker photo/logo', 'Quote text animation', 'Brand colour scheme', 'Square & vertical formats', 'Auto-caption overlay'],
+    bestFor: ['Podcast promotion', 'LinkedIn/Instagram clips', 'Twitter/X content', 'YouTube Shorts'],
+    youtubeExamples: ['Joe Rogan clips', 'Huberman Lab clips', 'Tim Ferriss clips', 'Diary of a CEO clips'],
     deliverable: '1:1, 9:16, 16:9 formats',
-  },
-  // Graphic Design
-  'Logo Design': {
-    description: 'Professional brand identity design including primary logo, variations, and usage guidelines.',
-    includes: ['3 initial concepts', 'Unlimited revisions (within scope)', 'Vector files (AI, EPS, SVG)', 'PNG/JPG exports', 'Dark & light variants', 'Brand color palette'],
-    bestFor: ['Startups', 'Personal brands', 'Small businesses', 'YouTube channels'],
-    deliverable: 'Full brand kit with all file formats',
-  },
-  'Social Media Post (static)': {
-    description: 'Eye-catching static social media graphics designed for maximum engagement and brand consistency.',
-    includes: ['Platform-optimized dimensions', 'Brand color & font usage', 'High-res export', 'Editable source file'],
-    bestFor: ['Instagram', 'Facebook', 'LinkedIn', 'Twitter/X'],
-    deliverable: 'PNG/JPG + editable source file',
-  },
-  'YouTube Thumbnail': {
-    description: 'Click-optimized thumbnails designed with proven CTR principles â€” bold text, contrast, and emotional hooks.',
-    includes: ['Custom background design', 'Bold typography', 'Face/subject cutout', 'A/B variant (optional)', 'Brand consistency'],
-    bestFor: ['YouTube channels of all sizes', 'Viral content optimization'],
-    youtubeExamples: ['MrBeast style', 'Educational channels', 'Tech reviews'],
-    deliverable: '1280Ã—720px PNG, web-optimized',
-  },
-  'Infographic (single page)': {
-    description: 'Data-driven visual storytelling that makes complex information digestible and shareable.',
-    includes: ['Data visualization', 'Icon design', 'Brand styling', 'Print & web versions', 'Editable source'],
-    bestFor: ['Blog content', 'Social sharing', 'Presentations', 'Reports'],
-    deliverable: 'PDF + PNG, print-ready resolution',
-  },
-  // 3D Animation
-  'Product Rotation / Turntable': {
-    description: 'Clean 360Â° product showcase animation with professional lighting and rendering.',
-    includes: ['360Â° rotation', 'Studio lighting setup', 'Material & texture work', 'Background options', '4K render'],
-    bestFor: ['E-commerce', 'Product launches', 'Amazon listings', 'Ad campaigns'],
-    deliverable: 'MP4 loop, transparent background option',
-  },
-  'Architectural Walkthrough (external)': {
-    description: 'Photorealistic exterior walkthrough of buildings, landscapes, and architectural designs.',
-    includes: ['Exterior modeling', 'Landscape & environment', 'Lighting & atmosphere', 'Camera path animation', '4K render'],
-    bestFor: ['Real estate', 'Architecture firms', 'Construction companies'],
-    deliverable: '4K MP4, project files on request',
-  },
-  'Character Animation (single, looped, no lip sync)': {
-    description: 'Rigged character animation for mascots, explainer videos, and game assets.',
-    includes: ['Character rigging', 'Walk/idle/action cycles', 'Smooth looping', 'Export in multiple formats'],
-    bestFor: ['Brand mascots', 'Game assets', 'Explainer videos', 'App animations'],
-    deliverable: 'MP4 + FBX/GLB on request',
-  },
-  // CGI / VFX
-  'Green Screen Keying': {
-    description: 'Professional chroma key removal with edge refinement, spill suppression, and background replacement.',
-    includes: ['Chroma key removal', 'Edge refinement', 'Spill suppression', 'Background replacement', 'Color match'],
-    bestFor: ['YouTube creators', 'Film production', 'Corporate videos', 'News segments'],
-    deliverable: 'Composited video, transparent PNG sequence option',
-  },
-  'Screen Replacement': {
-    description: 'Replace phone, laptop, or monitor screens with custom content using motion tracking.',
-    includes: ['Motion tracking', 'Screen content replacement', 'Reflection & glare matching', 'Color grading match'],
-    bestFor: ['App demos', 'Tech reviews', 'Commercial ads'],
-    deliverable: 'Composited video sequence',
-  },
-  'Particle VFX (rain, snow, sparks)': {
-    description: 'Realistic particle simulations for atmospheric effects, action sequences, and visual enhancement.',
-    includes: ['Particle system setup', 'Physics simulation', 'Lighting integration', 'Compositing into footage'],
-    bestFor: ['Music videos', 'Film VFX', 'Commercial production'],
-    deliverable: 'Composited video + VFX elements separately',
-  },
-  // Script Writing
-  'YouTube Script (vlog, talking head)': {
-    description: 'Conversational, engaging scripts written for YouTube talking-head and vlog formats with natural speech patterns.',
-    includes: ['Hook & intro', 'Structured narrative', 'Call-to-action', 'SEO keyword integration', 'Revision round'],
-    bestFor: ['Educational channels', 'Personal brands', 'Commentary channels'],
-    youtubeExamples: ['Veritasium style', 'Mark Rober style', 'Kurzgesagt style'],
-    deliverable: 'Google Doc with timestamps & notes',
-  },
-  'Corporate / Brand Video Script': {
-    description: 'Professional brand messaging scripts for company videos, product launches, and investor presentations.',
-    includes: ['Brand voice alignment', 'Key message hierarchy', 'Stakeholder-ready language', 'Multiple revision rounds'],
-    bestFor: ['Company about pages', 'Product launches', 'Investor decks', 'Trade shows'],
-    deliverable: 'Final script + teleprompter format',
-  },
-  'Explainer Video Script': {
-    description: 'Clear, concise scripts that break down complex products or concepts for general audiences.',
-    includes: ['Problem-solution structure', 'Simple language', 'Visual cue notes', 'Voiceover-ready format'],
-    bestFor: ['SaaS products', 'Fintech', 'Healthcare', 'EdTech'],
-    deliverable: 'Script with scene-by-scene breakdown',
   },
 };
 
@@ -175,185 +144,129 @@ function getMetaForItem(item) {
 }
 
 // â”€â”€ Service Detail Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Service Detail Sidebar — data from DB ────────────────────────
 function ServiceSidebar({ item, onClose, convert, showDiscount }) {
   const navigate = useNavigate();
-  const meta = getMetaForItem(item);
   const discountedInr = item.rate * (1 - DISCOUNT);
   const normal = convert(item.rate, false);
   const discounted = convert(discountedInr, true);
+  const d = item.details || {};
+  const hasDetails = d.description || d.includes?.length || d.bestFor?.length;
 
   return (
     <motion.div
-      initial={{ x: '100%', opacity: 0 }}
+      initial={{ x: "100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '100%', opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      exit={{ x: "100%", opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed top-0 right-0 h-full z-[200] flex flex-col border-l overflow-hidden"
-      style={{
-        width: 'min(420px, 100vw)',
-        background: 'var(--bg-secondary)',
-        borderColor: 'var(--border)',
-        boxShadow: '-8px 0 40px rgba(0,0,0,0.2)',
-      }}
+      style={{ width: "min(440px, 100vw)", background: "var(--bg-secondary)", borderColor: "var(--border)", boxShadow: "-8px 0 40px rgba(0,0,0,0.2)" }}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between px-6 py-5 border-b shrink-0"
-        style={{ borderColor: 'var(--border)' }}>
+      <div className="flex items-start justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: "var(--border)" }}>
         <div className="flex-1 min-w-0 pr-3">
-          <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--accent)' }}>
-            Service Details
-          </p>
-          <h2 className="text-base font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
-            {item.name}
-          </h2>
-          {item.tolerance && (
-            <p className="text-[10px] mt-1 opacity-50" style={{ color: 'var(--text-secondary)' }}>
-              Tolerance: {item.tolerance}
-            </p>
-          )}
+          <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--accent)" }}>Service Details</p>
+          <h2 className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)" }}>{item.name}</h2>
+          {item.tolerance && <p className="text-[10px] mt-1 opacity-50" style={{ color: "var(--text-secondary)" }}>Tolerance: {item.tolerance}</p>}
         </div>
-        <button onClick={onClose}
-          className="p-2 rounded-xl border shrink-0 transition-all hover:scale-105"
-          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}>
+        <button onClick={onClose} className="p-2 rounded-xl border shrink-0 transition-all hover:scale-105"
+          style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>
           <X size={16} strokeWidth={1.5} />
         </button>
       </div>
 
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-
-        {/* Pricing */}
-        <div className="p-4 rounded-2xl" style={{ background: 'var(--bg-card)' }}>
-          <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-            Pricing
-          </p>
+        <div className="p-4 rounded-2xl" style={{ background: "var(--bg-card)" }}>
+          <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>Pricing</p>
           {showDiscount ? (
-            <div className="flex items-end gap-3">
+            <div className="flex items-end gap-3 flex-wrap">
               <div>
-                <p className="text-xs line-through opacity-40" style={{ color: 'var(--text-secondary)' }}>
-                  {normal.display}
-                </p>
-                <p className="text-3xl font-black" style={{ color: 'var(--accent)' }}>
-                  {discounted.display}
-                </p>
+                <p className="text-xs line-through opacity-40" style={{ color: "var(--text-secondary)" }}>{normal.display}</p>
+                <p className="text-3xl font-black" style={{ color: "var(--accent)" }}>{discounted.display}</p>
               </div>
-              <div className="mb-1">
-                <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full"
-                  style={{ background: 'var(--accent)22', color: 'var(--accent)' }}>
-                  <Sparkles size={9} /> 15% off
-                </span>
-              </div>
-              <p className="text-sm mb-1 ml-auto" style={{ color: 'var(--text-secondary)' }}>
-                per {item.unit}
-              </p>
+              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full mb-1"
+                style={{ background: "var(--accent)22", color: "var(--accent)" }}>
+                <Sparkles size={9} /> 15% off
+              </span>
+              <p className="text-sm mb-1 ml-auto" style={{ color: "var(--text-secondary)" }}>per {item.unit}</p>
             </div>
           ) : (
             <div className="flex items-end gap-2">
-              <p className="text-3xl font-black" style={{ color: 'var(--text-primary)' }}>
-                {normal.display}
-              </p>
-              <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>per {item.unit}</p>
+              <p className="text-3xl font-black" style={{ color: "var(--text-primary)" }}>{normal.display}</p>
+              <p className="text-sm mb-1" style={{ color: "var(--text-secondary)" }}>per {item.unit}</p>
             </div>
           )}
+          {d.turnaround && <p className="text-[10px] mt-2 font-semibold" style={{ color: "var(--text-secondary)" }}>⏱ {d.turnaround}</p>}
         </div>
 
-        {/* Description */}
-        {meta?.description && (
+        {d.description && (
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>
-              What is this?
-            </p>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-              {meta.description}
-            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-secondary)" }}>What is this?</p>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>{d.description}</p>
           </div>
         )}
 
-        {/* What's included */}
-        {meta?.includes?.length > 0 && (
+        {d.includes?.length > 0 && (
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-              What's Included
-            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>{"What's Included"}</p>
             <div className="space-y-2">
-              {meta.includes.map((inc, i) => (
+              {d.includes.map((inc, i) => (
                 <div key={i} className="flex items-start gap-2.5">
-                  <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
-                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{inc}</span>
+                  <CheckCircle2 size={14} className="shrink-0 mt-0.5" style={{ color: "var(--accent)" }} />
+                  <span className="text-sm" style={{ color: "var(--text-primary)" }}>{inc}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Best for */}
-        {meta?.bestFor?.length > 0 && (
+        {d.bestFor?.length > 0 && (
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-              Best For
-            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>Best For</p>
             <div className="flex flex-wrap gap-2">
-              {meta.bestFor.map((b, i) => (
+              {d.bestFor.map((b, i) => (
                 <span key={i} className="px-3 py-1.5 rounded-full text-xs font-semibold border"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}>
-                  {b}
-                </span>
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>{b}</span>
               ))}
             </div>
           </div>
         )}
 
-        {/* YouTube channel references */}
-        {meta?.youtubeExamples?.length > 0 && (
+        {d.youtubeExamples?.length > 0 && (
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-              YouTube Channel References
-            </p>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-secondary)" }}>YouTube References</p>
             <div className="space-y-2">
-              {meta.youtubeExamples.map((ch, i) => (
-                <div key={i} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
-                  style={{ background: 'var(--bg-card)' }}>
-                  <PlayCircle size={14} style={{ color: '#ef4444' }} />
-                  <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{ch}</span>
+              {d.youtubeExamples.map((ch, i) => (
+                <div key={i} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl" style={{ background: "var(--bg-card)" }}>
+                  <PlayCircle size={14} style={{ color: "#ef4444" }} />
+                  <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{ch}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Deliverable */}
-        {meta?.deliverable && (
-          <div className="p-4 rounded-xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-            <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>
-              Deliverable
-            </p>
-            <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{meta.deliverable}</p>
+        {d.deliverable && (
+          <div className="p-4 rounded-xl border" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>Deliverable</p>
+            <p className="text-sm" style={{ color: "var(--text-primary)" }}>{d.deliverable}</p>
           </div>
         )}
 
-        {/* No metadata fallback */}
-        {!meta && (
-          <div className="flex items-start gap-3 p-4 rounded-xl"
-            style={{ background: 'var(--bg-card)' }}>
-            <Info size={16} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Detailed information for this service is being added. Contact us for a full breakdown.
-            </p>
+        {!hasDetails && (
+          <div className="flex items-start gap-3 p-4 rounded-xl" style={{ background: "var(--bg-card)" }}>
+            <Info size={16} className="shrink-0 mt-0.5" style={{ color: "var(--accent)" }} />
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Detailed information for this service is being added. Contact us for a full breakdown.</p>
           </div>
         )}
       </div>
 
-      {/* CTA */}
-      <div className="px-6 py-5 border-t shrink-0" style={{ borderColor: 'var(--border)' }}>
-        <button
-          onClick={() => navigate('/signup?role=client&redirect=/client/post-project')}
+      <div className="px-6 py-5 border-t shrink-0" style={{ borderColor: "var(--border)" }}>
+        <button onClick={() => navigate("/signup?role=client&redirect=/client/post-project")}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: 'var(--accent)', color: '#fff' }}>
+          style={{ background: "var(--accent)", color: "#fff" }}>
           Post a Project <ArrowRight size={15} />
         </button>
-        <p className="text-[10px] text-center mt-2" style={{ color: 'var(--text-secondary)' }}>
-          First project gets 15% off â€” applied automatically
-        </p>
+        <p className="text-[10px] text-center mt-2" style={{ color: "var(--text-secondary)" }}>First project gets 15% off — applied automatically</p>
       </div>
     </motion.div>
   );
