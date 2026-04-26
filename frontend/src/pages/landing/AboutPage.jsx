@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  CheckCircle, ArrowRight, ShieldCheck, Users, MonitorPlay, Scale, ChevronLeft
+  CheckCircle, ArrowRight, ShieldCheck, Users, MonitorPlay, Scale, ChevronLeft, ArrowLeft
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import { useEffect } from 'react';
@@ -34,6 +34,21 @@ export default function AboutPage() {
       style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
     >
       <Header />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-3 pt-28 pb-4 px-4">
+        <motion.button
+          onClick={() => navigate("/")}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all hover:opacity-80"
+          style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+        >
+          <ArrowLeft size={18} />
+          <span className="text-sm font-medium">Back</span>
+        </motion.button>
+      </div>
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="pt-48 pb-32 px-6 text-center relative overflow-hidden">
