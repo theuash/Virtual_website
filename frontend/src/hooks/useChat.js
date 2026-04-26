@@ -27,7 +27,7 @@ export function useChat(conversationId, token) {
   const [isTyping,    setIsTyping]    = useState(false);
   const [error,       setError]       = useState(null);
 
-  // ── Connect / disconnect when token changes ───────────────────
+  //  Connect / disconnect when token changes 
   useEffect(() => {
     if (!token) return;
 
@@ -75,7 +75,7 @@ export function useChat(conversationId, token) {
     };
   }, [token]);
 
-  // ── Join / leave conversation room when conversationId changes ─
+  //  Join / leave conversation room when conversationId changes 
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket || !conversationId) return;
@@ -91,7 +91,7 @@ export function useChat(conversationId, token) {
     };
   }, [conversationId]);
 
-  // ── Load message history via REST on conversation change ───────
+  //  Load message history via REST on conversation change 
   useEffect(() => {
     if (!conversationId || !token) return;
 
@@ -105,7 +105,7 @@ export function useChat(conversationId, token) {
       .catch(() => {}); // silent - socket will deliver new messages anyway
   }, [conversationId, token]);
 
-  // ── sendMessage ───────────────────────────────────────────────
+  //  sendMessage 
   const sendMessage = useCallback(
     (content) => {
       const socket = socketRef.current;
@@ -118,7 +118,7 @@ export function useChat(conversationId, token) {
     [conversationId]
   );
 
-  // ── sendTyping ────────────────────────────────────────────────
+  //  sendTyping 
   const sendTyping = useCallback(
     (typing) => {
       const socket = socketRef.current;

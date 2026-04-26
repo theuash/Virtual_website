@@ -218,7 +218,7 @@ export default function FreelancerDashboard() {
         animate="visible"
       >
 
-        {/* ── Greeting + Tier ──────────────────────────────────── */}
+        {/*  Greeting + Tier  */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Greeting */}
           <motion.div
@@ -315,7 +315,7 @@ export default function FreelancerDashboard() {
           </motion.div>
         </div>
 
-        {/* ── Mentor card ──────────────────────────────────────── */}
+        {/*  Mentor card  */}
         {mentor && (
           <motion.div
             variants={itemVariants}
@@ -354,7 +354,7 @@ export default function FreelancerDashboard() {
           </motion.div>
         )}
 
-        {/* ── Stats row ────────────────────────────────────────── */}
+        {/*  Stats row  */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -381,12 +381,12 @@ export default function FreelancerDashboard() {
 
           <StatCard
             label="Learning Progress"
-            value={learningLoading ? '…' : `${completedCount}/${totalCount}`}
+            value={learningLoading ? '' : `${completedCount}/${totalCount}`}
             icon={<BookOpen size={17} strokeWidth={1.5} />}
           />
         </motion.div>
 
-        {/* ── Main grid ────────────────────────────────────────── */}
+        {/*  Main grid  */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
           {/* Active Projects - locked for precrate */}
@@ -453,7 +453,7 @@ export default function FreelancerDashboard() {
                     <div className="flex-1 min-w-0 pr-4">
                       <div className="text-sm font-semibold truncate mb-1" style={{ color: 'var(--text-primary)' }}>{task.title}</div>
                       <div className="flex items-center gap-3 text-[11px]" style={{ color: 'var(--text-secondary)' }}>
-                        <span className="flex items-center gap-1"><Clock size={10} /> {task.estimation || '2–3 hrs'}</span>
+                        <span className="flex items-center gap-1"><Clock size={10} /> {task.estimation || '23 hrs'}</span>
                         <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase" style={{ background: 'var(--border)', color: 'var(--text-secondary)' }}>
                           {task.status || 'assigned'}
                         </span>
@@ -571,7 +571,7 @@ export default function FreelancerDashboard() {
                   <BookOpen size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} /> Learning
                 </h2>
                 <span className="text-[9px] font-black" style={{ color: 'var(--text-secondary)' }}>
-                  {learningLoading ? '…' : `${completedCount}/${totalCount} done`}
+                  {learningLoading ? '' : `${completedCount}/${totalCount} done`}
                 </span>
               </div>
               <div className="p-3 space-y-2">
@@ -651,7 +651,7 @@ export default function FreelancerDashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{v.title}</p>
                           <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>
-                            {v.level} · {v.software?.replace(/_/g, ' ')}
+                            {v.level}  {v.software?.replace(/_/g, ' ')}
                           </p>
                           {pct > 0 && !done && (
                             <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>

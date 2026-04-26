@@ -8,7 +8,7 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// ── Request interceptor - attach access token ─────────────────────
+//  Request interceptor - attach access token 
 api.interceptors.request.use((config) => {
   try {
     const stored = localStorage.getItem('virtual_user');
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response interceptor - silent token refresh on 401 ───────────
+//  Response interceptor - silent token refresh on 401 
 let isRefreshing = false;
 let refreshQueue = []; // queued requests waiting for the new token
 

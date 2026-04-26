@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -93,7 +93,7 @@ export default function SupervisorEarnings() {
                           {p.projectId?.title || 'Project'}
                         </p>
                         <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                          {p.entries?.length ?? 0} recipients · Finalized {p.finalizedAt ? new Date(p.finalizedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                          {p.entries?.length ?? 0} recipients  Finalized {p.finalizedAt ? new Date(p.finalizedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                         </p>
                       </div>
                       <p className="text-sm font-black shrink-0" style={{ color: '#10b981' }}>

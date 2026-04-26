@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -148,7 +148,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                 {method === 'upi' ? 'UPI ID' : method === 'bank' ? 'Account Number / IFSC' : 'Card Number (last 4 digits)'}
               </label>
               <input type="text" value={details} onChange={e => setDetails(e.target.value)}
-                placeholder={method === 'upi' ? 'yourname@upi' : method === 'bank' ? 'XXXX XXXX XXXX / IFSC' : '•••• •••• •••• XXXX'}
+                placeholder={method === 'upi' ? 'yourname@upi' : method === 'bank' ? 'XXXX XXXX XXXX / IFSC' : '   XXXX'}
                 className="w-full px-4 py-3 rounded-xl border text-sm outline-none"
                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
             </div>
@@ -158,7 +158,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
             <button onClick={handleWithdraw} disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
               style={{ background: '#f59e0b', color: '#fff' }}>
-              {loading ? 'Processing…' : `Withdraw ?${parseInt(amount || 0).toLocaleString('en-IN')}`}
+              {loading ? 'Processing' : `Withdraw ?${parseInt(amount || 0).toLocaleString('en-IN')}`}
             </button>
           </div>
         )}

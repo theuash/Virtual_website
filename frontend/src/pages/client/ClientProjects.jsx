@@ -92,7 +92,7 @@ function ProjectCard({ project, onView }) {
             Budget
           </span>
           <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>
-            ₹{Number(project.totalAmount || project.baseAmount || project.openBudget || 0).toLocaleString('en-IN')}
+            {Number(project.totalAmount || project.baseAmount || project.openBudget || 0).toLocaleString('en-IN')}
           </span>
         </div>
 
@@ -432,7 +432,7 @@ export default function ClientProjects() {
                       Budget
                     </p>
                     <p className="text-lg font-black" style={{ color: 'var(--accent)' }}>
-                      ₹{Number(viewProject.totalAmount || viewProject.baseAmount || viewProject.openBudget || 0).toLocaleString('en-IN')}
+                      {Number(viewProject.totalAmount || viewProject.baseAmount || viewProject.openBudget || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl" style={{ background: 'var(--bg-card)' }}>

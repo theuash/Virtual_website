@@ -63,7 +63,7 @@ export default function SupervisorDashboard() {
       <DashboardHeader title="Dashboard" />
       <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
 
-        {/* ── Hero banner ──────────────────────────────────────── */}
+        {/*  Hero banner  */}
         <motion.div
           variants={fadeUp} initial="hidden" animate="show"
           className="relative overflow-hidden p-6 rounded-2xl border"
@@ -84,7 +84,7 @@ export default function SupervisorDashboard() {
                 {firstName}
               </h2>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                {dept ? `${dept} department` : 'All departments'} · Quality & delivery oversight
+                {dept ? `${dept} department` : 'All departments'}  Quality & delivery oversight
               </p>
             </div>
 
@@ -114,7 +114,7 @@ export default function SupervisorDashboard() {
           </div>
         </motion.div>
 
-        {/* ── Stats ────────────────────────────────────────────── */}
+        {/*  Stats  */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard i={0} label="Total Reviews"   value={user?.totalReviews   ?? 0} icon={<Star size={17} strokeWidth={1.5} />} />
           <StatCard i={1} label="Approval Rate"   value={user?.approvalRate   ? `${user.approvalRate}%` : '-'} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
@@ -122,7 +122,7 @@ export default function SupervisorDashboard() {
           <StatCard i={3} label="Unread Messages" value={unreadTotal}          icon={<MessageSquare size={17} strokeWidth={1.5} />} />
         </div>
 
-        {/* ── Main grid ────────────────────────────────────────── */}
+        {/*  Main grid  */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Recent conversations - 2 cols */}

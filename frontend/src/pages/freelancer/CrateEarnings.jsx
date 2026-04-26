@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -10,7 +10,7 @@ import {
 
 const WITHDRAW_METHODS = [
   { id: 'upi',         label: 'UPI',         icon: <Smartphone size={16} strokeWidth={1.5} />,  desc: 'Instant transfer to UPI ID' },
-  { id: 'bank',        label: 'Bank Transfer',icon: <Building2 size={16} strokeWidth={1.5} />,  desc: '2–3 business days' },
+  { id: 'bank',        label: 'Bank Transfer',icon: <Building2 size={16} strokeWidth={1.5} />,  desc: '23 business days' },
   { id: 'card',        label: 'Debit Card',   icon: <CreditCard size={16} strokeWidth={1.5} />, desc: 'Transfer to linked card' },
 ];
 
@@ -39,7 +39,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
 
   const handleWithdraw = async () => {
     const amt = parseInt(amount);
-    if (!amt || amt < 100) return setError('Minimum withdrawal is ₹100');
+    if (!amt || amt < 100) return setError('Minimum withdrawal is 100');
     if (amt > balance)     return setError('Insufficient balance');
     if (!details.trim())   return setError('Please enter your account details');
     setLoading(true); setError('');
@@ -79,23 +79,23 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
             <CheckCircle2 size={40} strokeWidth={1.5} className="mb-3" style={{ color: '#10b981' }} />
             <p className="font-bold" style={{ color: 'var(--text-primary)' }}>Withdrawal Requested!</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Funds will be transferred within 2–3 business days.</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Funds will be transferred within 23 business days.</p>
           </div>
         ) : (
           <div className="p-6 space-y-5">
             {/* Available balance */}
             <div className="p-4 rounded-xl text-center" style={{ background: 'var(--bg-card)' }}>
               <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>Available Balance</p>
-              <p className="text-2xl font-black" style={{ color: '#10b981' }}>₹{balance.toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-black" style={{ color: '#10b981' }}>{balance.toLocaleString('en-IN')}</p>
             </div>
 
             {/* Amount */}
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest mb-2 block" style={{ color: 'var(--text-secondary)' }}>
-                Amount (₹)
+                Amount ()
               </label>
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}>₹</span>
+                <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}></span>
                 <input
                   type="number" value={amount} onChange={e => setAmount(e.target.value)}
                   placeholder="0" min="100" max={balance}
@@ -115,7 +115,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                       background:  'var(--bg-card)',
                     }}
                   >
-                    ₹{a.toLocaleString()}
+                    {a.toLocaleString()}
                   </button>
                 ))}
                 {balance > 0 && (
@@ -168,7 +168,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
               </label>
               <input
                 type="text" value={details} onChange={e => setDetails(e.target.value)}
-                placeholder={method === 'upi' ? 'yourname@upi' : method === 'bank' ? 'XXXX XXXX XXXX / IFSC' : '•••• •••• •••• XXXX'}
+                placeholder={method === 'upi' ? 'yourname@upi' : method === 'bank' ? 'XXXX XXXX XXXX / IFSC' : '   XXXX'}
                 className="w-full px-4 py-3 rounded-xl border text-sm outline-none"
                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               />
@@ -182,7 +182,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
               className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
               style={{ background: 'var(--accent)', color: '#fff' }}
             >
-              {loading ? 'Processing…' : `Withdraw ₹${parseInt(amount || 0).toLocaleString('en-IN')}`}
+              {loading ? 'Processing' : `Withdraw ${parseInt(amount || 0).toLocaleString('en-IN')}`}
             </button>
           </div>
         )}
@@ -259,7 +259,7 @@ export default function CrateEarnings() {
                     </span>
                   </div>
                   <p className="text-2xl font-black" style={{ color: card.color }}>
-                    ₹{card.value.toLocaleString('en-IN')}
+                    {card.value.toLocaleString('en-IN')}
                   </p>
                 </motion.div>
               ))}
@@ -343,7 +343,7 @@ export default function CrateEarnings() {
                           className="text-sm font-black shrink-0"
                           style={{ color: style.color }}
                         >
-                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '−' : '+'}₹{tx.amount.toLocaleString('en-IN')}
+                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '' : '+'}{tx.amount.toLocaleString('en-IN')}
                         </p>
                       </motion.div>
                     );

@@ -62,7 +62,7 @@ function ClientCard({ client }) {
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] disabled:opacity-60"
           style={{ background: '#3b82f622', color: '#3b82f6' }}>
           <MessageSquare size={14} />
-          {messaging ? 'Opening…' : 'Message Client'}
+          {messaging ? 'Opening' : 'Message Client'}
         </button>
       </div>
     </motion.div>

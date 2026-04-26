@@ -9,7 +9,7 @@ import {
 
 const STATUS_COLORS = {
   scheduled:  { bg: '#3b82f611', color: '#3b82f6', label: 'Scheduled' },
-  live:       { bg: '#22c55e11', color: '#22c55e', label: '🟢 Ongoing' },
+  live:       { bg: '#22c55e11', color: '#22c55e', label: ' Ongoing' },
   completed:  { bg: '#6b728011', color: '#6b7280', label: 'Ended' },
   cancelled:  { bg: '#ef444411', color: '#ef4444', label: 'Cancelled' },
 };
@@ -59,7 +59,7 @@ function MeetingCard({ meeting, onCancel, onCopy, copied }) {
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--bg-card)' }}>
             <Clock size={12} style={{ color: '#f59e0b' }} />
             <span className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
-              {scheduled.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} · {meeting.duration}m
+              {scheduled.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}  {meeting.duration}m
             </span>
           </div>
         </div>
@@ -103,7 +103,7 @@ function MeetingCard({ meeting, onCancel, onCopy, copied }) {
           )}
           {(meeting.status === 'cancelled' || meeting.status === 'completed') && (
             <div className="flex items-center gap-1.5 text-xs py-2" style={{ color: 'var(--text-secondary)' }}>
-              {meeting.status === 'cancelled' ? '🚫 Cancelled' : '⏹ Meeting Ended'}
+              {meeting.status === 'cancelled' ? ' Cancelled' : ' Meeting Ended'}
             </div>
           )}
         </div>
@@ -112,7 +112,7 @@ function MeetingCard({ meeting, onCancel, onCopy, copied }) {
   );
 }
 
-// ── Participant picker - sectioned by role ────────────────────────
+//  Participant picker - sectioned by role 
 function ParticipantPicker({ selected, onChange }) {
   const [precrates, setPrecrates]   = useState([]);
   const [initiators, setInitiators] = useState([]);
@@ -372,7 +372,7 @@ export default function SupervisorMeetings() {
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Description</label>
                       <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                        placeholder="Optional agenda or notes…" rows={2}
+                        placeholder="Optional agenda or notes" rows={2}
                         className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-none"
                         style={inputStyle} />
                     </div>
@@ -407,7 +407,7 @@ export default function SupervisorMeetings() {
                       className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:opacity-90 disabled:opacity-60"
                       style={{ background: '#f59e0b', color: '#fff' }}>
                       {saving ? <Loader2 size={13} className="animate-spin" /> : <Calendar size={13} />}
-                      {saving ? 'Scheduling…' : 'Schedule Meeting'}
+                      {saving ? 'Scheduling' : 'Schedule Meeting'}
                     </button>
                   </form>
 

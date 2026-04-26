@@ -18,17 +18,17 @@ const STEPS = [
 ];
 
 const HOURS_OPTIONS = [
-  { value: 5,  label: '1–5 hrs / week',   desc: 'Light availability' },
-  { value: 10, label: '5–10 hrs / week',  desc: 'Part-time' },
-  { value: 20, label: '10–20 hrs / week', desc: 'Regular commitment' },
-  { value: 40, label: '20–40 hrs / week', desc: 'Full-time' },
+  { value: 5,  label: '15 hrs / week',   desc: 'Light availability' },
+  { value: 10, label: '510 hrs / week',  desc: 'Part-time' },
+  { value: 20, label: '1020 hrs / week', desc: 'Regular commitment' },
+  { value: 40, label: '2040 hrs / week', desc: 'Full-time' },
 ];
 
 const CONTACT_SLOTS = [
-  '9am – 12pm',
-  '12pm – 3pm',
-  '3pm – 6pm',
-  '6pm – 9pm',
+  '9am  12pm',
+  '12pm  3pm',
+  '3pm  6pm',
+  '6pm  9pm',
   'Flexible / Anytime',
 ];
 
@@ -86,7 +86,7 @@ export default function FreelancerOnboarding() {
     setLoading(true);
     setError('');
     try {
-      const preferredContactTime = `${contactDays.join(', ')} · ${contactTime}`;
+      const preferredContactTime = `${contactDays.join(', ')}  ${contactTime}`;
       await api.post('/freelancer/onboarding', {
         primarySkill,
         secondarySkills,
@@ -157,7 +157,7 @@ export default function FreelancerOnboarding() {
         style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
       >
         <AnimatePresence mode="wait" custom={dir}>
-          {/* ── Step 0: Skills ─────────────────────────────────── */}
+          {/*  Step 0: Skills  */}
           {step === 0 && (
             <motion.div key="skills" custom={dir} variants={fadeSlide} initial="initial" animate="animate" exit="exit" className="p-8">
               <div className="mb-6">
@@ -204,7 +204,7 @@ export default function FreelancerOnboarding() {
                           color: secondarySkills.includes(skill) ? 'var(--accent)' : 'var(--text-secondary)',
                         }}
                       >
-                        {secondarySkills.includes(skill) && '✓ '}{SKILL_LABELS[skill]}
+                        {secondarySkills.includes(skill) && ' '}{SKILL_LABELS[skill]}
                       </button>
                     ))}
                   </div>
@@ -213,7 +213,7 @@ export default function FreelancerOnboarding() {
             </motion.div>
           )}
 
-          {/* ── Step 1: Availability ───────────────────────────── */}
+          {/*  Step 1: Availability  */}
           {step === 1 && (
             <motion.div key="availability" custom={dir} variants={fadeSlide} initial="initial" animate="animate" exit="exit" className="p-8">
               <div className="mb-6">
@@ -247,7 +247,7 @@ export default function FreelancerOnboarding() {
             </motion.div>
           )}
 
-          {/* ── Step 2: Contact window ─────────────────────────── */}
+          {/*  Step 2: Contact window  */}
           {step === 2 && (
             <motion.div key="contact" custom={dir} variants={fadeSlide} initial="initial" animate="animate" exit="exit" className="p-8">
               <div className="mb-6">
@@ -299,7 +299,7 @@ export default function FreelancerOnboarding() {
             </motion.div>
           )}
 
-          {/* ── Step 3: Confirm ────────────────────────────────── */}
+          {/*  Step 3: Confirm  */}
           {step === 3 && (
             <motion.div key="confirm" custom={dir} variants={fadeSlide} initial="initial" animate="animate" exit="exit" className="p-8">
               <div className="mb-6">

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useChat } from '../hooks/useChat';
 import api from '../services/api';
 
-// ── Helpers ───────────────────────────────────────────────────────
+//  Helpers 
 const timeAgo = (date) => {
   const diff = (Date.now() - new Date(date)) / 1000;
   if (diff < 60)    return 'now';
@@ -17,7 +17,7 @@ const timeAgo = (date) => {
 const getInitials = (name = '') =>
   name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
-// ── Avatar ────────────────────────────────────────────────────────
+//  Avatar 
 function Avatar({ name, size = 9 }) {
   return (
     <div
@@ -29,7 +29,7 @@ function Avatar({ name, size = 9 }) {
   );
 }
 
-// ── Conversation list item ────────────────────────────────────────
+//  Conversation list item 
 function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, onUnblock }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -67,7 +67,7 @@ function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, o
           </div>
           <div className="flex items-center gap-1">
             <p className="text-xs truncate flex-1" style={{ color: isBlocked ? '#ef4444' : 'var(--text-secondary)' }}>
-              {isBlocked ? '🚫 Blocked' : preview}
+              {isBlocked ? ' Blocked' : preview}
             </p>
             {unread > 0 && !isBlocked && (
               <span className="shrink-0 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center"
@@ -79,7 +79,7 @@ function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, o
         </div>
       </button>
 
-      {/* ⋮ menu - always visible on hover, sits at far right */}
+      {/*  menu - always visible on hover, sits at far right */}
       <div ref={menuRef} className="relative shrink-0">
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
@@ -133,7 +133,7 @@ function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, o
   );
 }
 
-// ── Message bubble ────────────────────────────────────────────────
+//  Message bubble 
 function MessageBubble({ msg, isMine }) {
   return (
     <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`}>
@@ -161,7 +161,7 @@ function MessageBubble({ msg, isMine }) {
   );
 }
 
-// ── New conversation modal ────────────────────────────────────────
+//  New conversation modal 
 function NewConvModal({ onClose, onCreated, currentUserId }) {
   const [recipientId, setRecipientId] = useState('');
   const [loading, setLoading]         = useState(false);
@@ -210,7 +210,7 @@ function NewConvModal({ onClose, onCreated, currentUserId }) {
             type="text"
             value={recipientId}
             onChange={e => setRecipientId(e.target.value)}
-            placeholder="Paste user ID…"
+            placeholder="Paste user ID"
             className="w-full px-4 py-3 rounded-xl border text-sm outline-none"
             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
             onKeyDown={e => e.key === 'Enter' && handleCreate()}
@@ -222,7 +222,7 @@ function NewConvModal({ onClose, onCreated, currentUserId }) {
             className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: 'var(--accent)', color: '#fff' }}
           >
-            {loading ? 'Creating…' : 'Start Conversation'}
+            {loading ? 'Creating' : 'Start Conversation'}
           </button>
         </div>
       </motion.div>
@@ -230,7 +230,7 @@ function NewConvModal({ onClose, onCreated, currentUserId }) {
   );
 }
 
-// ── Main MessagingUI ──────────────────────────────────────────────
+//  Main MessagingUI 
 export default function MessagingUI({ initialConvId = null }) {
   const { user } = useAuth();
   const currentUserId = user?._id || user?.id;
@@ -247,7 +247,7 @@ export default function MessagingUI({ initialConvId = null }) {
   const { messages, sendMessage, isConnected, isTyping, sendTyping, error: socketError } =
     useChat(activeConvId, user?.token);
 
-  // ── Load conversations ────────────────────────────────────────
+  //  Load conversations 
   const loadConversations = useCallback(async () => {
     try {
       const res = await api.get('/messaging/conversations');
@@ -296,7 +296,7 @@ export default function MessagingUI({ initialConvId = null }) {
     );
   }, [messages, activeConvId]);
 
-  // ── Delete conversation ───────────────────────────────────────
+  //  Delete conversation 
   const handleDelete = async (convId) => {
     if (!confirm('Delete this conversation? This cannot be undone.')) return;
     try {
@@ -306,7 +306,7 @@ export default function MessagingUI({ initialConvId = null }) {
     } catch { /* silent */ }
   };
 
-  // ── Block / Unblock ───────────────────────────────────────────
+  //  Block / Unblock 
   const handleBlock = async (convId) => {
     if (!confirm('Block this user? They won\'t be able to message you.')) return;
     try {
@@ -326,7 +326,7 @@ export default function MessagingUI({ initialConvId = null }) {
     } catch { /* silent */ }
   };
 
-  // ── Send ──────────────────────────────────────────────────────
+  //  Send 
   const handleSend = () => {
     if (!input.trim() || !activeConvId) return;
     // Check if blocked
@@ -337,7 +337,7 @@ export default function MessagingUI({ initialConvId = null }) {
     sendTyping(false);
   };
 
-  // ── Typing indicator ──────────────────────────────────────────
+  //  Typing indicator 
   const handleInputChange = (e) => {
     setInput(e.target.value);
     sendTyping(true);
@@ -355,7 +355,7 @@ export default function MessagingUI({ initialConvId = null }) {
       className="flex h-[calc(100vh-80px)] overflow-hidden rounded-xl border"
       style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}
     >
-      {/* ── Sidebar ──────────────────────────────────────────── */}
+      {/*  Sidebar  */}
       <div
         className="w-72 shrink-0 flex flex-col border-r"
         style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
@@ -387,7 +387,7 @@ export default function MessagingUI({ initialConvId = null }) {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search…"
+              placeholder="Search"
               className="flex-1 bg-transparent text-xs outline-none"
               style={{ color: 'var(--text-primary)' }}
             />
@@ -424,7 +424,7 @@ export default function MessagingUI({ initialConvId = null }) {
         </div>
       </div>
 
-      {/* ── Chat area ────────────────────────────────────────── */}
+      {/*  Chat area  */}
       {activeConvId ? (
         <div className="flex-1 flex flex-col min-w-0">
           {/* Chat header */}
@@ -439,9 +439,9 @@ export default function MessagingUI({ initialConvId = null }) {
               </div>
               <div className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                 {isTyping ? (
-                  <span style={{ color: 'var(--accent)' }}>typing…</span>
+                  <span style={{ color: 'var(--accent)' }}>typing</span>
                 ) : (
-                  isConnected ? 'Online' : 'Connecting…'
+                  isConnected ? 'Online' : 'Connecting'
                 )}
               </div>
             </div>
@@ -517,7 +517,7 @@ export default function MessagingUI({ initialConvId = null }) {
                         handleSend();
                       }
                     }}
-                    placeholder="Type a message… (Enter to send)"
+                    placeholder="Type a message (Enter to send)"
                     rows={1}
                     className="flex-1 bg-transparent text-sm outline-none resize-none"
                     style={{ color: 'var(--text-primary)', maxHeight: '120px' }}

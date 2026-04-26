@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -90,7 +90,7 @@ function OpenProjectCard({ project, onAccept, accepting }) {
           {accepting === project._id
             ? <Loader2 size={14} className="animate-spin" />
             : <ArrowRight size={14} />}
-          {accepting === project._id ? 'Accepting…' : 'Accept Project'}
+          {accepting === project._id ? 'Accepting' : 'Accept Project'}
         </button>
       </div>
     </motion.div>

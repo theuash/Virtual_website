@@ -15,7 +15,7 @@ const fadeUp = {
   })
 };
 
-// Same two-phase pop → expand animation as the floating pill
+// Same two-phase pop  expand animation as the floating pill
 function ExpandingCTA({ onClick }) {
   const [expanded, setExpanded] = useState(false);
   const [popped, setPopped] = useState(false);

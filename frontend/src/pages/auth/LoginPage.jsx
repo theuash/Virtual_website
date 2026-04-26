@@ -9,7 +9,7 @@ import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
 import ThemeToggle from '../../components/ThemeToggle';
 
-/* ── Shared input style helper ───────────────────────────────────────── */
+/*  Shared input style helper  */
 const inputStyle = {
   paddingTop: '0.875rem',
   paddingBottom: '0.875rem',
@@ -110,7 +110,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex select-none" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ── Left Art Panel (fixed, desktop only) ── */}
+      {/*  Left Art Panel (fixed, desktop only)  */}
       <div className="hidden lg:block fixed top-0 left-0 w-[60%] h-full z-0 bg-black border-r border-white/5 overflow-hidden">
         <motion.img
           src={authArt}
@@ -193,7 +193,7 @@ export default function LoginPage() {
         </motion.div>
       </div>
 
-      {/* ── Right Form Panel ── */}
+      {/*  Right Form Panel  */}
       <div
         className="w-full min-h-screen flex items-center justify-center px-6 py-16 z-10"
         style={{ background: 'var(--bg-primary)', marginLeft: 'clamp(0px, 60vw, 60%)' }}
@@ -368,7 +368,7 @@ export default function LoginPage() {
                     type="password"
                     className="w-full text-sm rounded-xl border outline-none transition-all"
                     style={inputStyle}
-                    placeholder="••••••••••"
+                    placeholder=""
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

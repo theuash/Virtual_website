@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -41,7 +41,7 @@ function GroupProjectCard({ project, index }) {
             </div>
             <h3 className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{project.title}</h3>
             <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>
-              {project.clientId?.fullName || '-'} · {project.clientId?.company || ''}
+              {project.clientId?.fullName || '-'}  {project.clientId?.company || ''}
             </p>
           </div>
           <span className="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold capitalize"

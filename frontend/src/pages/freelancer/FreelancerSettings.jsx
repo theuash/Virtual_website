@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+ï»¿import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import DashboardHeader from "../../components/DashboardHeader";
 import api from "../../services/api";
@@ -103,11 +103,11 @@ export default function FreelancerSettings() {
   useEffect(() => {
     if (!user) return;
 
-    // Parse preferredContactTime - stored as "Mon, Tue · 9am-12pm"
+    // Parse preferredContactTime - stored as "Mon, Tue  9am-12pm"
     let parsedDays = [];
     let parsedTime = "";
     if (user.preferredContactTime) {
-      const parts = user.preferredContactTime.split(' · ');
+      const parts = user.preferredContactTime.split('  ');
       if (parts.length === 2) {
         parsedDays = parts[0].split(', ').map(d => d.trim()).filter(Boolean);
         parsedTime = parts[1].trim();
@@ -160,7 +160,7 @@ export default function FreelancerSettings() {
     }
 
     setBgRemoving(true);
-    setStatus({ type: 'info', msg: 'Removing background…' });
+    setStatus({ type: 'info', msg: 'Removing background' });
     try {
       const fd = new FormData();
       fd.append("image_file", croppedFile);
@@ -195,7 +195,7 @@ export default function FreelancerSettings() {
       // Combine days + time into the stored format
       if (contactDays.length > 0 || contactTime) {
         const combined = contactDays.length > 0 && contactTime
-          ? `${contactDays.join(', ')} · ${contactTime}`
+          ? `${contactDays.join(', ')}  ${contactTime}`
           : contactTime || contactDays.join(', ');
         fd.append("preferredContactTime", combined);
       }
@@ -273,7 +273,7 @@ export default function FreelancerSettings() {
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
               style={{ background: "var(--accent)", color: "#fff" }}>
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-              {saving ? "Saving…" : "Save Changes"}
+              {saving ? "Saving" : "Save Changes"}
             </button>
           </div>
           <div className="p-6 flex items-center gap-6">
@@ -305,7 +305,7 @@ export default function FreelancerSettings() {
                 <button onClick={() => fileRef.current?.click()} disabled={bgRemoving}
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-[1.02] disabled:opacity-50"
                   style={{ borderColor: "var(--border)", color: "var(--text-primary)", background: "var(--bg-card)" }}>
-                  {bgRemoving ? "Processing…" : "Upload Photo"}
+                  {bgRemoving ? "Processing" : "Upload Photo"}
                 </button>
                 {avatarPreview && (
                   <button onClick={handleRemoveAvatar} disabled={removingAvatar}
@@ -316,7 +316,7 @@ export default function FreelancerSettings() {
                   </button>
                 )}
               </div>
-              <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>JPG, PNG, WebP · Max 5MB</p>
+              <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>JPG, PNG, WebP  Max 5MB</p>
             </div>
           </div>
         </div>
@@ -357,7 +357,7 @@ export default function FreelancerSettings() {
                   <div className="flex flex-wrap gap-2 pt-1">
                     <span className="px-3 py-1.5 rounded-full text-xs font-bold"
                       style={{ background: "var(--accent)", color: "#fff" }}>
-                      {user.primarySkill.replace(/_/g, " ")} · Primary
+                      {user.primarySkill.replace(/_/g, " ")}  Primary
                     </span>
                     {(user.secondarySkills || []).map(s => (
                       <span key={s} className="px-3 py-1.5 rounded-full text-xs font-semibold border"
@@ -366,7 +366,7 @@ export default function FreelancerSettings() {
                       </span>
                     ))}
                     <span className="text-[10px] self-center" style={{ color: "var(--text-secondary)" }}>
-                      · Change via onboarding
+                       Change via onboarding
                     </span>
                   </div>
                 </Field>
@@ -442,7 +442,7 @@ export default function FreelancerSettings() {
             {(contactDays.length > 0 || contactTime) && (
               <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
                 Contact window: <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                  {contactDays.length > 0 ? `${contactDays.join(', ')} · ` : ''}{contactTime}
+                  {contactDays.length > 0 ? `${contactDays.join(', ')}  ` : ''}{contactTime}
                 </span>
               </p>
             )}

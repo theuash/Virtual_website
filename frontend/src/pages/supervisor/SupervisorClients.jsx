@@ -60,7 +60,7 @@ function ClientCard({ client }) {
             className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] disabled:opacity-60"
             style={{ background: '#f59e0b22', color: '#f59e0b' }}>
             <MessageSquare size={13} strokeWidth={1.5} />
-            {messaging ? 'Opening…' : 'Message'}
+            {messaging ? 'Opening' : 'Message'}
           </button>
           <button
             onClick={() => navigate(`/supervisor/projects?client=${client._id}`)}

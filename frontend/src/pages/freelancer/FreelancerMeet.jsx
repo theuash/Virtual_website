@@ -15,7 +15,7 @@ const canSchedule = (user) =>
 
 const STATUS_COLORS = {
   scheduled: { bg: '#3b82f611', color: '#3b82f6', label: 'Scheduled' },
-  live:      { bg: '#22c55e11', color: '#22c55e', label: '🟢 Ongoing' },
+  live:      { bg: '#22c55e11', color: '#22c55e', label: ' Ongoing' },
   completed: { bg: '#6b728011', color: '#6b7280', label: 'Ended' },
   cancelled: { bg: '#ef444411', color: '#ef4444', label: 'Cancelled' },
 };
@@ -45,7 +45,7 @@ function MeetingCard({ meeting, canJoin, onCopy, copied, onStart }) {
         <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-secondary)' }}>
           <span className="flex items-center gap-1"><Calendar size={11} />
             {scheduled.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-            {' · '}
+            {'  '}
             {scheduled.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </span>
           <span className="flex items-center gap-1"><Clock size={11} />{meeting.duration}m</span>
@@ -58,7 +58,7 @@ function MeetingCard({ meeting, canJoin, onCopy, copied, onStart }) {
         <div className="flex gap-2 pt-1">
           {meeting.status === 'cancelled' ? (
             <div className="flex items-center gap-1.5 text-xs py-2" style={{ color: '#ef4444' }}>
-              🚫 Cancelled
+               Cancelled
             </div>
           ) : meeting.status === 'completed' ? (
             <div className="flex items-center gap-1.5 text-xs py-2" style={{ color: 'var(--text-secondary)' }}>
@@ -85,7 +85,7 @@ function MeetingCard({ meeting, canJoin, onCopy, copied, onStart }) {
   );
 }
 
-// ── Participant picker ────────────────────────────────────────────
+//  Participant picker 
 function ParticipantPicker({ selected, onChange }) {
   const [precrates, setPrecrates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +101,7 @@ function ParticipantPicker({ selected, onChange }) {
     onChange(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
   };
 
-  if (loading) return <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Loading…</div>;
+  if (loading) return <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>Loading</div>;
   if (precrates.length === 0) return <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>No freelancers found.</div>;
 
   return (
@@ -120,7 +120,7 @@ function ParticipantPicker({ selected, onChange }) {
   );
 }
 
-// ── Schedule modal ────────────────────────────────────────────────
+//  Schedule modal 
 function ScheduleModal({ onClose, onCreated, apiPath }) {
   const [form, setForm] = useState({ title: '', description: '', scheduledTime: '', duration: 30 });
   const [participants, setParticipants] = useState([]);
@@ -171,7 +171,7 @@ function ScheduleModal({ onClose, onCreated, apiPath }) {
             <div className="space-y-1.5">
               <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Description</label>
               <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="Optional agenda…" rows={2} className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-none" style={inputStyle} />
+                placeholder="Optional agenda" rows={2} className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-none" style={inputStyle} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -201,7 +201,7 @@ function ScheduleModal({ onClose, onCreated, apiPath }) {
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:opacity-90 disabled:opacity-60"
               style={{ background: 'var(--accent)', color: '#fff' }}>
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Calendar size={13} />}
-              {saving ? 'Scheduling…' : 'Schedule Meeting'}
+              {saving ? 'Scheduling' : 'Schedule Meeting'}
             </button>
           </form>
         </div>
@@ -210,7 +210,7 @@ function ScheduleModal({ onClose, onCreated, apiPath }) {
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────
+//  Main 
 export default function FreelancerMeet() {
   const { user } = useAuth();
   const navigate = useNavigate();

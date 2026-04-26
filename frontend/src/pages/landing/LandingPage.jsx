@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+﻿import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
@@ -66,7 +66,7 @@ const MeshGrid = ({ count = 5, speed = 10 }) => (
   </div>
 );
 
-// Hero CTA - same pop → expand as floating pill and pricing CTA
+// Hero CTA - same pop  expand as floating pill and pricing CTA
 function HeroExpandingCTA({ onClick }) {
   const [popped, setPopped] = useState(false);
   const [expanded, setExpanded] = useState(false);

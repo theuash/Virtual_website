@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -134,7 +134,7 @@ export default function SupervisorTeams() {
                           {team.initiatorId?.fullName || 'Team'}
                         </p>
                         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {team.members?.length ?? 0} members · {team.projectId?.title || 'No project'}
+                          {team.members?.length ?? 0} members  {team.projectId?.title || 'No project'}
                         </p>
                       </div>
                       <ChevronRight size={14} style={{ color: 'var(--text-secondary)' }} />
@@ -184,7 +184,7 @@ export default function SupervisorTeams() {
                           className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] disabled:opacity-60"
                           style={{ background: '#f59e0b22', color: '#f59e0b' }}>
                           <MessageSquare size={13} strokeWidth={1.5} />
-                          {messaging ? 'Opening…' : 'Message'}
+                          {messaging ? 'Opening' : 'Message'}
                         </button>
                       </div>
                     </div>

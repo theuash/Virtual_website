@@ -52,7 +52,7 @@ function PayrollRow({ payroll }) {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-sm font-black" style={{ color: '#f59e0b' }}>
-            ₹{budget.toLocaleString('en-IN')}
+            {budget.toLocaleString('en-IN')}
           </span>
           <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
             style={{
@@ -97,7 +97,7 @@ function PayrollRow({ payroll }) {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>
-                          ₹{(entry.amount || 0).toLocaleString('en-IN')}
+                          {(entry.amount || 0).toLocaleString('en-IN')}
                         </span>
                         <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold"
                           style={{ background: st.bg, color: st.color }}>
@@ -119,7 +119,7 @@ function PayrollRow({ payroll }) {
                   className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
                   style={{ background: '#f59e0b', color: '#fff' }}>
                   {distributing ? (
-                    <><Loader2 size={14} className="animate-spin" /> Distributing…</>
+                    <><Loader2 size={14} className="animate-spin" /> Distributing</>
                   ) : (
                     <><Send size={14} strokeWidth={2} /> Distribute Payroll</>
                   )}

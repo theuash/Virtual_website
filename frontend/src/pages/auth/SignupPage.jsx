@@ -11,7 +11,7 @@ import { getRoleRedirect } from '../../utils/roleGuards';
 import ThemeToggle from '../../components/ThemeToggle';
 import { useCurrency } from '../../context/CurrencyContext';
 
-// Country code → dial code map (major countries)
+// Country code  dial code map (major countries)
 const DIAL_CODES = {
   IN: '+91', US: '+1', GB: '+44', CA: '+1', AU: '+61', DE: '+49', FR: '+33',
   NL: '+31', SE: '+46', NO: '+47', DK: '+45', FI: '+358', CH: '+41', AT: '+43',
@@ -31,7 +31,7 @@ function getDialCode(countryCode) {
   return DIAL_CODES[countryCode] || '+1';
 }
 
-/* ── Shared input style helper ───────────────────────────────────────── */
+/*  Shared input style helper  */
 const inputStyle = {
   paddingTop: '0.875rem',
   paddingBottom: '0.875rem',
@@ -192,7 +192,7 @@ export default function SignupPage() {
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } };
   const otpDestination = pendingUser?.phone || pendingUser?.user?.phone || formData.phone;
 
-  /* ── Role Selection Screen ──────────────────────────────────────────── */
+  /*  Role Selection Screen  */
   if (!role) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
@@ -278,13 +278,13 @@ export default function SignupPage() {
     );
   }
 
-  /* ── Signup Form Screen ─────────────────────────────────────────────── */
+  /*  Signup Form Screen  */
   const accentColor = role === 'client' ? 'var(--accent)' : '#10B981';
 
   return (
     <div className="min-h-screen flex select-none" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ── Left Art Panel (fixed, desktop only) ── */}
+      {/*  Left Art Panel (fixed, desktop only)  */}
       <div className="hidden lg:block fixed top-0 left-0 w-[60%] h-full z-0 bg-black border-r border-white/5 overflow-hidden">
         <motion.img
           src={signupArt}
@@ -367,7 +367,7 @@ export default function SignupPage() {
         </motion.div>
       </div>
 
-      {/* ── Right Form Panel ── */}
+      {/*  Right Form Panel  */}
       <div
         className="w-full min-h-screen flex items-start justify-center px-6 py-16 z-10"
         style={{ background: 'var(--bg-primary)', marginLeft: 'clamp(0px, 60vw, 60%)' }}
@@ -420,7 +420,7 @@ export default function SignupPage() {
                 <span>
                   {error}
                   {(error.toLowerCase().includes('already exists') || error.toLowerCase().includes('already registered')) && (
-                    <> <Link to={`/login?email=${encodeURIComponent(formData.email)}`} className="underline font-black hover:opacity-70" style={{ color: '#f87171' }}>Log in now →</Link></>
+                    <> <Link to={`/login?email=${encodeURIComponent(formData.email)}`} className="underline font-black hover:opacity-70" style={{ color: '#f87171' }}>Log in now </Link></>
                   )}
                 </span>
               </motion.div>
@@ -520,20 +520,20 @@ export default function SignupPage() {
                       className="text-sm rounded-xl border outline-none transition-all cursor-pointer flex-shrink-0"
                       style={{ ...inputNoIconStyle, paddingLeft: '0.5rem', width: '120px' }}
                       required value={formData.countryCode} onChange={handleChange}>
-                      <option value="+91">🇮🇳 +91</option>
-                      <option value="+1">🇺🇸 +1</option>
-                      <option value="+44">🇬🇧 +44</option>
-                      <option value="+61">🇦🇺 +61</option>
-                      <option value="+86">🇨🇳 +86</option>
-                      <option value="+81">🇯🇵 +81</option>
-                      <option value="+33">🇫🇷 +33</option>
-                      <option value="+49">🇩🇪 +49</option>
-                      <option value="+39">🇮🇹 +39</option>
-                      <option value="+34">🇪🇸 +34</option>
-                      <option value="+31">🇳🇱 +31</option>
-                      <option value="+47">🇳🇴 +47</option>
-                      <option value="+46">🇸🇪 +46</option>
-                      <option value="+41">🇨🇭 +41</option>
+                      <option value="+91"> +91</option>
+                      <option value="+1"> +1</option>
+                      <option value="+44"> +44</option>
+                      <option value="+61"> +61</option>
+                      <option value="+86"> +86</option>
+                      <option value="+81"> +81</option>
+                      <option value="+33"> +33</option>
+                      <option value="+49"> +49</option>
+                      <option value="+39"> +39</option>
+                      <option value="+34"> +34</option>
+                      <option value="+31"> +31</option>
+                      <option value="+47"> +47</option>
+                      <option value="+46"> +46</option>
+                      <option value="+41"> +41</option>
                     </select>
                     <input name="phone" type="tel"
                       className="flex-1 text-sm rounded-xl border outline-none transition-all"
@@ -601,7 +601,7 @@ export default function SignupPage() {
             <p className="text-center mt-8 text-[11px] font-semibold" style={{ color: 'var(--text-secondary)' }}>
               Already have an account?{' '}
               <Link to="/login" className="font-black hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
-                Sign In →
+                Sign In 
               </Link>
             </p>
           )}

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+﻿import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 // Full-screen spinner shown while the token check is in progress

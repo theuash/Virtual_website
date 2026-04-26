@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ï»¿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -26,7 +26,7 @@ function LearningBar({ completed, total }) {
     <div>
       <div className="flex justify-between mb-1">
         <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Learning</span>
-        <span className="text-[9px] font-bold" style={{ color: 'var(--text-primary)' }}>{completed}/{total} modules · {pct}%</span>
+        <span className="text-[9px] font-bold" style={{ color: 'var(--text-primary)' }}>{completed}/{total} modules  {pct}%</span>
       </div>
       <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: '#f59e0b' }} />
@@ -107,7 +107,7 @@ function PrecratSidebar({ id, onClose, onUpdated }) {
         });
         // Parse preferredContactTime
         if (d.preferredContactTime) {
-          const parts = d.preferredContactTime.split(' · ');
+          const parts = d.preferredContactTime.split('  ');
           if (parts.length === 2) {
             setContactDays(parts[0].split(', ').map(s => s.trim()).filter(Boolean));
             setContactTime(parts[1].trim());
@@ -135,7 +135,7 @@ function PrecratSidebar({ id, onClose, onUpdated }) {
     setStatus(null);
     try {
       const preferredContactTime = contactDays.length > 0 && contactTime
-        ? `${contactDays.join(', ')} · ${contactTime}`
+        ? `${contactDays.join(', ')}  ${contactTime}`
         : contactTime;
       await api.patch(`/supervisor/precrates/${id}`, { ...form, preferredContactTime });
       setStatus({ type: 'success', msg: 'Saved successfully.' });
@@ -438,7 +438,7 @@ function PrecratSidebar({ id, onClose, onUpdated }) {
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:opacity-90 disabled:opacity-60"
                 style={{ background: '#f59e0b', color: '#fff' }}>
                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                {saving ? 'Saving…' : 'Save Changes'}
+                {saving ? 'Saving' : 'Save Changes'}
               </button>
             </div>
           )}

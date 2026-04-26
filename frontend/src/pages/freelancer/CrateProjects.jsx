@@ -85,13 +85,13 @@ function ProjectCard({ project, onClick }) {
           {deadline && (
             <div className="flex items-center gap-1 text-xs" style={{ color: isOverdue ? '#ef4444' : 'var(--text-secondary)' }}>
               <Calendar size={11} />
-              {isOverdue ? 'Overdue · ' : ''}{deadline.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+              {isOverdue ? 'Overdue  ' : ''}{deadline.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
             </div>
           )}
           {project.totalAmount && (
             <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
               <DollarSign size={11} />
-              ₹{project.totalAmount?.toLocaleString('en-IN')}
+              {project.totalAmount?.toLocaleString('en-IN')}
             </div>
           )}
         </div>
@@ -186,7 +186,7 @@ function ProjectDetailModal({ project, onClose }) {
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}>✕</button>
+          <button onClick={onClose} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}></button>
         </div>
 
         <div className="overflow-y-auto flex-1 p-6 space-y-5">
@@ -199,7 +199,7 @@ function ProjectDetailModal({ project, onClose }) {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Budget', value: project.totalAmount ? `₹${project.totalAmount.toLocaleString('en-IN')}` : '-' },
+              { label: 'Budget', value: project.totalAmount ? `${project.totalAmount.toLocaleString('en-IN')}` : '-' },
               { label: 'Deadline', value: project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN') : '-' },
               { label: 'Tasks', value: project.tasks?.length ?? 0 },
             ].map(s => (
@@ -229,7 +229,7 @@ function ProjectDetailModal({ project, onClose }) {
                           Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN') : '-'}
                         </span>
                         <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>
-                          ₹{task.earnings?.toLocaleString('en-IN')}
+                          {task.earnings?.toLocaleString('en-IN')}
                         </span>
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+ï»¿import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -108,7 +108,7 @@ export default function SupervisorDispatch() {
                   </div>
                   <h2 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{project?.title || '-'}</h2>
                   <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    {project?.clientName || project?.client?.fullName || '-'} · {project?.clientCompany || project?.client?.company || ''}
+                    {project?.clientName || project?.client?.fullName || '-'}  {project?.clientCompany || project?.client?.company || ''}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1 rounded-full text-xs font-bold capitalize"
@@ -231,7 +231,7 @@ export default function SupervisorDispatch() {
                   <button onClick={handleDispatch} disabled={!selected || dispatching}
                     className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                     style={{ background: 'var(--accent)', color: '#fff' }}>
-                    {dispatching ? <><Loader2 size={15} className="animate-spin" /> Dispatching…</> : 'Dispatch Project'}
+                    {dispatching ? <><Loader2 size={15} className="animate-spin" /> Dispatching</> : 'Dispatch Project'}
                   </button>
                 </div>
               )}

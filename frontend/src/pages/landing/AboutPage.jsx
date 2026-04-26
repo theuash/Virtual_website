@@ -50,7 +50,7 @@ export default function AboutPage() {
         </motion.button>
       </div>
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
+      {/*  Hero  */}
       <section className="pt-48 pb-32 px-6 text-center relative overflow-hidden">
         {/* Ambient glow */}
         <div
@@ -98,7 +98,7 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* ── Department Structure ──────────────────────────────────── */}
+      {/*  Department Structure  */}
       <section id="quality-assurance" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-16">
@@ -141,7 +141,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Wallet & Escrow ───────────────────────────────────────── */}
+      {/*  Wallet & Escrow  */}
       <section id="escrow-protection" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -184,7 +184,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Dispute Resolution ────────────────────────────────────── */}
+      {/*  Dispute Resolution  */}
       <section className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
@@ -243,7 +243,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Structured Teams ──────────────────────────────────────── */}
+      {/*  Structured Teams  */}
       <section id="structured-teams" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
@@ -272,7 +272,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Earn While You Learn ──────────────────────────────────── */}
+      {/*  Earn While You Learn  */}
       <section id="earn-while-you-learn" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -311,7 +311,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Real Portfolio Work ───────────────────────────────────── */}
+      {/*  Real Portfolio Work  */}
       <section id="real-portfolio-work" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
@@ -343,7 +343,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Chain of Command ──────────────────────────────────────── */}
+      {/*  Chain of Command  */}
       <section id="chain-of-command" className="py-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
@@ -380,7 +380,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
+      {/*  CTA  */}
       <section className="py-32 px-6 border-t text-center relative overflow-hidden" style={{ borderColor: 'var(--border)' }}>
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-[120px] pointer-events-none"

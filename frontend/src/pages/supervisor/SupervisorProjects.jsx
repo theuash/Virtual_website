@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+ï»¿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardHeader from "../../components/DashboardHeader";
@@ -57,7 +57,7 @@ function ProjectCard({ project, index }) {
         <div>
           <h3 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{project.title}</h3>
           <p className="text-xs mt-0.5 truncate" style={{ color: "var(--text-secondary)" }}>
-            {project.clientId?.fullName || "-"} {project.clientId?.company ? `· ${project.clientId.company}` : ""}
+            {project.clientId?.fullName || "-"} {project.clientId?.company ? ` ${project.clientId.company}` : ""}
           </p>
         </div>
 

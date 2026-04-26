@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext';
+﻿import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun, Settings, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

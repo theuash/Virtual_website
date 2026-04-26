@@ -8,7 +8,7 @@ import {
   Tag, DollarSign, Star, Play,
 } from 'lucide-react';
 
-// ── Constants ─────────────────────────────────────────────────────
+//  Constants 
 const SKILL_LABELS = {
   video_editing: 'Video Editing', '3d_animation': '3D Animation',
   cgi: 'CGI / VFX', script_writing: 'Script Writing', graphic_designing: 'Graphic Design',
@@ -33,7 +33,7 @@ const TABS = [
   { id: 'personal', label: 'Personal',         icon: <FolderKanban size={14} strokeWidth={1.5} /> },
 ];
 
-// ── Shared helpers ────────────────────────────────────────────────
+//  Shared helpers 
 function StatusBadge({ status, cfg = STATUS_CFG }) {
   const c = cfg[status] || { label: status, color: '#6b7280', bg: '#6b728022' };
   return (
@@ -94,7 +94,7 @@ function TaskProgressBar({ tasks = [], color = 'var(--accent)' }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-          {approved}/{total} done {submitted > 0 && `· ${submitted} pending review`}
+          {approved}/{total} done {submitted > 0 && ` ${submitted} pending review`}
         </span>
         <span className="text-[10px] font-bold" style={{ color }}>{pct}%</span>
       </div>
@@ -107,7 +107,7 @@ function TaskProgressBar({ tasks = [], color = 'var(--accent)' }) {
   );
 }
 
-// ── Project Detail Modal ──────────────────────────────────────────
+//  Project Detail Modal 
 function ProjectDetailModal({ project, onClose }) {
   if (!project) return null;
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
@@ -218,7 +218,7 @@ function ProjectDetailModal({ project, onClose }) {
   );
 }
 
-// ── Team Projects Tab ─────────────────────────────────────────────
+//  Team Projects Tab 
 function TeamProjectCard({ project, onClick }) {
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
   const tasks   = project.tasks || [];
@@ -317,7 +317,7 @@ function TeamProjectsTab({ data, loading }) {
   );
 }
 
-// ── Group Projects Tab ────────────────────────────────────────────
+//  Group Projects Tab 
 function GroupProjectCard({ project, onClick }) {
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
   const coInitiators = project.coInitiators || [];
@@ -387,7 +387,7 @@ function GroupProjectsTab({ data, loading }) {
   );
 }
 
-// ── Personal Projects Tab ─────────────────────────────────────────
+//  Personal Projects Tab 
 function PersonalProjectCard({ project, onClick }) {
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
   const tasks = project.tasks || [];
@@ -448,7 +448,7 @@ function PersonalProjectsTab({ data, loading }) {
   );
 }
 
-// ── Main Component ────────────────────────────────────────────────
+//  Main Component 
 export default function InitiatorProjects() {
   const [activeTab, setActiveTab] = useState('team');
   const [data, setData]           = useState({});

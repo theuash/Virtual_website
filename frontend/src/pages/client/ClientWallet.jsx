@@ -33,7 +33,7 @@ function AddMoneyModal({ onClose, onSuccess }) {
 
   const handleAdd = async () => {
     const amt = parseInt(amount);
-    if (!amt || amt < 2) return setError('Minimum add amount is ₹100');
+    if (!amt || amt < 2) return setError('Minimum add amount is 100');
     setLoading(true); setError('');
     try {
       await api.post('/client/wallet/add', { amount: amt, method });
@@ -69,10 +69,10 @@ function AddMoneyModal({ onClose, onSuccess }) {
           {/* Amount input */}
           <div>
             <label className="text-[10px] font-black uppercase tracking-widest mb-2 block"
-              style={{ color: 'var(--text-secondary)' }}>Amount (₹)</label>
+              style={{ color: 'var(--text-secondary)' }}>Amount ()</label>
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl border"
               style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}>₹</span>
+              <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}></span>
               <input
                 type="number" value={amount} onChange={e => setAmount(e.target.value)}
                 placeholder="0" min="100"
@@ -90,7 +90,7 @@ function AddMoneyModal({ onClose, onSuccess }) {
                     color: amount === String(a) ? 'var(--accent)' : 'var(--text-secondary)',
                     background: 'var(--bg-card)',
                   }}>
-                  ₹{a.toLocaleString()}
+                  {a.toLocaleString()}
                 </button>
               ))}
             </div>
@@ -127,8 +127,8 @@ function AddMoneyModal({ onClose, onSuccess }) {
             className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
             style={{ background: 'var(--accent)', color: '#fff' }}>
             {success ? <><CheckCircle2 size={16} /> Added!</> :
-             loading  ? <><Loader2 size={16} className="animate-spin" /> Processing…</> :
-             `Add ₹${parseInt(amount || 0).toLocaleString()}`}
+             loading  ? <><Loader2 size={16} className="animate-spin" /> Processing</> :
+             `Add ${parseInt(amount || 0).toLocaleString()}`}
           </button>
 
           <p className="text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
@@ -179,7 +179,7 @@ export default function ClientWallet() {
                 {card.label}
               </div>
               <div className="text-2xl font-black" style={{ color: card.accent ? '#fff' : 'var(--text-primary)' }}>
-                {loading ? '-' : `₹${card.value.toLocaleString()}`}
+                {loading ? '-' : `${card.value.toLocaleString()}`}
               </div>
             </motion.div>
           ))}
@@ -242,7 +242,7 @@ export default function ClientWallet() {
                   </div>
                   <div className="text-sm font-black shrink-0"
                     style={{ color: isCredit ? '#10b981' : '#ef4444' }}>
-                    {isCredit ? '+' : '-'}₹{tx.amount.toLocaleString()}
+                    {isCredit ? '+' : '-'}{tx.amount.toLocaleString()}
                   </div>
                 </div>
               );

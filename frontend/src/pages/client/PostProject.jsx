@@ -10,7 +10,7 @@ import {
   CheckCircle2, Search, X, Plus, Loader2, AlertCircle, Receipt,
 } from 'lucide-react';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+//  Constants 
 const SKILL_LABELS = {
   video_editing:     'Video Editing',
   '3d_animation':    '3D Animation',
@@ -35,7 +35,7 @@ const TIME_SENSITIVE_RATE   = 0.60;
 const DEPOSIT_RATE          = 0.30;
 const FIRST_PROJECT_DISCOUNT = 0.15;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 
 function minDate(timeSensitive = false) {
   const d = new Date();
@@ -59,7 +59,7 @@ function minDuration(timeSensitive = false) {
   return timeSensitive ? 1 : 4;
 }
 
-// ─── Shared UI primitives ─────────────────────────────────────────────────────
+//  Shared UI primitives 
 function Tooltip({ text }) {
   const [show, setShow] = useState(false);
   return (
@@ -142,7 +142,7 @@ const inputStyle = {
   color: 'var(--text-primary)',
 };
 
-// ─── Receipt Panel ────────────────────────────────────────────────────────────
+//  Receipt Panel 
 function ReceiptPanel({ selectedService, form, pricing, convert }) {
   const hasService  = !!selectedService;
   const hasQuantity = hasService && form.quantity && parseFloat(form.quantity) > 0;
@@ -290,7 +290,7 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
   );
 }
 
-// ─── Step 0 – Choose Path ─────────────────────────────────────────────────────
+//  Step 0  Choose Path 
 function StepChoosePath({ onSelect }) {
   return (
     <div className="space-y-6">
@@ -375,7 +375,7 @@ function StepChoosePath({ onSelect }) {
   );
 }
 
-// ─── Step 1 (service mode) – Service Selection ────────────────────────────────
+//  Step 1 (service mode)  Service Selection 
 function StepServiceSelection({
   catalogue, catalogueLoading,
   selectedDept, setSelectedDept,
@@ -510,7 +510,7 @@ function StepServiceSelection({
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               Estimated base:{' '}
               <strong style={{ color: 'var(--text-primary)' }}>
-                ₹{(selectedService.rate * parseFloat(form.quantity)).toLocaleString('en-IN')}
+                {(selectedService.rate * parseFloat(form.quantity)).toLocaleString('en-IN')}
               </strong>
             </p>
           )}
@@ -526,7 +526,7 @@ function StepServiceSelection({
   );
 }
 
-// ─── Step 1 (open mode) – Tags + Budget ──────────────────────────────────────
+//  Step 1 (open mode)  Tags + Budget 
 function StepOpenBudget({ form, setForm, errors }) {
   const [tagInput, setTagInput] = useState('');
 
@@ -601,7 +601,7 @@ function StepOpenBudget({ form, setForm, errors }) {
             value={tagInput}
             onChange={e => setTagInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={(form.openTags || []).length === 0 ? 'Type a tag and press Enter…' : ''}
+            placeholder={(form.openTags || []).length === 0 ? 'Type a tag and press Enter' : ''}
             className="flex-1 bg-transparent text-sm outline-none min-w-[120px]"
             style={{ color: 'var(--text-primary)' }}
           />
@@ -636,7 +636,7 @@ function StepOpenBudget({ form, setForm, errors }) {
 
       {/* Budget */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField label="Budget Amount (₹)" error={errors.openBudget}>
+        <InputField label="Budget Amount ()" error={errors.openBudget}>
           <input
             type="number"
             className={inputCls}
@@ -680,7 +680,7 @@ function StepOpenBudget({ form, setForm, errors }) {
   );
 }
 
-// ─── Step 2 – Project Details ─────────────────────────────────────────────────
+//  Step 2  Project Details 
 function StepProjectDetails({ form, setForm, errors }) {
   const timeSensitive = form.timeSensitive;
   const minDur = minDuration(timeSensitive);
@@ -711,7 +711,7 @@ function StepProjectDetails({ form, setForm, errors }) {
         <textarea
           className={inputCls}
           style={{ ...inputStyle, resize: 'vertical', minHeight: 110 }}
-          placeholder="Describe what you need, style references, tone, deliverables…"
+          placeholder="Describe what you need, style references, tone, deliverables"
           value={form.description}
           onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
           rows={4}
@@ -895,7 +895,7 @@ function StepProjectDetails({ form, setForm, errors }) {
   );
 }
 
-// ─── Step 3 – Extras ──────────────────────────────────────────────────────────
+//  Step 3  Extras 
 function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing, errors }) {
   const filtered = SOFTWARE_OPTIONS.filter(
     s => s.toLowerCase().includes(softwareSearch.toLowerCase()) && !form.preferredSoftware.includes(s)
@@ -947,7 +947,7 @@ function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing,
           <input
             className={inputCls + ' pl-9'}
             style={inputStyle}
-            placeholder="Search software…"
+            placeholder="Search software"
             value={softwareSearch}
             onChange={e => setSoftwareSearch(e.target.value)}
           />
@@ -1067,7 +1067,7 @@ function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing,
   );
 }
 
-// ─── Step 4 – Review & Submit ─────────────────────────────────────────────────
+//  Step 4  Review & Submit 
 function StepReview({ form, mode, selectedService, pricing, loading, error, onSubmit, convert }) {
   const fmt = (n) => {
     const converted = convert(n);
@@ -1097,7 +1097,7 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
     {
       label: 'Service',
       value: mode === 'service' && selectedService
-        ? `${selectedService.name} - ${fmt(selectedService.rate)} / ${selectedService.unit} �- ${form.quantity || 0}`
+        ? `${selectedService.name} - ${fmt(selectedService.rate)} / ${selectedService.unit} - ${form.quantity || 0}`
         : mode === 'open'
         ? `Open Budget - ${fmt(form.openBudget || 0)} / ${form.openUnit}`
         : '-',
@@ -1217,13 +1217,13 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
         style={{ background: 'var(--accent)', color: '#fff' }}
       >
         {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-        {loading ? 'Posting…' : 'Post Project'}
+        {loading ? 'Posting' : 'Post Project'}
       </button>
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+//  Main Component 
 export default function PostProject() {
   const navigate = useNavigate();
   const { convert } = useCurrency();
@@ -1442,7 +1442,7 @@ export default function PostProject() {
         {step > 0 && (
           <div className={`grid gap-8 ${isServiceMode ? 'lg:grid-cols-3' : 'max-w-2xl mx-auto'}`}>
 
-            {/* ── Left: form ─────────────────────────────────── */}
+            {/*  Left: form  */}
             <div className={isServiceMode ? 'lg:col-span-2' : ''}>
 
               {/* Progress bar */}
@@ -1578,7 +1578,7 @@ export default function PostProject() {
               )}
             </div>
 
-            {/* ── Right: receipt panel (service mode only) ────── */}
+            {/*  Right: receipt panel (service mode only)  */}
             {isServiceMode && (
               <div className="lg:col-span-1">
                 <div className="sticky top-24">

@@ -55,7 +55,7 @@ function generateBlobPath(seed, size) {
 
     if (i === 0) d += `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} `;
 
-    // Catmull-Rom → cubic bezier
+    // Catmull-Rom  cubic bezier
     const cp1x = p1.x + (p2.x - p0.x) / 6;
     const cp1y = p1.y + (p2.y - p0.y) / 6;
     const cp2x = p2.x - (p3.x - p1.x) / 6;

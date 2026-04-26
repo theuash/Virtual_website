@@ -1,4 +1,4 @@
-import { useAuth } from '../../context/AuthContext';
+﻿import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
 import LockedOverlay from '../../components/LockedOverlay';
 import CrateEarnings from './CrateEarnings';

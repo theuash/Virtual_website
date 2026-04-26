@@ -100,7 +100,7 @@ export default function InitiatorDashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{task.title}</p>
                           <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                            {task.projectId?.title} {task.assignedTo && `· by ${task.assignedTo.fullName}`}
+                            {task.projectId?.title} {task.assignedTo && ` by ${task.assignedTo.fullName}`}
                           </p>
                         </div>
                         <span className="text-[10px] font-bold shrink-0" style={{ color: tc.color }}>{tc.label}</span>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -119,7 +119,7 @@ export default function SupervisorLayout() {
                       <div>
                         <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{n.title}</p>
                         <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                          {n.timeSensitive ? '⚡ Time Sensitive' : '🎯 Consultancy'} · {n.clientId?.company || n.clientId?.fullName}
+                          {n.timeSensitive ? ' Time Sensitive' : ' Consultancy'}  {n.clientId?.company || n.clientId?.fullName}
                         </p>
                       </div>
                     </button>

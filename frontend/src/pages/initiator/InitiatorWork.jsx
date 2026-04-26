@@ -80,7 +80,7 @@ function WorkFeedItem({ item }) {
                   <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{task.title}</p>
                   {task.assignedTo && (
                     <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                      by {task.assignedTo.fullName} · {task.assignedTo.tier}
+                      by {task.assignedTo.fullName}  {task.assignedTo.tier}
                     </p>
                   )}
                 </div>

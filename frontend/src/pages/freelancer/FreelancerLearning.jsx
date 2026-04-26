@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -47,7 +47,7 @@ const SOFTWARE_LABELS = {
   canva: 'Canva',
 };
 
-// Ã¢ââ¬Ã¢ââ¬ YouTube IFrame API progress-tracking player Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬Ã¢ââ¬
+//  YouTube IFrame API progress-tracking player 
 // Uses the YouTube IFrame API to poll playback position every 5s and
 // report to the backend. A video is "complete" once 80% is watched.
 let ytApiReady = false;
@@ -165,7 +165,7 @@ function VideoPlayer({ video, onProgressUpdate, progressMap }) {
   }, [video?.youtubeId]);
 
   // Re-apply iframe fill styles whenever the wrapper is resized (e.g. sidebar collapse/expand).
-  // The YouTube IFrame API bakes in pixel dimensions â ResizeObserver catches the reflow.
+  // The YouTube IFrame API bakes in pixel dimensions  ResizeObserver catches the reflow.
   useEffect(() => {
     if (!wrapperRef.current) return;
     const applyFill = () => {
@@ -193,8 +193,8 @@ function VideoPlayer({ video, onProgressUpdate, progressMap }) {
       className="w-full rounded-xl overflow-hidden"
       style={{ background: 'var(--bg-card)' }}
     >
-      {/* Official YouTube IFrame player Ã¢â¬â full controls, HD quality */}
-      {/* Padding-top 56.25% = 16:9 aspect ratio â iframe fills the container absolutely */}
+      {/* Official YouTube IFrame player  full controls, HD quality */}
+      {/* Padding-top 56.25% = 16:9 aspect ratio  iframe fills the container absolutely */}
       <div ref={wrapperRef} style={{ position: 'relative', paddingTop: '56.25%', width: '100%', background: '#000' }}>
         <div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
       </div>
@@ -295,7 +295,7 @@ function TutorialCard({ tutorial, onSelect, isSelected, isCompleted }) {
         <p className="text-xs mt-1 opacity-80 line-clamp-2">{tutorial.desc}</p>
         <div className="flex items-center gap-2 text-xs opacity-70 mt-2">
           <Clock size={12} />
-          {tutorial.duration} Ã¢â¬Â¢ {tutorial.level}
+          {tutorial.duration}  {tutorial.level}
         </div>
       </div>
     </motion.div>
@@ -400,7 +400,7 @@ function CrashCourseCard({ course, onToggle, isExpanded, onSelectVideo }) {
   );
 }
 
-// ââ Promotion Progress Panel ââââââââââââââââââââââââââââââââââââââââââ
+//  Promotion Progress Panel 
 function PromotionProgressPanel({ onApplied }) {
   const [status, setStatus]     = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -451,7 +451,7 @@ function PromotionProgressPanel({ onApplied }) {
 
   return (
     <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-      {/* Header row â always visible */}
+      {/* Header row  always visible */}
       <div className="px-5 py-4 flex items-center justify-between gap-4 flex-wrap"
         style={{ borderBottom: expanded ? '1px solid var(--border)' : 'none' }}>
         <div className="flex items-center gap-2 shrink-0">
@@ -542,7 +542,7 @@ function PromotionProgressPanel({ onApplied }) {
                 </div>
               ) : softwareRows.length === 0 ? (
                 <p className="text-xs text-center py-2" style={{ color: 'var(--text-secondary)' }}>
-                  No progress data yet â start watching videos!
+                  No progress data yet  start watching videos!
                 </p>
               ) : (
                 <div className="overflow-x-auto">
@@ -586,7 +586,7 @@ function PromotionProgressPanel({ onApplied }) {
                                       color: best ? LEVEL_COLORS[level].text : val > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
                                       border: best ? `1px solid ${LEVEL_COLORS[level].bar}` : '1px solid transparent',
                                     }}
-                                    title={best ? `Best for ${level} â counts toward promotion` : undefined}
+                                    title={best ? `Best for ${level}  counts toward promotion` : undefined}
                                   >
                                     {val}/{req}
                                   </span>
@@ -603,7 +603,7 @@ function PromotionProgressPanel({ onApplied }) {
                     </tbody>
                   </table>
                   <p className="text-[10px] mt-3" style={{ color: 'var(--text-secondary)' }}>
-                    Highlighted = best software per level (counts toward promotion). Requirements: Beg {REQUIREMENTS.Beginner} · Int {REQUIREMENTS.Intermediate} · Adv {REQUIREMENTS.Advanced}
+                    Highlighted = best software per level (counts toward promotion). Requirements: Beg {REQUIREMENTS.Beginner}  Int {REQUIREMENTS.Intermediate}  Adv {REQUIREMENTS.Advanced}
                   </p>
                 </div>
               )}
@@ -737,14 +737,14 @@ export default function FreelancerLearning() {
       .then(res => {
         const raw = res.data?.data ?? {};
         // Normalize: each skill/software value might be a plain object {tutorials,playlists,crash_courses}
-        // OR an array of full documents (old backend format) ÎÃÃ¶ handle both
+        // OR an array of full documents (old backend format)  handle both
         const normalized = {};
         for (const skill of Object.keys(raw)) {
           normalized[skill] = {};
           for (const software of Object.keys(raw[skill])) {
             const val = raw[skill][software];
             if (Array.isArray(val)) {
-              // Old format: array of documents ÎÃÃ¶ merge all into one
+              // Old format: array of documents  merge all into one
               normalized[skill][software] = {
                 tutorials: val.flatMap(d => d.tutorials ?? []),
                 playlists: val.flatMap(d => d.playlists ?? []),
@@ -944,7 +944,7 @@ export default function FreelancerLearning() {
                                 <h4 className="text-xs font-semibold line-clamp-2" style={{ color: selectedVideo?.youtubeId === tutorial.youtubeId ? '#fff' : 'var(--text-primary)' }}>{tutorial.title}</h4>
                                 <p className="text-[10px] mt-0.5 opacity-80">{tutorial.duration}</p>
                                 {progressMap[tutorial.youtubeId]?.completed && (
-                                  <span className="text-[9px] font-bold" style={{ color: '#16a34a' }}>ÎÂ£Ã´ Completed</span>
+                                  <span className="text-[9px] font-bold" style={{ color: '#16a34a' }}> Completed</span>
                                 )}
                               </div>
                             </motion.div>

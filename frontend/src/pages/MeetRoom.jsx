@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, PhoneOff, Copy, Check } from 'lucide-react';
@@ -83,7 +83,7 @@ export default function MeetRoom() {
         },
       });
 
-      // Supervisor joined → set live
+      // Supervisor joined  set live
       apiRef.current.addEventListener('videoConferenceJoined', () => {
         if (isSupervisor && !statusUpdatedRef.current) {
           statusUpdatedRef.current = true;
@@ -91,7 +91,7 @@ export default function MeetRoom() {
         }
       });
 
-      // Supervisor left → set completed
+      // Supervisor left  set completed
       apiRef.current.addEventListener('videoConferenceLeft', () => {
         if (isSupervisor) updateStatus('completed');
         navigate(-1);
@@ -147,7 +147,7 @@ export default function MeetRoom() {
           <span className="text-white font-black text-sm tracking-tight">Virtual Meet</span>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded"
             style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}>
-            {meetingId?.slice(0, 16)}…
+            {meetingId?.slice(0, 16)}
           </span>
         </div>
         <div className="flex items-center gap-2">

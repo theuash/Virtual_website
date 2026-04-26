@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/roleGuards';
 import api from '../../services/api';
