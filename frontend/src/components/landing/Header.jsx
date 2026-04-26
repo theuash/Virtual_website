@@ -23,7 +23,7 @@ export default function Header() {
   });
   const smoothScrollY = useSpring(effectiveScroll, { stiffness: 150, damping: 25, mass: 0.3 });
   const headerOpacity = useTransform(smoothScrollY, [50, 200], [0, 1]);
-  const headerY      = useTransform(smoothScrollY, [50, 200], [-80, 0]);
+  const headerY = useTransform(smoothScrollY, [50, 200], [-64, 0]);
 
   useEffect(() => {
     if (!isLanding) return;
@@ -47,36 +47,41 @@ export default function Header() {
     navigate(path);
   };
 
-  const headerStyle = {
-    position: 'fixed',
-    top: 0, left: 0, right: 0,
-    zIndex: 100,
-    background: 'var(--bg-glass)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-    padding: '0 1.5rem',
-    height: '80px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  };
+  const logoFilter = isDark
+    ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)'
+    : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)';
 
   return (
     <>
       <motion.header
-        className="header-main md:block"
-        style={
-          isLanding
-            ? { ...headerStyle, opacity: headerOpacity, y: headerY }
-            : { ...headerStyle, opacity: 1, y: 0 }
+        className="header-main"
+        style={isLanding
+          ? { opacity: headerOpacity, y: headerY }
+          : { opacity: 1, y: 0 }
         }
+        css-vars="true"
       >
         <style>{`
+          .header-main {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: ${scrolled ? '1px solid var(--border)' : '1px solid transparent'};
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            height: 80px;
+          }
           @media (max-width: 767px) {
             .header-main {
+              height: 56px;
+              padding: 0 1rem;
               opacity: ${headerVisible ? '1' : '0'} !important;
-              transform: translateY(${headerVisible ? '0' : '-80px'}) !important;
+              transform: translateY(${headerVisible ? '0' : '-56px'}) !important;
               transition: opacity 0.3s ease, transform 0.3s ease;
               pointer-events: ${headerVisible ? 'auto' : 'none'};
             }
@@ -84,18 +89,23 @@ export default function Header() {
         `}</style>
 
         {/* Logo */}
-        <div onClick={() => navigate('/')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-end', gap: '0' }}>
+        <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-end' }}>
           <img src={logo} alt="Virtual Logo" style={{
-            width: 44, height: 44, objectFit: 'contain', flexShrink: 0, marginBottom: '2px',
-            filter: isDark
-              ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)'
-              : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)',
+            width: 'clamp(28px, 36px, 44px)',
+            height: 'clamp(28px, 36px, 44px)',
+            objectFit: 'contain',
+            flexShrink: 0,
+            marginBottom: '2px',
+            filter: logoFilter,
           }} />
           <span style={{
-            fontWeight: 800, fontSize: '1.5rem', lineHeight: 1,
-            color: 'var(--text-primary)', letterSpacing: '-0.06em',
-            marginBottom: '5px', marginLeft: '-8px',
+            fontWeight: 800,
+            fontSize: 'clamp(1.1rem, 1.4rem, 1.5rem)',
+            lineHeight: 1,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.06em',
+            marginBottom: '4px',
+            marginLeft: '-6px',
           }}>
             irtual
           </span>
@@ -105,9 +115,9 @@ export default function Header() {
         <nav className="hidden md:flex" style={{ gap: '2rem', alignItems: 'center' }}>
           {[
             ['How It Works', '/how-it-works'],
-            ['Roles',        '/roles'],
-            ['Pricing',      '/pricing'],
-            ['About',        '/about'],
+            ['Roles', '/roles'],
+            ['Pricing', '/pricing'],
+            ['About', '/about'],
           ].map(([label, path]) => (
             <button key={path} onClick={() => navigate(path)}
               style={{
@@ -125,16 +135,30 @@ export default function Header() {
         </nav>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <CountrySelector />
-          <ThemeToggle  />
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {/* CountrySelector — desktop only */}
+          <div className="hidden md:block">
+            <CountrySelector />
+          </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:scale-105 transition-transform"
-            style={{ color: 'var(--text-secondary)' }}>
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <ThemeToggle />
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex items-center justify-center rounded-lg transition-colors"
+            style={{
+              width: 36, height: 36,
+              color: 'var(--text-secondary)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
+          {/* Desktop auth buttons */}
           <button className="hidden md:block" onClick={() => navigate('/login')}
             style={{
               background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)',
@@ -146,44 +170,74 @@ export default function Header() {
           >
             Log In
           </button>
-          <button className="btn-primary hidden md:block" onClick={() => navigate('/signup')}>
-            Get Started
-          </button>
+          <div className="hidden md:block">
+            <button className="btn-primary" onClick={() => navigate('/signup')}>
+              Get Started
+            </button>
+          </div>
         </div>
       </motion.header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — slides down from header */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-0 right-0 z-50 md:hidden"
-            style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
-            <div className="p-4 space-y-3">
-              {[
-                ['How It Works', '/how-it-works'],
-                ['Roles',        '/roles'],
-                ['Pricing',      '/pricing'],
-                ['About',        '/about'],
-              ].map(([label, path]) => (
-                <button key={path} onClick={() => handleNavClick(path)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg transition-colors hover:bg-[rgba(110,44,242,0.1)]"
-                  style={{ color: location.pathname === path ? 'var(--accent)' : 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 500 }}>
-                  {label}
-                </button>
-              ))}
-              <button onClick={() => handleNavClick('/login')}
-                className="w-full py-2.5 rounded-lg font-semibold"
-                style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
-                Log In
-              </button>
-              <button onClick={() => handleNavClick('/signup')}
-                className="w-full py-2.5 rounded-lg font-semibold hover:scale-[1.02] active:scale-95 transition-all"
-                style={{ background: 'var(--accent)', color: '#fff' }}>
-                Get Started
-              </button>
-            </div>
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-40 md:hidden"
+              style={{ background: 'rgba(0,0,0,0.4)', top: 56 }}
+            />
+            {/* Menu panel */}
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="fixed left-0 right-0 z-50 md:hidden"
+              style={{
+                top: 56,
+                background: 'var(--bg-secondary)',
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              <div className="p-3 flex flex-col gap-1">
+                {[
+                  ['How It Works', '/how-it-works'],
+                  ['Roles', '/roles'],
+                  ['Pricing', '/pricing'],
+                  ['About', '/about'],
+                ].map(([label, path]) => (
+                  <button key={path} onClick={() => handleNavClick(path)}
+                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors"
+                    style={{
+                      color: location.pathname === path ? 'var(--accent)' : 'var(--text-primary)',
+                      fontSize: '0.9rem', fontWeight: 500,
+                      background: location.pathname === path ? 'rgba(110,44,242,0.08)' : 'transparent',
+                    }}>
+                    {label}
+                  </button>
+                ))}
+
+                <div className="flex gap-2 pt-2 mt-1" style={{ borderTop: '1px solid var(--border)' }}>
+                  <button onClick={() => handleNavClick('/login')}
+                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold"
+                    style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+                    Log In
+                  </button>
+                  <button onClick={() => handleNavClick('/signup')}
+                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold"
+                    style={{ background: 'var(--accent)', color: '#fff', border: 'none' }}>
+                    Get Started
+                  </button>
+                </div>
+
+                {/* Country selector in mobile menu */}
+                <div className="pt-2">
+                  <CountrySelector />
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

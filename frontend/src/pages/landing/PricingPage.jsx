@@ -98,7 +98,12 @@ export default function PricingPage() {
     if (hash && TABS.find(t => t.key === hash)) {
       setActiveTab(hash);
       setTimeout(() => {
-        sectionRefs.current[hash]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const el = sectionRefs.current[hash];
+        if (el) {
+          const headerH = window.innerWidth < 768 ? 56 : 80;
+          const top = el.getBoundingClientRect().top + window.scrollY - headerH - 8;
+          window.scrollTo({ top, behavior: "smooth" });
+        }
       }, 300);
     }
   }, [location.hash, loading]);
@@ -122,13 +127,31 @@ export default function PricingPage() {
     setActiveTab(key);
     setQuery("");
     setTimeout(() => {
-      sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const el = sectionRefs.current[key];
+      if (el) {
+        const headerH = window.innerWidth < 768 ? 56 : 80;
+        // +48 accounts for the sticky tabs bar height (~48px)
+        const top = el.getBoundingClientRect().top + window.scrollY - headerH - 48 - 8;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
     }, 50);
   };
 
   return (
     <div className="min-h-screen font-sans" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
       <Header />
+
+      {/* Mobile: fixed bg block that covers the gap between header and sticky tabs */}
+      <div
+        className="fixed sm:hidden z-40"
+        style={{
+          top: 2,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: "var(--bg-primary)",
+        }}
+      />
 
       {/* Desktop view with floating border */}
       <div className="hidden sm:block pt-14 pb-8 px-4">
@@ -199,7 +222,7 @@ export default function PricingPage() {
       </div>
 
       {/* Search */}
-      <div className="px-6 mb-6">
+      <div className="px-6 mb-6 relative z-[70]">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl border"
             style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
@@ -243,8 +266,14 @@ export default function PricingPage() {
 
       {/* Sticky tabs */}
       {!query.trim() && (
-        <div className="sticky top-[79px] z-50 px-6 py-3 border-b"
-          style={{ background: "var(--bg-glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderColor: "var(--border)" }}>
+        <div className="sticky top-14 sm:top-[79px] z-50 px-8 py-6 border-b"
+          style={{
+            background: "var(--bg-primary)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderColor: "var(--border)",
+            boxShadow: "0 -90px 0 0 var(--bg-primary)",
+          }}>
           <div className="max-w-5xl mx-auto flex items-center gap-1 overflow-x-auto scrollbar-hide">
             {TABS.map(tab => (
               <button key={tab.key} onClick={() => handleTabClick(tab.key)}
@@ -273,7 +302,7 @@ export default function PricingPage() {
                 if (!dept) return null;
                 return (
                   <div key={tab.key} ref={el => sectionRefs.current[tab.key] = el} id={tab.key}
-                    className="pt-16 pb-8" style={{ display: activeTab === tab.key ? "block" : "none" }}>
+                    className="pt-8 sm:pt-16 pb-8" style={{ display: activeTab === tab.key ? "block" : "none" }}>
                     <div className="mb-10">
                       <div className="text-xs font-bold uppercase tracking-[0.4em] mb-3" style={{ color: "var(--accent)" }}>Department</div>
                       <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
@@ -389,7 +418,7 @@ export default function PricingPage() {
         </div>
 
         {/* Search */}
-        <div className="px-6 mb-6">
+        <div className="px-6 mb-6 relative z-[70]">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl border"
               style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
@@ -433,8 +462,14 @@ export default function PricingPage() {
 
         {/* Sticky tabs */}
         {!query.trim() && (
-          <div className="sticky top-[79px] z-50 px-6 py-3 border-b"
-            style={{ background: "var(--bg-glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderColor: "var(--border)" }}>
+          <div className="sticky top-14 sm:top-[79px] z-50 px-6 py-3 border-b"
+            style={{
+              background: "var(--bg-primary)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              borderColor: "var(--border)",
+              boxShadow: "0 -56px 0 0 var(--bg-primary)",
+            }}>
             <div className="max-w-5xl mx-auto flex items-center gap-1 overflow-x-auto scrollbar-hide">
               {TABS.map(tab => (
                 <button key={tab.key} onClick={() => handleTabClick(tab.key)}
@@ -463,7 +498,7 @@ export default function PricingPage() {
                   if (!dept) return null;
                   return (
                     <div key={tab.key} ref={el => sectionRefs.current[tab.key] = el} id={tab.key}
-                      className="pt-16 pb-8" style={{ display: activeTab === tab.key ? "block" : "none" }}>
+                      className="pt-8 sm:pt-16 pb-8" style={{ display: activeTab === tab.key ? "block" : "none" }}>
                       <div className="mb-10">
                         <div className="text-xs font-bold uppercase tracking-[0.4em] mb-3" style={{ color: "var(--accent)" }}>Department</div>
                         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
@@ -525,3 +560,8 @@ export default function PricingPage() {
     </div>
   );
 }
+
+
+
+
+

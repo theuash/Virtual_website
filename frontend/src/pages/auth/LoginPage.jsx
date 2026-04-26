@@ -108,7 +108,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex select-none" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen select-none lg:flex" style={{ background: 'var(--bg-primary)' }}>
 
       {/*  Left Art Panel (fixed, desktop only)  */}
       <div className="hidden lg:block fixed top-0 left-0 w-[60%] h-full z-0 bg-black border-r border-white/5 overflow-hidden">
@@ -195,8 +195,8 @@ export default function LoginPage() {
 
       {/*  Right Form Panel  */}
       <div
-        className="w-full min-h-screen flex items-center justify-center px-6 py-16 z-10"
-        style={{ background: 'var(--bg-primary)', marginLeft: 'clamp(0px, 60vw, 60%)' }}
+        className="w-full min-h-screen flex items-center justify-center px-5 py-10 z-10 lg:ml-[60%]"
+        style={{ background: 'var(--bg-primary)' }}
       >
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -206,7 +206,7 @@ export default function LoginPage() {
           style={{ maxWidth: 420 }}
         >
           {/* Back link + theme toggle row */}
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center justify-between mb-8">
             <button
               onClick={() => isVerifying ? setIsVerifying(false) : navigate('/')}
               className="inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
@@ -215,6 +215,12 @@ export default function LoginPage() {
               <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Login' : 'Return to Home'}
             </button>
             <ThemeToggle  />
+          </div>
+
+          {/* Mobile-only logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <img src={logo} alt="Virtual" className="w-8 h-8" style={{ filter: 'var(--logo-filter)' }} />
+            <span className="font-black text-xl tracking-tight" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>Virtual</span>
           </div>
 
           {/* Heading */}

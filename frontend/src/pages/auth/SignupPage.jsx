@@ -201,10 +201,10 @@ export default function SignupPage() {
           style={{ backgroundImage: 'radial-gradient(var(--text-primary) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
         <motion.div variants={containerVariants} initial="hidden" animate="visible"
-          className="relative z-10 w-full max-w-3xl px-4 py-12 text-center">
+          className="relative z-10 w-full max-w-3xl px-4 py-10 sm:py-12 text-center">
 
           {/* Back + theme toggle */}
-          <motion.div variants={itemVariants} className="flex items-center justify-between mb-10">
+          <motion.div variants={itemVariants} className="flex items-center justify-between mb-8">
             <button onClick={() => navigate('/')}
               className="inline-flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
               style={{ color: 'var(--text-secondary)' }}>
@@ -214,7 +214,7 @@ export default function SignupPage() {
           </motion.div>
 
           {/* Logo + heading */}
-          <motion.div variants={itemVariants} className="flex flex-col items-center mb-10">
+          <motion.div variants={itemVariants} className="flex flex-col items-center mb-8">
             <img src={logo} className="w-14 h-14 mb-6" style={{ filter: 'var(--logo-filter)' }} alt="Virtual Logo" />
             <div className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full border border-border bg-secondary/30">
               <div className="w-1.5 h-1.5 rounded-full bg-accent" style={{ backgroundColor: 'var(--accent)' }} />
@@ -234,7 +234,7 @@ export default function SignupPage() {
           <div className="grid sm:grid-cols-2 gap-4 mb-10">
             <motion.button variants={itemVariants} whileHover={{ y: -4 }}
               onClick={() => setRole('client')}
-              className="group p-8 rounded-3xl text-left border transition-all duration-300"
+              className="group p-5 sm:p-8 rounded-3xl text-left border transition-all duration-300"
               style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                 style={{ background: 'rgba(37,99,235,0.08)', color: 'var(--accent)' }}>
@@ -251,7 +251,7 @@ export default function SignupPage() {
 
             <motion.button variants={itemVariants} whileHover={{ y: -4 }}
               onClick={() => setRole('freelancer')}
-              className="group p-8 rounded-3xl text-left border transition-all duration-300"
+              className="group p-5 sm:p-8 rounded-3xl text-left border transition-all duration-300"
               style={{ border: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                 style={{ background: 'rgba(16,185,129,0.08)', color: '#10B981' }}>
@@ -282,7 +282,7 @@ export default function SignupPage() {
   const accentColor = role === 'client' ? 'var(--accent)' : '#10B981';
 
   return (
-    <div className="min-h-screen flex select-none" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen select-none lg:flex" style={{ background: 'var(--bg-primary)' }}>
 
       {/*  Left Art Panel (fixed, desktop only)  */}
       <div className="hidden lg:block fixed top-0 left-0 w-[60%] h-full z-0 bg-black border-r border-white/5 overflow-hidden">
@@ -369,8 +369,8 @@ export default function SignupPage() {
 
       {/*  Right Form Panel  */}
       <div
-        className="w-full min-h-screen flex items-start justify-center px-6 py-16 z-10"
-        style={{ background: 'var(--bg-primary)', marginLeft: 'clamp(0px, 60vw, 60%)' }}
+        className="w-full min-h-screen flex items-start justify-center px-5 py-10 z-10 lg:ml-[60%]"
+        style={{ background: 'var(--bg-primary)' }}
       >
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -381,11 +381,17 @@ export default function SignupPage() {
         >
           {/* Back */}
           <button onClick={() => isVerifying ? setIsVerifying(false) : setRole(null)}
-            className="inline-flex items-center gap-2 mb-10 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
+            className="inline-flex items-center gap-2 mb-8 text-[10px] uppercase font-black tracking-[0.2em] hover:gap-3 transition-all duration-300"
             style={{ color: 'var(--text-secondary)' }}
           >
             <ArrowLeft size={12} strokeWidth={3} /> {isVerifying ? 'Back to Setup' : 'Change Path'}
           </button>
+
+          {/* Mobile-only logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <img src={logo} alt="Virtual" className="w-8 h-8" style={{ filter: 'var(--logo-filter)' }} />
+            <span className="font-black text-xl tracking-tight" style={{ color: 'var(--text-primary)', letterSpacing: '-0.05em' }}>Virtual</span>
+          </div>
 
           {/* Heading */}
           <div className="mb-8">
@@ -554,7 +560,7 @@ export default function SignupPage() {
               )}
 
               {/* Password row */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Password" icon={Lock}>
                   <input name="password" type="password"
                     className="w-full text-sm rounded-xl border outline-none transition-all"
