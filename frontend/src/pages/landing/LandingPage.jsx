@@ -429,7 +429,7 @@ export default function LandingPage() {
       <Header />
 
       {/* Responsive wrapper - floating window on all screen sizes */}
-      <div className="pt-8 pb-8 px-4">
+      <div className="pt-1 pb-1 px-4">
         <div className="max-w-7xl mx-auto rounded-2xl border p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
 
       {/* Hero Section (Sticky Parallax) */}
@@ -447,14 +447,13 @@ export default function LandingPage() {
               className="absolute pointer-events-none"
               style={{
                 position: 'absolute',
-                top: '50%',
+                top: '0',
                 left: '50%',
-                width: '100vw',
-                height: '56.25vw',
-                minHeight: '100vh',
-                minWidth: '177.78vh',
-                transform: 'translate(-50%, -50%)',
-                objectFit: 'cover',
+                width: 'auto',
+                height: '100%',
+                minWidth: '100%',
+                transform: 'translateX(-50%)',
+                objectFit: 'contain',
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
                 willChange: 'opacity',
