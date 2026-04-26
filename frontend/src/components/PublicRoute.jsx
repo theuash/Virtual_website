@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getRoleRedirect } from '../utils/roleGuards';
+import { useState, useEffect } from 'react';
 
 // Full-screen spinner shown while the token check is in progress
 function Spinner() {
@@ -20,7 +21,16 @@ function Spinner() {
 export default function PublicRoute({ children }) {
   const { user, loading } = useAuth();
 
-  if (loading) return <Spinner />;
+  // On initial mount (checking stored token), show spinner to avoid flash
+  // But once the page has rendered once, keep rendering children during
+  // subsequent loading states (e.g. API calls) so state isn't lost
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
+
+  useEffect(() => {
+    if (!loading) setInitialCheckDone(true);
+  }, [loading]);
+
+  if (!initialCheckDone && loading) return <Spinner />;
   if (user) return <Navigate to={getRoleRedirect(user.role, user)} replace />;
   return children;
 }

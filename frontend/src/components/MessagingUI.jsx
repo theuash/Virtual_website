@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, MessageSquare, Search, Plus, X, Loader2, Check, CheckCheck } from 'lucide-react';
+import { Send, MessageSquare, Search, Plus, X, Loader2, Check, CheckCheck, MoreVertical, Trash2, Ban, ShieldOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../hooks/useChat';
 import api from '../services/api';
@@ -30,47 +30,106 @@ function Avatar({ name, size = 9 }) {
 }
 
 // ── Conversation list item ────────────────────────────────────────
-function ConvItem({ conv, isActive, onClick, currentUserId }) {
-  const other = conv.lastMessage;
-  const name  = conv.name || `Conversation`;
+function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, onUnblock }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const name    = conv.name || 'Conversation';
   const preview = conv.lastMessage?.content || 'No messages yet';
   const time    = conv.lastMessage?.createdAt ? timeAgo(conv.lastMessage.createdAt) : '';
   const unread  = conv.unreadCount ?? 0;
+  const isBlocked = conv.blockedBy?.includes(currentUserId);
+
+  useEffect(() => {
+    const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all"
+    <div
+      className="flex items-center gap-2 px-3 py-2.5 transition-all group"
       style={{
         background: isActive ? 'var(--bg-card)' : 'transparent',
         borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
       }}
     >
-      <Avatar name={name} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-0.5">
-          <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-            {name}
-          </span>
-          <span className="text-[10px] shrink-0 ml-2" style={{ color: 'var(--text-secondary)' }}>
-            {time}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
-            {preview}
-          </p>
-          {unread > 0 && (
-            <span
-              className="ml-2 shrink-0 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--accent)', color: '#fff' }}
-            >
-              {unread > 9 ? '9+' : unread}
+      {/* Clickable area */}
+      <button onClick={onClick} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+        <Avatar name={name} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+              {name}
             </span>
-          )}
+            <span className="text-[10px] shrink-0 ml-2" style={{ color: 'var(--text-secondary)' }}>
+              {time}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <p className="text-xs truncate flex-1" style={{ color: isBlocked ? '#ef4444' : 'var(--text-secondary)' }}>
+              {isBlocked ? '🚫 Blocked' : preview}
+            </p>
+            {unread > 0 && !isBlocked && (
+              <span className="shrink-0 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--accent)', color: '#fff' }}>
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </div>
         </div>
+      </button>
+
+      {/* ⋮ menu — always visible on hover, sits at far right */}
+      <div ref={menuRef} className="relative shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
+          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          <MoreVertical size={13} strokeWidth={1.5} />
+        </button>
+
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: -4 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: -4 }}
+              transition={{ duration: 0.12 }}
+              className="absolute right-0 top-8 z-50 rounded-xl border overflow-hidden shadow-lg min-w-[140px]"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {isBlocked ? (
+                <button
+                  onClick={() => { setMenuOpen(false); onUnblock(conv._id); }}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold hover:opacity-80 transition-opacity"
+                  style={{ color: '#22c55e' }}
+                >
+                  <ShieldOff size={13} /> Unblock
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setMenuOpen(false); onBlock(conv._id); }}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold hover:opacity-80 transition-opacity"
+                  style={{ color: '#f59e0b' }}
+                >
+                  <Ban size={13} /> Block
+                </button>
+              )}
+              <div style={{ height: 1, background: 'var(--border)' }} />
+              <button
+                onClick={() => { setMenuOpen(false); onDelete(conv._id); }}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold hover:opacity-80 transition-opacity"
+                style={{ color: '#ef4444' }}
+              >
+                <Trash2 size={13} /> Delete
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -237,9 +296,42 @@ export default function MessagingUI({ initialConvId = null }) {
     );
   }, [messages, activeConvId]);
 
+  // ── Delete conversation ───────────────────────────────────────
+  const handleDelete = async (convId) => {
+    if (!confirm('Delete this conversation? This cannot be undone.')) return;
+    try {
+      await api.delete(`/messaging/conversations/${convId}`);
+      setConversations(prev => prev.filter(c => c._id !== convId));
+      if (activeConvId === convId) setActiveConvId(null);
+    } catch { /* silent */ }
+  };
+
+  // ── Block / Unblock ───────────────────────────────────────────
+  const handleBlock = async (convId) => {
+    if (!confirm('Block this user? They won\'t be able to message you.')) return;
+    try {
+      await api.post(`/messaging/conversations/${convId}/block`);
+      setConversations(prev => prev.map(c =>
+        c._id === convId ? { ...c, blockedBy: [...(c.blockedBy || []), currentUserId] } : c
+      ));
+    } catch { /* silent */ }
+  };
+
+  const handleUnblock = async (convId) => {
+    try {
+      await api.post(`/messaging/conversations/${convId}/unblock`);
+      setConversations(prev => prev.map(c =>
+        c._id === convId ? { ...c, blockedBy: (c.blockedBy || []).filter(id => id !== currentUserId) } : c
+      ));
+    } catch { /* silent */ }
+  };
+
   // ── Send ──────────────────────────────────────────────────────
   const handleSend = () => {
     if (!input.trim() || !activeConvId) return;
+    // Check if blocked
+    const conv = conversations.find(c => c._id === activeConvId);
+    if (conv?.blockedBy?.includes(currentUserId)) return;
     sendMessage(input.trim());
     setInput('');
     sendTyping(false);
@@ -323,6 +415,9 @@ export default function MessagingUI({ initialConvId = null }) {
                 isActive={conv._id === activeConvId}
                 onClick={() => setActiveConvId(conv._id)}
                 currentUserId={currentUserId}
+                onDelete={handleDelete}
+                onBlock={handleBlock}
+                onUnblock={handleUnblock}
               />
             ))
           )}
@@ -402,36 +497,45 @@ export default function MessagingUI({ initialConvId = null }) {
             className="px-4 py-3 border-t shrink-0"
             style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
           >
-            <div
-              className="flex items-end gap-3 px-4 py-2.5 rounded-2xl border"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-            >
-              <textarea
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Type a message… (Enter to send)"
-                rows={1}
-                className="flex-1 bg-transparent text-sm outline-none resize-none"
-                style={{ color: 'var(--text-primary)', maxHeight: '120px' }}
-              />
-              <button
-                onClick={handleSend}
-                disabled={!input.trim() || !isConnected}
-                className="p-2 rounded-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-40 shrink-0"
-                style={{ background: 'var(--accent)', color: '#fff' }}
-              >
-                <Send size={15} strokeWidth={2} />
-              </button>
-            </div>
-            <p className="text-[9px] mt-1.5 text-center" style={{ color: 'var(--text-secondary)' }}>
-              Shift+Enter for new line
-            </p>
+            {activeConv?.blockedBy?.includes(currentUserId) ? (
+              <div className="flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-xl"
+                style={{ background: '#ef444411', color: '#ef4444', border: '1px solid #ef444433' }}>
+                <Ban size={13} /> You have blocked this conversation
+              </div>
+            ) : (
+              <>
+                <div
+                  className="flex items-end gap-3 px-4 py-2.5 rounded-2xl border"
+                  style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                >
+                  <textarea
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder="Type a message… (Enter to send)"
+                    rows={1}
+                    className="flex-1 bg-transparent text-sm outline-none resize-none"
+                    style={{ color: 'var(--text-primary)', maxHeight: '120px' }}
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={!input.trim() || !isConnected}
+                    className="p-2 rounded-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-40 shrink-0"
+                    style={{ background: 'var(--accent)', color: '#fff' }}
+                  >
+                    <Send size={15} strokeWidth={2} />
+                  </button>
+                </div>
+                <p className="text-[9px] mt-1.5 text-center" style={{ color: 'var(--text-secondary)' }}>
+                  Shift+Enter for new line
+                </p>
+              </>
+            )}
           </div>
         </div>
       ) : (

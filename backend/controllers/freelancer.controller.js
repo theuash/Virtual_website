@@ -149,6 +149,7 @@ export const getPromotionStatus = asyncHandler(async (req, res) => {
     requirements: PROMO_REQUIREMENTS,
     progress: bestPerLevel,
     bestSoftware: bestSoftwarePerLevel,
+    softwareStats,   // full per-software breakdown for the expanded view
     eligible,
     alreadyApplied: freelancer.promotionApplied ?? false,
     currentTier: freelancer.tier,
@@ -172,34 +173,84 @@ export const applyForPromotion = asyncHandler(async (req, res) => {
 });
 
 export const completeOnboarding = asyncHandler(async (req, res) => {
-  const { primarySkill, secondarySkills, hoursPerWeek, preferredContactTime, portfolioUrl, dateOfBirth } = req.body;
+  const { primarySkill, secondarySkills, hoursPerWeek, preferredContactTime, portfolioUrl, dateOfBirth, supervisorCode } = req.body;
 
   if (!primarySkill) return res.status(400).json(new ApiResponse(400, null, 'Primary skill is required'));
   if (!hoursPerWeek) return res.status(400).json(new ApiResponse(400, null, 'Weekly availability is required'));
   if (!preferredContactTime) return res.status(400).json(new ApiResponse(400, null, 'Preferred contact time is required'));
 
-  const freelancer = await Freelancer.findByIdAndUpdate(
-    req.user._id,
-    {
-      primarySkill,
-      secondarySkills: secondarySkills || [],
-      hoursPerWeek,
-      preferredContactTime,
-      portfolioUrl: portfolioUrl || '',
-      dateOfBirth: dateOfBirth || null,
-      onboardingComplete: true,
-    },
-    { new: true }
-  );
+  // ── Resolve supervisor ────────────────────────────────────────
+  let mentorId = null;
+  const { MomentumSupervisor } = await import('../models/MomentumSupervisor.js');
+
+  if (supervisorCode?.trim()) {
+    // User provided a code — find that specific supervisor
+    const supervisor = await MomentumSupervisor.findOne({
+      supervisorCode: supervisorCode.trim().toUpperCase(),
+      isSuspended: { $ne: true },
+    });
+    if (!supervisor) {
+      return res.status(400).json(new ApiResponse(400, null, 'Invalid supervisor code. Please check and try again.'));
+    }
+    mentorId = supervisor._id;
+  } else {
+    // Auto-assign: supervisor with fewest precrate freelancers
+    const supervisors = await MomentumSupervisor.find({ isSuspended: { $ne: true } }).select('_id').lean();
+    if (supervisors.length > 0) {
+      const counts = await Promise.all(
+        supervisors.map(async (s) => ({
+          id: s._id,
+          count: await Freelancer.countDocuments({ mentorId: s._id, tier: 'precrate' }),
+        }))
+      );
+      counts.sort((a, b) => a.count - b.count);
+      mentorId = counts[0].id;
+    }
+  }
+
+  const updateData = {
+    primarySkill,
+    secondarySkills: secondarySkills || [],
+    hoursPerWeek,
+    preferredContactTime,
+    portfolioUrl: portfolioUrl || '',
+    dateOfBirth: dateOfBirth || null,
+    onboardingComplete: true,
+    ...(mentorId && { mentorId }),
+  };
+
+  const freelancer = await Freelancer.findByIdAndUpdate(req.user._id, updateData, { new: true });
+
+  // Add freelancer to supervisor's list
+  if (mentorId) {
+    await MomentumSupervisor.findByIdAndUpdate(mentorId, {
+      $addToSet: { supervisedFreelancers: req.user._id },
+    });
+  }
 
   res.json(new ApiResponse(200, { onboardingComplete: true, freelancer }, 'Onboarding complete'));
 });
 
 export const getSupervisor = asyncHandler(async (req, res) => {
   const { MomentumSupervisor } = await import('../models/MomentumSupervisor.js');
-  // Return the first available supervisor — in future this can be matched by department
-  const supervisor = await MomentumSupervisor.findOne({ isSuspended: { $ne: true } })
-    .select('-passwordHash -otpCodeHash -otpExpiresAt -otpSentAt -otpContext -loginOtpPending');
+
+  // Get the freelancer's assigned mentor
+  const freelancer = await Freelancer.findById(req.user._id).select('mentorId').lean();
+
+  let supervisor = null;
+  if (freelancer?.mentorId) {
+    supervisor = await MomentumSupervisor.findById(freelancer.mentorId)
+      .select('fullName email avatar supervisorCode department supervisedFreelancers')
+      .lean();
+  }
+
+  // Fallback: return any available supervisor
+  if (!supervisor) {
+    supervisor = await MomentumSupervisor.findOne({ isSuspended: { $ne: true } })
+      .select('fullName email avatar supervisorCode department supervisedFreelancers')
+      .lean();
+  }
+
   res.json(new ApiResponse(200, supervisor, supervisor ? 'Supervisor found' : 'No supervisor assigned yet'));
 });
 

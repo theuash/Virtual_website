@@ -1,154 +1,177 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Share2, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Loader2, PhoneOff, Copy, Check } from 'lucide-react';
+import api from '../services/api';
+
+const JITSI_DOMAIN = 'meet.jit.si';
 
 export default function MeetRoom() {
   const { meetingId } = useParams();
   const navigate = useNavigate();
-  const [isMicOn, setIsMicOn] = useState(true);
-  const [isVideoOn, setIsVideoOn] = useState(true);
-  const [participants, setParticipants] = useState([
-    { id: 1, name: 'You', avatar: '👤', isMuted: false, isVideoOff: false }
-  ]);
+  const { user } = useAuth();
+  const jitsiContainerRef = useRef(null);
+  const apiRef = useRef(null);
+  const statusUpdatedRef = useRef(false);
 
-  const handleEndCall = () => {
-    navigate(-1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+  const [copied, setCopied]   = useState(false);
+
+  const isSupervisor = user?.role === 'momentum_supervisor';
+
+  // Update meeting status in DB
+  const updateStatus = async (status) => {
+    if (!isSupervisor) return; // only supervisor controls status
+    try {
+      await api.patch(`/supervisor/meetings/${meetingId}/status`, { status });
+    } catch {
+      // try freelancer route as fallback
+      try { await api.patch(`/freelancer/meetings/${meetingId}/status`, { status }); } catch { /* silent */ }
+    }
   };
 
+  useEffect(() => {
+    const loadJitsi = () => {
+      if (window.JitsiMeetExternalAPI) { initJitsi(); return; }
+      const script = document.createElement('script');
+      script.src = `https://${JITSI_DOMAIN}/external_api.js`;
+      script.async = true;
+      script.onload = initJitsi;
+      script.onerror = () => setError('Failed to load meeting. Check your internet connection.');
+      document.head.appendChild(script);
+    };
+
+    const initJitsi = () => {
+      if (!jitsiContainerRef.current || apiRef.current) return;
+
+      const roomName = `virtual-${meetingId}`.replace(/[^a-zA-Z0-9-]/g, '-');
+
+      apiRef.current = new window.JitsiMeetExternalAPI(JITSI_DOMAIN, {
+        roomName,
+        parentNode: jitsiContainerRef.current,
+        width: '100%',
+        height: '100%',
+        userInfo: {
+          displayName: user?.fullName || 'Guest',
+          email: user?.email || '',
+        },
+        configOverwrite: {
+          startWithAudioMuted: false,
+          startWithVideoMuted: false,
+          enableWelcomePage: false,
+          prejoinPageEnabled: true,
+          disableDeepLinking: true,
+          defaultLanguage: 'en',
+          toolbarButtons: [
+            'microphone', 'camera', 'closedcaptions', 'desktop',
+            'fullscreen', 'fodeviceselection', 'hangup', 'chat',
+            'recording', 'livestreaming', 'sharedvideo', 'settings',
+            'raisehand', 'videoquality', 'filmstrip', 'participants-pane',
+            'tileview', 'select-background', 'mute-everyone', 'security',
+          ],
+        },
+        interfaceConfigOverwrite: {
+          SHOW_JITSI_WATERMARK: false,
+          SHOW_WATERMARK_FOR_GUESTS: false,
+          SHOW_BRAND_WATERMARK: false,
+          SHOW_POWERED_BY: false,
+          DISPLAY_WELCOME_FOOTER: false,
+          APP_NAME: 'Virtual Meet',
+          NATIVE_APP_NAME: 'Virtual Meet',
+          PROVIDER_NAME: 'Virtual',
+        },
+      });
+
+      // Supervisor joined → set live
+      apiRef.current.addEventListener('videoConferenceJoined', () => {
+        if (isSupervisor && !statusUpdatedRef.current) {
+          statusUpdatedRef.current = true;
+          updateStatus('live');
+        }
+      });
+
+      // Supervisor left → set completed
+      apiRef.current.addEventListener('videoConferenceLeft', () => {
+        if (isSupervisor) updateStatus('completed');
+        navigate(-1);
+      });
+
+      apiRef.current.addEventListener('readyToClose', () => {
+        if (isSupervisor) updateStatus('completed');
+        navigate(-1);
+      });
+    };
+
+    loadJitsi();
+
+    return () => {
+      if (apiRef.current) {
+        apiRef.current.dispose();
+        apiRef.current = null;
+      }
+    };
+  }, [meetingId, user, navigate, isSupervisor]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleLeave = () => {
+    if (apiRef.current) apiRef.current.executeCommand('hangup');
+    else { if (isSupervisor) updateStatus('completed'); navigate(-1); }
+  };
+
+  if (error) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center gap-4"
+        style={{ background: 'var(--bg-primary)' }}>
+        <p className="text-sm font-semibold" style={{ color: '#ef4444' }}>{error}</p>
+        <button onClick={() => navigate(-1)}
+          className="px-4 py-2 rounded-xl text-sm font-bold"
+          style={{ background: 'var(--accent)', color: '#fff' }}>
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
-      {/* Header */}
-      <div
-        className="p-4 border-b flex items-center justify-between"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div>
-          <h1 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
-            Video Meeting
-          </h1>
-          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            Meeting ID: {meetingId}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-            🔴 LIVE
+    <div className="w-full h-screen flex flex-col" style={{ background: '#000' }}>
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-2 shrink-0"
+        style={{ background: 'rgba(0,0,0,0.8)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="flex items-center gap-3">
+          <span className="text-white font-black text-sm tracking-tight">Virtual Meet</span>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}>
+            {meetingId?.slice(0, 16)}…
           </span>
         </div>
+        <div className="flex items-center gap-2">
+          <button onClick={handleCopyLink}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}>
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+          <button onClick={handleLeave}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:opacity-90"
+            style={{ background: '#ef4444', color: '#fff' }}>
+            <PhoneOff size={12} /> Leave
+          </button>
+        </div>
       </div>
 
-      {/* Main video area */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-full h-full rounded-2xl flex items-center justify-center" style={{ background: 'var(--bg-secondary)' }}>
-          <div className="text-center">
-            <div className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-6xl" style={{ background: 'var(--bg-card)' }}>
-              📹
-            </div>
-            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Video Meeting Room
-            </h2>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              This is a placeholder for the video meeting interface.
-            </p>
-            <p className="text-xs mt-4" style={{ color: 'var(--text-secondary)' }}>
-              In production, integrate with Jitsi Meet, Agora, or similar service.
-            </p>
+      {/* Jitsi container */}
+      <div ref={jitsiContainerRef} className="flex-1 w-full" style={{ minHeight: 0 }}>
+        {loading && (
+          <div className="w-full h-full flex items-center justify-center">
+            <Loader2 size={32} className="animate-spin" style={{ color: 'var(--accent)' }} />
           </div>
-        </div>
-      </div>
-
-      {/* Participants sidebar */}
-      <div
-        className="w-full md:w-64 border-t md:border-t-0 md:border-l p-4 max-h-48 md:max-h-full overflow-y-auto"
-        style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
-      >
-        <h3 className="text-sm font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
-          Participants ({participants.length})
-        </h3>
-        <div className="space-y-2">
-          {participants.map(p => (
-            <div key={p.id} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--accent)', color: '#fff' }}>
-                {p.avatar}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                  {p.name}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div
-        className="p-4 border-t flex items-center justify-center gap-3 flex-wrap"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsMicOn(!isMicOn)}
-          className="p-3 rounded-full transition-all"
-          style={{
-            background: isMicOn ? 'var(--accent)' : '#ef4444',
-            color: '#fff'
-          }}
-        >
-          {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsVideoOn(!isVideoOn)}
-          className="p-3 rounded-full transition-all"
-          style={{
-            background: isVideoOn ? 'var(--accent)' : '#ef4444',
-            color: '#fff'
-          }}
-        >
-          {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="p-3 rounded-full transition-all border"
-          style={{
-            borderColor: 'var(--border)',
-            color: 'var(--text-secondary)'
-          }}
-        >
-          <Share2 size={20} />
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="p-3 rounded-full transition-all border"
-          style={{
-            borderColor: 'var(--border)',
-            color: 'var(--text-secondary)'
-          }}
-        >
-          <Settings size={20} />
-        </motion.button>
-
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleEndCall}
-          className="p-3 rounded-full transition-all"
-          style={{
-            background: '#ef4444',
-            color: '#fff'
-          }}
-        >
-          <PhoneOff size={20} />
-        </motion.button>
+        )}
       </div>
     </div>
   );

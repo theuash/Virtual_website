@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import DashboardHeader from "../../components/DashboardHeader";
 import api from "../../services/api";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageCropModal from "../../components/ImageCropModal";
 import {
   Camera, User, Mail, Phone, Calendar, Link, Clock,
   CheckCircle2, AlertCircle, Loader2, Trash2, Save, Sparkles,
@@ -11,15 +12,15 @@ import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
 
 // ── Constants ─────────────────────────────────────────────────────
 const HOURS_OPTIONS = [
-  { value: "1-5",   label: "1–5 hrs / week" },
-  { value: "5-10",  label: "5–10 hrs / week" },
-  { value: "10-20", label: "10–20 hrs / week" },
-  { value: "20-40", label: "20–40 hrs / week" },
-  { value: "40+",   label: "40+ hrs / week" },
+  { value: 5,  label: "1–5 hrs / week" },
+  { value: 10, label: "5–10 hrs / week" },
+  { value: 20, label: "10–20 hrs / week" },
+  { value: 40, label: "20–40 hrs / week" },
 ];
 const CONTACT_TIMES = [
   "9am – 12pm", "12pm – 3pm", "3pm – 6pm", "6pm – 9pm", "Flexible / Anytime",
 ];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
@@ -87,66 +88,89 @@ export default function FreelancerSettings() {
 
   const [form, setForm] = useState({
     fullName: "", phone: "", dateOfBirth: "", portfolioUrl: "",
-    hoursPerWeek: "", preferredContactTime: "",
+    hoursPerWeek: "",
   });
+  const [contactDays, setContactDays] = useState([]);
+  const [contactTime, setContactTime] = useState("");
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [avatarFile, setAvatarFile]       = useState(null); // processed PNG blob
+  const [avatarFile, setAvatarFile]       = useState(null);
   const [bgRemoving, setBgRemoving]       = useState(false);
   const [saving, setSaving]               = useState(false);
   const [status, setStatus]               = useState(null);
   const [removingAvatar, setRemovingAvatar] = useState(false);
+  const [cropSrc, setCropSrc]             = useState(null); // raw src for crop modal
 
-  // Pre-fill from user — includes all signup + onboarding data
   useEffect(() => {
     if (!user) return;
-    setForm({
-      fullName:             user.fullName || "",
-      // phone may come from signup (stored as user.phone)
-      phone:                user.phone || "",
-      // dateOfBirth from signup (stored as user.dateOfBirth or user.dob)
-      dateOfBirth:          user.dateOfBirth
-                              ? (typeof user.dateOfBirth === 'string' ? user.dateOfBirth.slice(0, 10) : new Date(user.dateOfBirth).toISOString().slice(0, 10))
-                              : "",
-      portfolioUrl:         user.portfolioUrl || "",
-      // hoursPerWeek from onboarding
-      hoursPerWeek:         user.hoursPerWeek ? String(user.hoursPerWeek) : "",
-      // preferredContactTime from onboarding
-      preferredContactTime: user.preferredContactTime || "",
-    });
-    if (user.avatar) {
-      setAvatarPreview(resolveAvatar(user.avatar));
+
+    // Parse preferredContactTime — stored as "Mon, Tue · 9am–12pm"
+    let parsedDays = [];
+    let parsedTime = "";
+    if (user.preferredContactTime) {
+      const parts = user.preferredContactTime.split(' · ');
+      if (parts.length === 2) {
+        parsedDays = parts[0].split(', ').map(d => d.trim()).filter(Boolean);
+        parsedTime = parts[1].trim();
+      } else {
+        // Legacy: just a time string
+        parsedTime = user.preferredContactTime;
+      }
     }
+
+    setForm({
+      fullName:     user.fullName || "",
+      phone:        user.phone || "",
+      dateOfBirth:  user.dateOfBirth
+                      ? (typeof user.dateOfBirth === 'string' ? user.dateOfBirth.slice(0, 10) : new Date(user.dateOfBirth).toISOString().slice(0, 10))
+                      : "",
+      portfolioUrl: user.portfolioUrl || "",
+      hoursPerWeek: user.hoursPerWeek ? Number(user.hoursPerWeek) : "",
+    });
+    setContactDays(parsedDays);
+    setContactTime(parsedTime);
+
+    if (user.avatar) setAvatarPreview(resolveAvatar(user.avatar));
   }, [user]);
 
   const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  // Upload → try remove.bg if key exists, else use original directly
-  const handleAvatarChange = useCallback(async (e) => {
+  // Open crop modal when user picks a file
+  const handleAvatarChange = useCallback((e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result);
+    reader.readAsDataURL(file);
+  }, []);
 
-    // Always set the original file immediately so Save works even if bg removal fails
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+  // Called when user confirms crop — always attempt bg removal
+  const handleCropDone = useCallback(async (croppedFile, previewUrl) => {
+    setCropSrc(null);
+    setAvatarFile(croppedFile);
+    setAvatarPreview(previewUrl);
     setStatus(null);
 
     const apiKey = import.meta.env.VITE_REMOVE_BG_API_KEY;
-    if (!apiKey) return; // no key — just use original
+    if (!apiKey) {
+      setStatus({ type: 'success', msg: 'Photo cropped. Save to apply.' });
+      setTimeout(() => setStatus(null), 3000);
+      return;
+    }
 
     setBgRemoving(true);
+    setStatus({ type: 'info', msg: 'Removing background…' });
     try {
       const fd = new FormData();
-      fd.append("image_file", file);
+      fd.append("image_file", croppedFile);
       fd.append("size", "auto");
-
       const res = await fetch("https://api.remove.bg/v1.0/removebg", {
         method: "POST",
         headers: { "X-Api-Key": apiKey },
         body: fd,
       });
-
       if (!res.ok) throw new Error(`remove.bg ${res.status}`);
-
       const blob = await res.blob();
       const pngFile = new File([blob], "avatar.png", { type: "image/png" });
       setAvatarFile(pngFile);
@@ -154,9 +178,8 @@ export default function FreelancerSettings() {
       setStatus({ type: "success", msg: "Background removed! Save to apply." });
       setTimeout(() => setStatus(null), 4000);
     } catch {
-      // Keep original file — already set above
-      setStatus({ type: "error", msg: "Background removal unavailable — original photo will be used." });
-      setTimeout(() => setStatus(null), 4000);
+      setStatus({ type: "success", msg: "Photo cropped. Save to apply." });
+      setTimeout(() => setStatus(null), 3000);
     } finally {
       setBgRemoving(false);
     }
@@ -168,15 +191,20 @@ export default function FreelancerSettings() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => { if (v !== undefined && v !== "") fd.append(k, v); });
+
+      // Combine days + time into the stored format
+      if (contactDays.length > 0 || contactTime) {
+        const combined = contactDays.length > 0 && contactTime
+          ? `${contactDays.join(', ')} · ${contactTime}`
+          : contactTime || contactDays.join(', ');
+        fd.append("preferredContactTime", combined);
+      }
+
       if (avatarFile) {
         fd.append("avatar", avatarFile, avatarFile.name || "avatar.png");
-        console.log("[settings] appending avatar:", avatarFile.name, avatarFile.size, "bytes", avatarFile.type);
-      } else {
-        console.log("[settings] no avatarFile to upload");
       }
 
       const res = await api.patch("/profile/update", fd);
-      console.log("[settings] save response:", res.status, res.data?.data?.avatar);
       const updated = res.data?.data;
       if (updated) {
         // Preserve auth tokens — the profile update response doesn't include them
@@ -222,6 +250,14 @@ export default function FreelancerSettings() {
 
   return (
     <>
+      {/* Image crop modal */}
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          onDone={handleCropDone}
+          onCancel={() => { setCropSrc(null); fileRef.current && (fileRef.current.value = ''); }}
+        />
+      )}
       <DashboardHeader title="Settings" />
       <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
 
@@ -243,7 +279,7 @@ export default function FreelancerSettings() {
           <div className="p-6 flex items-center gap-6">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <AvatarCircle src={avatarPreview} initial={initial} size={96} />
+              <AvatarCircle src={avatarPreview} initial={initial} size={120} />
               {bgRemoving && (
                 <div className="absolute inset-0 rounded-full flex items-center justify-center"
                   style={{ background: "rgba(0,0,0,0.5)" }}>
@@ -345,11 +381,12 @@ export default function FreelancerSettings() {
             <Clock size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
             <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Work Preferences</h2>
           </div>
-          <div className="p-6 space-y-5">
+          <div className="p-6 space-y-6">
+            {/* Hours per week */}
             <Field label="Hours per Week" icon={Clock}>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 pt-1">
                 {HOURS_OPTIONS.map(opt => (
-                  <button key={opt.value}
+                  <button key={opt.value} type="button"
                     onClick={() => setForm(f => ({ ...f, hoursPerWeek: opt.value }))}
                     className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
                     style={{
@@ -362,22 +399,53 @@ export default function FreelancerSettings() {
                 ))}
               </div>
             </Field>
-            <Field label="Preferred Contact Time" icon={Clock}>
-              <div className="flex flex-wrap gap-2">
-                {CONTACT_TIMES.map(t => (
-                  <button key={t}
-                    onClick={() => setForm(f => ({ ...f, preferredContactTime: t }))}
+
+            {/* Contact days */}
+            <Field label="Preferred Contact Days" icon={Clock}>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {DAYS.map(day => (
+                  <button key={day} type="button"
+                    onClick={() => setContactDays(prev =>
+                      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+                    )}
                     className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
                     style={{
-                      background: form.preferredContactTime === t ? "var(--accent)" : "var(--bg-card)",
-                      borderColor: form.preferredContactTime === t ? "var(--accent)" : "var(--border)",
-                      color: form.preferredContactTime === t ? "#fff" : "var(--text-secondary)",
+                      background: contactDays.includes(day) ? "var(--accent)" : "var(--bg-card)",
+                      borderColor: contactDays.includes(day) ? "var(--accent)" : "var(--border)",
+                      color: contactDays.includes(day) ? "#fff" : "var(--text-secondary)",
+                    }}>
+                    {day}
+                  </button>
+                ))}
+              </div>
+            </Field>
+
+            {/* Contact time */}
+            <Field label="Preferred Contact Time" icon={Clock}>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {CONTACT_TIMES.map(t => (
+                  <button key={t} type="button"
+                    onClick={() => setContactTime(t)}
+                    className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
+                    style={{
+                      background: contactTime === t ? "var(--accent)" : "var(--bg-card)",
+                      borderColor: contactTime === t ? "var(--accent)" : "var(--border)",
+                      color: contactTime === t ? "#fff" : "var(--text-secondary)",
                     }}>
                     {t}
                   </button>
                 ))}
               </div>
             </Field>
+
+            {/* Preview */}
+            {(contactDays.length > 0 || contactTime) && (
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                Contact window: <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                  {contactDays.length > 0 ? `${contactDays.join(', ')} · ` : ''}{contactTime}
+                </span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -389,6 +457,7 @@ export default function FreelancerSettings() {
           </div>
           <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
+              { label: "User ID",      value: user?.userId || "—" },
               { label: "Tier",         value: user?.tier || "—" },
               { label: "Role",         value: user?.role || "—" },
               { label: "Verified",     value: user?.isVerified ? "Yes" : "No" },
@@ -396,7 +465,7 @@ export default function FreelancerSettings() {
             ].map(s => (
               <div key={s.label} className="p-3 rounded-xl text-center" style={{ background: "var(--bg-card)" }}>
                 <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>{s.label}</p>
-                <p className="text-sm font-bold capitalize" style={{ color: "var(--text-primary)" }}>{s.value}</p>
+                <p className="text-sm font-bold capitalize font-mono" style={{ color: "var(--text-primary)" }}>{s.value}</p>
               </div>
             ))}
           </div>

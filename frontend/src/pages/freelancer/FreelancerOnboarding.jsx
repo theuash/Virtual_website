@@ -55,6 +55,10 @@ export default function FreelancerOnboarding() {
   const [hoursPerWeek, setHoursPerWeek] = useState(null);
   const [contactDays, setContactDays] = useState([]);
   const [contactTime, setContactTime] = useState('');
+  const [supervisorCode, setSupervisorCode] = useState(() => {
+    // Pre-fill from signup page if user entered a code there
+    return sessionStorage.getItem('pendingSupervisorCode') || '';
+  });
 
   const go = (n) => { setDir(n); setStep(s => s + n); setError(''); };
 
@@ -88,7 +92,9 @@ export default function FreelancerOnboarding() {
         secondarySkills,
         hoursPerWeek,
         preferredContactTime,
+        ...(supervisorCode.trim() && { supervisorCode: supervisorCode.trim().toUpperCase() }),
       });
+      sessionStorage.removeItem('pendingSupervisorCode');
       // Update local user state
       const stored = JSON.parse(localStorage.getItem('virtual_user') || '{}');
       const updated = { ...stored, onboardingComplete: true, primarySkill };
@@ -319,6 +325,25 @@ export default function FreelancerOnboarding() {
                     <span className="text-sm font-semibold text-right ml-4" style={{ color: 'var(--text-primary)' }}>{row.value}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Supervisor code — optional */}
+              <div className="mt-5">
+                <label className="block text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  Supervisor Code <span className="normal-case font-medium opacity-60">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={supervisorCode}
+                  onChange={e => setSupervisorCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. V26INMS-LUM01"
+                  maxLength={20}
+                  className="w-full px-4 py-3 rounded-xl border text-sm font-mono outline-none transition-all"
+                  style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                />
+                <p className="text-[10px] mt-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  Have a code from your supervisor? Enter it here. Leave blank to be auto-assigned.
+                </p>
               </div>
 
               {error && (

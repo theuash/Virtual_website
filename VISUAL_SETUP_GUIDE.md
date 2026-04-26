@@ -211,24 +211,23 @@ Google Login Not Working?
 
 ---
 
-## WhatsApp QR Code Issue
+## WhatsApp OTP Setup
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ WhatsApp QR Code Not Showing in Render Logs             │
+│ WhatsApp OTP Delivery via whatsapp-web.js               │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ Why: Render doesn't support interactive terminal       │
-│                                                         │
-│ Solution 1: Use Supabase OTP (Recommended)              │
-│ ✓ Already configured                                   │
-│ ✓ Users get OTP via email                              │
-│ ✓ Works on production                                  │
-│                                                         │
-│ Solution 2: Set Up Locally                              │
+│ Local Development:                                      │
 │ 1. Run: cd backend && npm run dev                       │
 │ 2. See QR code in terminal                              │
 │ 3. Scan with WhatsApp                                  │
+│ 4. Users can now receive OTP via WhatsApp              │
+│                                                         │
+│ Production (Render):                                    │
+│ ✓ WhatsApp session persists in .wwebjs_auth/           │
+│ ✓ Users get OTP via WhatsApp                           │
+│ ✓ Works on production                                  │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -268,10 +267,10 @@ Now          +5 min       +10 min      +15 min
 - Redirects to dashboard
 - No console errors
 
-### ✅ WhatsApp Setup (Optional)
+### ✅ WhatsApp OTP Setup
 - QR code visible in local terminal
 - Can scan with WhatsApp
-- Session saved
+- Session persists for production
 
 ### ✅ Email OTP Working
 - User gets OTP via email

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonGrid } from '../../components/SkeletonLoader';
-import { BookOpen, Play, Clock, MessageSquare, User, Monitor, X, CheckCircle, TrendingUp, Award, ChevronRight } from 'lucide-react';
+import { BookOpen, Play, Clock, MessageSquare, User, Monitor, X, CheckCircle, TrendingUp, Award, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSidebar } from '../../context/SidebarContext';
 
 const SKILL_LABELS = {
   video_editing: 'Video Editing',
@@ -46,7 +47,7 @@ const SOFTWARE_LABELS = {
   canva: 'Canva',
 };
 
-// ── YouTube IFrame API progress-tracking player ───────────────────
+// â”€â”€ YouTube IFrame API progress-tracking player â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Uses the YouTube IFrame API to poll playback position every 5s and
 // report to the backend. A video is "complete" once 80% is watched.
 let ytApiReady = false;
@@ -67,13 +68,20 @@ function ensureYTApi() {
 }
 
 function VideoPlayer({ video, onProgressUpdate, progressMap }) {
-  const containerRef = useRef(null);
-  const playerRef    = useRef(null);
-  const intervalRef  = useRef(null);
-  const reportedRef  = useRef(false); // prevent double-complete report
-  const videoIdRef   = useRef(video?.youtubeId);
+  const containerRef  = useRef(null);
+  const wrapperRef    = useRef(null);
+  const playerRef     = useRef(null);
+  const intervalRef   = useRef(null);
+  const reportedRef   = useRef(false);
+  const videoIdRef    = useRef(video?.youtubeId);
 
   const isCompleted = progressMap?.[video?.youtubeId]?.completed;
+  // Resume from last saved position (if > 5s and not completed)
+  const resumeAt = (() => {
+    const p = progressMap?.[video?.youtubeId];
+    if (!p || p.completed) return 0;
+    return p.lastPosition > 5 ? p.lastPosition : 0;
+  })();
 
   const startPolling = useCallback((player) => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -113,14 +121,29 @@ function VideoPlayer({ video, onProgressUpdate, progressMap }) {
       }
       const div = document.createElement('div');
       div.id = `yt-player-${video.youtubeId}-${Date.now()}`;
+      div.style.width = '100%';
+      div.style.height = '100%';
       containerRef.current.innerHTML = '';
       containerRef.current.appendChild(div);
 
       playerRef.current = new window.YT.Player(div.id, {
         videoId: video.youtubeId,
-        playerVars: { autoplay: 1, rel: 0, modestbranding: 1 },
+        width: '100%',
+        height: '100%',
+        playerVars: { autoplay: 1, rel: 0, modestbranding: 1, start: Math.floor(resumeAt) },
         events: {
-          onReady: (e) => startPolling(e.target),
+          onReady: (e) => {
+            // Force the injected iframe to fill the absolutely-positioned container
+            const iframe = e.target.getIframe();
+            if (iframe) {
+              iframe.style.position = 'absolute';
+              iframe.style.top = '0';
+              iframe.style.left = '0';
+              iframe.style.width = '100%';
+              iframe.style.height = '100%';
+            }
+            startPolling(e.target);
+          },
           onStateChange: (e) => {
             if (e.data === window.YT.PlayerState.PLAYING) startPolling(e.target);
           },
@@ -141,6 +164,27 @@ function VideoPlayer({ video, onProgressUpdate, progressMap }) {
     };
   }, [video?.youtubeId]);
 
+  // Re-apply iframe fill styles whenever the wrapper is resized (e.g. sidebar collapse/expand).
+  // The YouTube IFrame API bakes in pixel dimensions — ResizeObserver catches the reflow.
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const applyFill = () => {
+      try {
+        const iframe = playerRef.current?.getIframe?.();
+        if (iframe) {
+          iframe.style.position = 'absolute';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+        }
+      } catch { /* ignore */ }
+    };
+    const ro = new ResizeObserver(applyFill);
+    ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -149,7 +193,11 @@ function VideoPlayer({ video, onProgressUpdate, progressMap }) {
       className="w-full rounded-xl overflow-hidden"
       style={{ background: 'var(--bg-card)' }}
     >
-      <div ref={containerRef} className="relative w-full bg-black" style={{ aspectRatio: '16/9' }} />
+      {/* Official YouTube IFrame player â€” full controls, HD quality */}
+      {/* Padding-top 56.25% = 16:9 aspect ratio — iframe fills the container absolutely */}
+      <div ref={wrapperRef} style={{ position: 'relative', paddingTop: '56.25%', width: '100%', background: '#000' }}>
+        <div ref={containerRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+      </div>
       <div className="p-4 border-t flex items-start justify-between gap-3" style={{ borderColor: 'var(--border)' }}>
         <div>
           <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{video.title}</h3>
@@ -247,7 +295,7 @@ function TutorialCard({ tutorial, onSelect, isSelected, isCompleted }) {
         <p className="text-xs mt-1 opacity-80 line-clamp-2">{tutorial.desc}</p>
         <div className="flex items-center gap-2 text-xs opacity-70 mt-2">
           <Clock size={12} />
-          {tutorial.duration} • {tutorial.level}
+          {tutorial.duration} â€¢ {tutorial.level}
         </div>
       </div>
     </motion.div>
@@ -352,12 +400,13 @@ function CrashCourseCard({ course, onToggle, isExpanded, onSelectVideo }) {
   );
 }
 
-// ── Promotion Progress Panel ──────────────────────────────────────
+// ── Promotion Progress Panel ──────────────────────────────────────────
 function PromotionProgressPanel({ onApplied }) {
-  const [status, setStatus]   = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [status, setStatus]     = useState(null);
+  const [loading, setLoading]   = useState(true);
   const [applying, setApplying] = useState(false);
   const [applied, setApplied]   = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -391,41 +440,42 @@ function PromotionProgressPanel({ onApplied }) {
     Advanced:     { bar: '#ef4444', bg: '#ef444422', text: '#dc2626' },
   };
 
+  // Build sorted software rows from softwareStats (best total first)
+  const softwareRows = status?.softwareStats
+    ? Object.values(status.softwareStats).sort((a, b) => {
+        const scoreA = (a.Beginner ?? 0) + (a.Intermediate ?? 0) + (a.Advanced ?? 0);
+        const scoreB = (b.Beginner ?? 0) + (b.Intermediate ?? 0) + (b.Advanced ?? 0);
+        return scoreB - scoreA;
+      })
+    : [];
+
   return (
     <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-      <div className="px-5 py-4 border-b flex items-center gap-2" style={{ borderColor: 'var(--border)' }}>
-        <TrendingUp size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-        <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Crate Promotion</h2>
-      </div>
-      <div className="p-5 space-y-4">
-        {loading ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => <div key={i} className="h-8 rounded animate-pulse" style={{ background: 'var(--border)' }} />)}
-          </div>
-        ) : !status ? (
-          <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>Could not load progress</p>
-        ) : (
-          <>
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              Complete videos from any software. Your best software per level counts toward promotion.
-            </p>
+      {/* Header row — always visible */}
+      <div className="px-5 py-4 flex items-center justify-between gap-4 flex-wrap"
+        style={{ borderBottom: expanded ? '1px solid var(--border)' : 'none' }}>
+        <div className="flex items-center gap-2 shrink-0">
+          <TrendingUp size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+          <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Crate Promotion</h2>
+        </div>
 
-            {/* Progress bars */}
+        {/* Compact inline progress bars */}
+        {!loading && status && (
+          <div className="flex items-center gap-4 flex-1 min-w-0 flex-wrap">
             {['Beginner', 'Intermediate', 'Advanced'].map(level => {
-              const current = status.progress?.[level] ?? 0;
+              const current  = status.progress?.[level] ?? 0;
               const required = REQUIREMENTS[level];
-              const pct = Math.min(100, Math.round((current / required) * 100));
-              const done = current >= required;
-              const colors = LEVEL_COLORS[level];
+              const pct      = Math.min(100, Math.round((current / required) * 100));
+              const done     = current >= required;
+              const colors   = LEVEL_COLORS[level];
               return (
-                <div key={level}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{level}</span>
-                    <span className="text-xs font-bold" style={{ color: done ? colors.text : 'var(--text-secondary)' }}>
-                      {current}/{required} {done && '✓'}
-                    </span>
-                  </div>
-                  <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                <div key={level} className="flex items-center gap-2 min-w-[130px]">
+                  <span className="text-[10px] font-semibold shrink-0 w-24"
+                    style={{ color: done ? colors.text : 'var(--text-secondary)' }}>
+                    {level} {done ? '\u2713' : `${current}/${required}`}
+                  </span>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden"
+                    style={{ background: 'var(--border)', minWidth: 60 }}>
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
@@ -434,42 +484,138 @@ function PromotionProgressPanel({ onApplied }) {
                       style={{ background: colors.bar }}
                     />
                   </div>
-                  {status.bestSoftware?.[level] && (
-                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                      Best: {status.bestSoftware[level].replace(/_/g, ' ')}
-                    </p>
-                  )}
                 </div>
               );
             })}
+          </div>
+        )}
 
-            {/* Apply button */}
-            {applied ? (
-              <div className="flex items-center gap-2 p-3 rounded-lg text-sm font-semibold" style={{ background: '#16a34a22', color: '#16a34a' }}>
-                <Award size={16} />
-                Application submitted!
-              </div>
+        {/* Right actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {!loading && status && (
+            applied ? (
+              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
+                style={{ background: '#16a34a22', color: '#16a34a' }}>
+                <Award size={12} /> Submitted
+              </span>
             ) : status.eligible ? (
               <button
                 onClick={handleApply}
                 disabled={applying}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                 style={{ background: 'var(--accent)', color: '#fff', opacity: applying ? 0.7 : 1 }}
               >
-                <Award size={14} />
-                {applying ? 'Applying…' : 'Apply for Promotion'}
+                <Award size={12} />
+                {applying ? 'Applying...' : 'Apply'}
               </button>
-            ) : (
-              <p className="text-xs text-center py-2" style={{ color: 'var(--text-secondary)' }}>
-                Complete all requirements to unlock promotion
-              </p>
-            )}
-          </>
-        )}
+            ) : null
+          )}
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-105"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}
+            title={expanded ? 'Hide software breakdown' : 'View per-software progress'}
+          >
+            <ChevronRight size={13} strokeWidth={2}
+              style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+            {expanded ? 'Hide' : 'Details'}
+          </button>
+        </div>
       </div>
+
+      {/* Expandable per-software breakdown */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="px-5 py-4">
+              {loading ? (
+                <div className="space-y-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-6 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                  ))}
+                </div>
+              ) : softwareRows.length === 0 ? (
+                <p className="text-xs text-center py-2" style={{ color: 'var(--text-secondary)' }}>
+                  No progress data yet — start watching videos!
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                        <th className="text-left pb-2 pr-4 font-semibold"
+                          style={{ color: 'var(--text-secondary)' }}>Software</th>
+                        {['Beginner', 'Intermediate', 'Advanced'].map(level => (
+                          <th key={level} className="text-center pb-2 px-3 font-semibold whitespace-nowrap"
+                            style={{ color: LEVEL_COLORS[level].text }}>
+                            {level.slice(0, 3)}
+                          </th>
+                        ))}
+                        <th className="text-center pb-2 px-3 font-semibold"
+                          style={{ color: 'var(--text-secondary)' }}>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {softwareRows.map((row, i) => {
+                        const total = (row.Beginner ?? 0) + (row.Intermediate ?? 0) + (row.Advanced ?? 0);
+                        const isBest = (level) => status?.bestSoftware?.[level] === row.software;
+                        return (
+                          <tr key={i} style={{ borderBottom: '1px solid var(--border)22' }}>
+                            <td className="py-2 pr-4 font-medium" style={{ color: 'var(--text-primary)' }}>
+                              {SOFTWARE_LABELS[row.software] || row.software.replace(/_/g, ' ')}
+                              <span className="ml-1 text-[9px] opacity-50">
+                                {SKILL_LABELS[row.skill] || row.skill}
+                              </span>
+                            </td>
+                            {['Beginner', 'Intermediate', 'Advanced'].map(level => {
+                              const val  = row[level] ?? 0;
+                              const req  = REQUIREMENTS[level];
+                              const best = isBest(level);
+                              return (
+                                <td key={level} className="text-center py-2 px-3">
+                                  <span
+                                    className="inline-flex items-center justify-center w-10 h-5 rounded font-bold text-[10px]"
+                                    style={{
+                                      background: best ? LEVEL_COLORS[level].bg : val > 0 ? 'var(--bg-card)' : 'transparent',
+                                      color: best ? LEVEL_COLORS[level].text : val > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                      border: best ? `1px solid ${LEVEL_COLORS[level].bar}` : '1px solid transparent',
+                                    }}
+                                    title={best ? `Best for ${level} — counts toward promotion` : undefined}
+                                  >
+                                    {val}/{req}
+                                  </span>
+                                </td>
+                              );
+                            })}
+                            <td className="text-center py-2 px-3 font-bold"
+                              style={{ color: total > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                              {total}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <p className="text-[10px] mt-3" style={{ color: 'var(--text-secondary)' }}>
+                    Highlighted = best software per level (counts toward promotion). Requirements: Beg {REQUIREMENTS.Beginner} · Int {REQUIREMENTS.Intermediate} · Adv {REQUIREMENTS.Advanced}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+
 
 // Supervisor Panel
 function SupervisorPanel() {
@@ -530,6 +676,7 @@ function SupervisorPanel() {
 export default function FreelancerLearning() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { setCollapsed: setNavCollapsed } = useSidebar();
 
   const userSkills = [
     ...(user?.primarySkill ? [user.primarySkill] : []),
@@ -590,14 +737,14 @@ export default function FreelancerLearning() {
       .then(res => {
         const raw = res.data?.data ?? {};
         // Normalize: each skill/software value might be a plain object {tutorials,playlists,crash_courses}
-        // OR an array of full documents (old backend format) — handle both
+        // OR an array of full documents (old backend format) ΓÇö handle both
         const normalized = {};
         for (const skill of Object.keys(raw)) {
           normalized[skill] = {};
           for (const software of Object.keys(raw[skill])) {
             const val = raw[skill][software];
             if (Array.isArray(val)) {
-              // Old format: array of documents — merge all into one
+              // Old format: array of documents ΓÇö merge all into one
               normalized[skill][software] = {
                 tutorials: val.flatMap(d => d.tutorials ?? []),
                 playlists: val.flatMap(d => d.playlists ?? []),
@@ -631,6 +778,7 @@ export default function FreelancerLearning() {
     setSelectedVideo(video);
     setSelectedSource(source);
     setSourceContext(context);
+    setNavCollapsed(true);  // collapse nav sidebar for more space
   };
 
   const getRecommendations = () => {
@@ -666,6 +814,7 @@ export default function FreelancerLearning() {
     <>
       <DashboardHeader title="Learning" />
       <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+        <PromotionProgressPanel onApplied={() => {}} />
 
         {/* Skill selector */}
         <div className="flex flex-wrap gap-2">
@@ -721,7 +870,7 @@ export default function FreelancerLearning() {
                   >
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Now Playing</h2>
-                      <button onClick={() => setSelectedVideo(null)} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}>
+                      <button onClick={() => { setSelectedVideo(null); setNavCollapsed(false); }} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}>
                         <X size={20} />
                       </button>
                     </div>
@@ -795,7 +944,7 @@ export default function FreelancerLearning() {
                                 <h4 className="text-xs font-semibold line-clamp-2" style={{ color: selectedVideo?.youtubeId === tutorial.youtubeId ? '#fff' : 'var(--text-primary)' }}>{tutorial.title}</h4>
                                 <p className="text-[10px] mt-0.5 opacity-80">{tutorial.duration}</p>
                                 {progressMap[tutorial.youtubeId]?.completed && (
-                                  <span className="text-[9px] font-bold" style={{ color: '#16a34a' }}>✓ Completed</span>
+                                  <span className="text-[9px] font-bold" style={{ color: '#16a34a' }}>Γ£ô Completed</span>
                                 )}
                               </div>
                             </motion.div>
@@ -1131,7 +1280,6 @@ export default function FreelancerLearning() {
 
                 {/* Right side - Supervisor */}
                 <div className="space-y-4">
-                  <PromotionProgressPanel onApplied={() => {}} />
                   <SupervisorPanel />
                 </div>
               </div>

@@ -1,174 +1,119 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { Meeting } from '../models/Meeting.js';
-import { User } from '../models/User.js';
 
-// ── Get meetings for freelancer ───────────────────────────────────
+// ── Shared helpers ────────────────────────────────────────────────
+const getMeetingsForUser = (userId) =>
+  Meeting.find({ $or: [{ initiatorId: userId }, { participants: userId }] })
+    .populate('initiatorId', 'fullName avatar role')
+    .populate('participants', 'fullName avatar role')
+    .sort({ scheduledTime: -1 });
+
+const buildMeeting = async (req, initiatorRole) => {
+  const { title, description, scheduledTime, duration, participants = [], projectId } = req.body;
+  if (!title || !scheduledTime || !duration)
+    throw new Error('title, scheduledTime and duration are required');
+
+  const allParticipants = [...new Set([req.user._id.toString(), ...participants])];
+  const meetingToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const meetingLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/meet/${meetingToken}`;
+
+  const meeting = await Meeting.create({
+    title, description,
+    initiatorId: req.user._id,
+    initiatorRole,
+    scheduledTime: new Date(scheduledTime),
+    duration,
+    participants: allParticipants,
+    meetingLink,
+    ...(projectId && { projectId }),
+  });
+  return meeting.populate('initiatorId', 'fullName avatar');
+};
+
+// ── GET /freelancer/meetings ──────────────────────────────────────
 export const getFreelancerMeetings = asyncHandler(async (req, res) => {
-  const meetings = await Meeting.find({
-    $or: [
-      { initiatorId: req.user._id, initiatorRole: 'freelancer' },
-      { participants: req.user._id }
-    ]
-  })
-    .populate('initiatorId', 'fullName avatar')
-    .populate('participants', 'fullName avatar')
-    .sort({ scheduledTime: -1 });
-
-  res.json(new ApiResponse(200, meetings, 'Freelancer meetings retrieved'));
+  const meetings = await getMeetingsForUser(req.user._id);
+  res.json(new ApiResponse(200, meetings, 'Meetings retrieved'));
 });
 
-// ── Get meetings for client ───────────────────────────────────────
+// ── GET /client/meetings ──────────────────────────────────────────
 export const getClientMeetings = asyncHandler(async (req, res) => {
-  const meetings = await Meeting.find({
-    $or: [
-      { initiatorId: req.user._id, initiatorRole: 'client' },
-      { participants: req.user._id }
-    ]
-  })
-    .populate('initiatorId', 'fullName avatar')
-    .populate('participants', 'fullName avatar')
-    .sort({ scheduledTime: -1 });
-
-  res.json(new ApiResponse(200, meetings, 'Client meetings retrieved'));
+  const meetings = await getMeetingsForUser(req.user._id);
+  res.json(new ApiResponse(200, meetings, 'Meetings retrieved'));
 });
 
-// ── Create meeting for freelancer ─────────────────────────────────
+// ── POST /freelancer/meetings (project_initiator / supervisor only)
 export const createFreelancerMeeting = asyncHandler(async (req, res) => {
-  const { title, description, scheduledTime, duration, participants, projectId } = req.body;
+  const canSchedule =
+    req.user.tier === 'project_initiator' ||
+    req.user.role === 'momentum_supervisor';
+  if (!canSchedule)
+    return res.status(403).json(new ApiResponse(403, null, 'Only project initiators and supervisors can schedule meetings'));
 
-  if (!title || !scheduledTime || !duration) {
-    return res.status(400).json(new ApiResponse(400, null, 'Missing required fields'));
-  }
+  // Use tier as initiatorRole for project_initiator, role otherwise
+  const initiatorRole = req.user.role === 'momentum_supervisor'
+    ? 'momentum_supervisor'
+    : 'project_initiator';
 
-  // Generate unique meeting link
-  const meetingLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/meet/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-  const meeting = await Meeting.create({
-    title,
-    description,
-    initiatorId: req.user._id,
-    initiatorRole: 'freelancer',
-    scheduledTime: new Date(scheduledTime),
-    duration,
-    participants: participants || [req.user._id],
-    meetingLink,
-    projectId,
-  });
-
-  const populatedMeeting = await meeting.populate('initiatorId', 'fullName avatar');
-
-  res.status(201).json(new ApiResponse(201, populatedMeeting, 'Meeting scheduled'));
+  const meeting = await buildMeeting(req, initiatorRole);
+  res.status(201).json(new ApiResponse(201, meeting, 'Meeting scheduled'));
 });
 
-// ── Create meeting for client ─────────────────────────────────────
+// ── POST /client/meetings ─────────────────────────────────────────
 export const createClientMeeting = asyncHandler(async (req, res) => {
-  const { title, description, scheduledTime, duration, participants, projectId } = req.body;
-
-  if (!title || !scheduledTime || !duration) {
-    return res.status(400).json(new ApiResponse(400, null, 'Missing required fields'));
-  }
-
-  // Generate unique meeting link
-  const meetingLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/meet/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-  const meeting = await Meeting.create({
-    title,
-    description,
-    initiatorId: req.user._id,
-    initiatorRole: 'client',
-    scheduledTime: new Date(scheduledTime),
-    duration,
-    participants: participants || [req.user._id],
-    meetingLink,
-    projectId,
-  });
-
-  const populatedMeeting = await meeting.populate('initiatorId', 'fullName avatar');
-
-  res.status(201).json(new ApiResponse(201, populatedMeeting, 'Meeting scheduled'));
+  const meeting = await buildMeeting(req, 'client');
+  res.status(201).json(new ApiResponse(201, meeting, 'Meeting scheduled'));
 });
 
-// ── Get meeting detail ────────────────────────────────────────────
+// ── GET /*/meetings/:id ───────────────────────────────────────────
 export const getMeetingDetail = asyncHandler(async (req, res) => {
   const meeting = await Meeting.findById(req.params.id)
     .populate('initiatorId', 'fullName avatar email')
     .populate('participants', 'fullName avatar email');
+  if (!meeting) return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
 
-  if (!meeting) {
-    return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
-  }
-
-  // Check if user is participant or initiator
-  const isParticipant = meeting.participants.some(p => p._id.toString() === req.user._id.toString());
-  const isInitiator = meeting.initiatorId._id.toString() === req.user._id.toString();
-
-  if (!isParticipant && !isInitiator) {
-    return res.status(403).json(new ApiResponse(403, null, 'Unauthorized'));
-  }
+  const uid = req.user._id.toString();
+  const isMember =
+    meeting.initiatorId._id.toString() === uid ||
+    meeting.participants.some(p => p._id.toString() === uid);
+  if (!isMember) return res.status(403).json(new ApiResponse(403, null, 'Unauthorized'));
 
   res.json(new ApiResponse(200, meeting, 'Meeting details retrieved'));
 });
 
-// ── Update meeting status ─────────────────────────────────────────
+// ── PATCH /*/meetings/:id/status ─────────────────────────────────
 export const updateMeetingStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
-
-  if (!['scheduled', 'live', 'completed', 'cancelled'].includes(status)) {
+  if (!['scheduled', 'live', 'completed', 'cancelled'].includes(status))
     return res.status(400).json(new ApiResponse(400, null, 'Invalid status'));
-  }
 
-  const meeting = await Meeting.findByIdAndUpdate(
-    req.params.id,
-    { status },
-    { new: true }
-  )
+  const meeting = await Meeting.findByIdAndUpdate(req.params.id, { status }, { new: true })
     .populate('initiatorId', 'fullName avatar')
     .populate('participants', 'fullName avatar');
-
-  if (!meeting) {
-    return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
-  }
-
-  res.json(new ApiResponse(200, meeting, 'Meeting status updated'));
+  if (!meeting) return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
+  res.json(new ApiResponse(200, meeting, 'Status updated'));
 });
 
-// ── Add participant to meeting ────────────────────────────────────
+// ── POST /*/meetings/:id/participants ─────────────────────────────
 export const addParticipant = asyncHandler(async (req, res) => {
   const { participantId } = req.body;
-
-  if (!participantId) {
-    return res.status(400).json(new ApiResponse(400, null, 'Participant ID required'));
-  }
+  if (!participantId) return res.status(400).json(new ApiResponse(400, null, 'participantId required'));
 
   const meeting = await Meeting.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { participants: participantId } },
     { new: true }
-  )
-    .populate('initiatorId', 'fullName avatar')
-    .populate('participants', 'fullName avatar');
-
-  if (!meeting) {
-    return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
-  }
-
+  ).populate('initiatorId', 'fullName avatar').populate('participants', 'fullName avatar');
+  if (!meeting) return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
   res.json(new ApiResponse(200, meeting, 'Participant added'));
 });
 
-// ── Cancel meeting ────────────────────────────────────────────────
+// ── POST /*/meetings/:id/cancel ───────────────────────────────────
 export const cancelMeeting = asyncHandler(async (req, res) => {
   const meeting = await Meeting.findByIdAndUpdate(
-    req.params.id,
-    { status: 'cancelled' },
-    { new: true }
-  )
-    .populate('initiatorId', 'fullName avatar')
-    .populate('participants', 'fullName avatar');
-
-  if (!meeting) {
-    return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
-  }
-
+    req.params.id, { status: 'cancelled' }, { new: true }
+  ).populate('initiatorId', 'fullName avatar').populate('participants', 'fullName avatar');
+  if (!meeting) return res.status(404).json(new ApiResponse(404, null, 'Meeting not found'));
   res.json(new ApiResponse(200, meeting, 'Meeting cancelled'));
 });

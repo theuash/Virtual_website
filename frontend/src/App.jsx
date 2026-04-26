@@ -41,6 +41,7 @@ import FreelancerLearning from './pages/freelancer/FreelancerLearning';
 import FreelancerMeet from './pages/freelancer/FreelancerMeet';
 import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
 import CrateMyTeam from './pages/freelancer/CrateMyTeam';
+import { SidebarProvider } from './context/SidebarContext';
 
 // Initiator
 import InitiatorLayout from './pages/initiator/InitiatorLayout';
@@ -68,6 +69,7 @@ import SupervisorPayouts from './pages/supervisor/SupervisorPayouts';
 import SupervisorEarnings from './pages/supervisor/SupervisorEarnings';
 import SupervisorWallet from './pages/supervisor/SupervisorWallet';
 import SupervisorSettings from './pages/supervisor/SupervisorSettings';
+import SupervisorMeetings from './pages/supervisor/SupervisorMeetings';
 
 // Admin
 import AdminLayout from './pages/admin/AdminLayout';
@@ -109,7 +111,7 @@ function App() {
       </Route>
 
       {/* Freelancer — protected */}
-      <Route path="/freelancer" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerLayout /></RoleGuard>}>
+      <Route path="/freelancer" element={<RoleGuard allowedRoles={['freelancer']}><SidebarProvider><FreelancerLayout /></SidebarProvider></RoleGuard>}>
         <Route index element={<Navigate to="/freelancer/dashboard" replace />} />
         <Route path="dashboard" element={<FreelancerDashboard />} />
         <Route path="tasks" element={<FreelancerTasks />} />
@@ -147,6 +149,7 @@ function App() {
         <Route path="teams"         element={<SupervisorTeams />} />
         <Route path="precrates"     element={<SupervisorPrecrates />} />
         <Route path="group-projects" element={<SupervisorGroupProjects />} />
+        <Route path="meetings"      element={<SupervisorMeetings />} />
         <Route path="clients"       element={<SupervisorClients />} />
         <Route path="payouts"       element={<SupervisorPayouts />} />
         <Route path="earnings"      element={<SupervisorEarnings />} />

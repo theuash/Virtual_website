@@ -12,6 +12,7 @@ const freelancerSchema = new mongoose.Schema({
 
   // Profile
   fullName:       { type: String, required: true },
+  userId:         { type: String, unique: true, sparse: true },
   phone:          { type: String },
   avatar:         { type: String },
   dateOfBirth:    { type: Date },

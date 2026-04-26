@@ -5,8 +5,8 @@
 ### Issue 1: Google Auth Not Working ⚠️ CRITICAL
 **Status:** Needs 5 minutes of your time
 
-### Issue 2: WhatsApp QR Code Not Showing ℹ️ INFORMATIONAL
-**Status:** Optional - use Supabase OTP instead
+### Issue 2: WhatsApp OTP Setup ℹ️ INFORMATIONAL
+**Status:** Optional - set up locally or on production
 
 ---
 
@@ -38,28 +38,26 @@ Google login will work after 5-10 minutes.
 
 ---
 
-## About Issue 2 (WhatsApp QR Code)
+## About Issue 2 (WhatsApp OTP)
 
 ### The Problem
-Render doesn't show QR codes in logs (it's a platform limitation).
+WhatsApp QR code needs to be scanned to authenticate the session.
 
 ### Your Options
 
-#### Option A: Use Supabase OTP (Recommended)
-- ✅ Already configured
-- ✅ Users get OTP via email
-- ✅ Works on production
-- ✅ No setup needed
-- **Status:** Ready to use
-
-#### Option B: Set Up WhatsApp Locally
-If you really need WhatsApp:
+#### Option A: Set Up Locally (Recommended for Development)
 ```bash
 cd backend
 npm run dev
 # QR code appears in terminal
 # Scan with WhatsApp on your phone
+# Session is saved for future use
 ```
+
+#### Option B: Set Up on Production
+- Deploy backend to Render
+- SSH into Render and scan QR code
+- Session persists for all users
 
 ---
 
@@ -82,7 +80,7 @@ For more details, see:
 ### ✅ Already Working
 - Frontend: Google Client ID set
 - Backend: Google credentials set
-- Supabase OTP: Configured
+- WhatsApp OTP: Configured
 - Database: Connected
 - Deployment: Live
 

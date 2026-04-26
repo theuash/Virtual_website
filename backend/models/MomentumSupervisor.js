@@ -12,6 +12,7 @@ const supervisorSchema = new mongoose.Schema({
 
   // Profile
   fullName:       { type: String, required: true },
+  userId:         { type: String, unique: true, sparse: true },
   phone:          { type: String },
   avatar:         { type: String },
   dateOfBirth:    { type: Date },
@@ -32,6 +33,7 @@ const supervisorSchema = new mongoose.Schema({
 
   // Work
   department:             { type: String, enum: SKILLS },
+  supervisorCode:         { type: String, unique: true, sparse: true },
   supervisedFreelancers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer' }],
   totalReviews:           { type: Number, default: 0 },
   approvalRate:           { type: Number, default: 0 },

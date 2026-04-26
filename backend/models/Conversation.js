@@ -19,6 +19,8 @@ const conversationSchema = new mongoose.Schema(
     },
     // Optional display name
     name: { type: String, trim: true, default: '' },
+    // Users who have blocked this conversation
+    blockedBy: [{ type: mongoose.Schema.Types.ObjectId }],
   },
   { timestamps: true, collection: 'conversations' }
 );

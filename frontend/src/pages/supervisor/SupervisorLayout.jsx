@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, FolderKanban, Users, MessageSquare,
   Settings, LogOut, Menu, X, DollarSign, Wallet,
-  Bell, Users2, Globe, Briefcase, TrendingUp,
+  Bell, Users2, Globe, Briefcase, TrendingUp, Video,
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import api from '../../services/api';
@@ -34,6 +34,7 @@ export default function SupervisorLayout() {
     { path: '/supervisor/projects',       icon: <FolderKanban size={17} strokeWidth={1.5} />,   label: 'Projects' },
     { path: '/supervisor/teams',          icon: <Users size={17} strokeWidth={1.5} />,           label: 'Teams' },
     { path: '/supervisor/precrates',      icon: <Users2 size={17} strokeWidth={1.5} />,          label: 'Precrates' },
+    { path: '/supervisor/meetings',       icon: <Video size={17} strokeWidth={1.5} />,            label: 'Meetings' },
     { path: '/supervisor/group-projects', icon: <Globe size={17} strokeWidth={1.5} />,           label: 'Group Projects' },
     { path: '/supervisor/clients',        icon: <Briefcase size={17} strokeWidth={1.5} />,       label: 'Clients' },
     { path: '/supervisor/payouts',        icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Payouts' },

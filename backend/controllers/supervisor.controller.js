@@ -114,7 +114,12 @@ export const getSupervisorTeams = asyncHandler(async (req, res) => {
 
 // ── GET /supervisor/precrates ────────────────────────────────────
 export const getPrecrates = asyncHandler(async (req, res) => {
-  const precrates = await Freelancer.find({ tier: 'precrate', isSuspended: { $ne: true } })
+  // Only return precrates assigned to THIS supervisor
+  const precrates = await Freelancer.find({
+    tier: 'precrate',
+    isSuspended: { $ne: true },
+    mentorId: myId(req),
+  })
     .select('fullName email primarySkill secondarySkills hoursPerWeek preferredContactTime createdAt mentorId')
     .lean();
 
@@ -126,6 +131,54 @@ export const getPrecrates = asyncHandler(async (req, res) => {
   }));
 
   res.json(new ApiResponse(200, enriched, 'Precrates fetched'));
+});
+
+// ── GET /supervisor/precrates/:id ───────────────────────────────
+export const getPrecratDetail = asyncHandler(async (req, res) => {
+  const freelancer = await Freelancer.findOne({ _id: req.params.id, mentorId: myId(req) })
+    .select('-passwordHash -otpCodeHash -otpExpiresAt -otpSentAt -otpContext -loginOtpPending')
+    .lean();
+  if (!freelancer) throw new ApiError(404, 'Freelancer not found or not under your supervision');
+
+  const progress = await LearningProgress.find({ freelancerId: freelancer._id }).lean();
+  const completed = progress.filter(p => p.completed).length;
+
+  res.json(new ApiResponse(200, {
+    ...freelancer,
+    learningProgress: { completed, total: progress.length, records: progress },
+  }, 'Precrate detail fetched'));
+});
+
+// ── PATCH /supervisor/precrates/:id ─────────────────────────────
+export const updatePrecrate = asyncHandler(async (req, res) => {
+  const { primarySkill, secondarySkills, hoursPerWeek, preferredContactTime } = req.body;
+
+  const freelancer = await Freelancer.findOne({ _id: req.params.id, mentorId: myId(req) });
+  if (!freelancer) throw new ApiError(404, 'Freelancer not found or not under your supervision');
+
+  const allowed = {};
+  if (primarySkill)          allowed.primarySkill = primarySkill;
+  if (secondarySkills)       allowed.secondarySkills = secondarySkills;
+  if (hoursPerWeek)          allowed.hoursPerWeek = Number(hoursPerWeek);
+  if (preferredContactTime)  allowed.preferredContactTime = preferredContactTime;
+
+  const updated = await Freelancer.findByIdAndUpdate(req.params.id, { $set: allowed }, { new: true })
+    .select('-passwordHash -otpCodeHash -otpExpiresAt -otpSentAt');
+
+  res.json(new ApiResponse(200, updated, 'Freelancer updated'));
+});
+
+// ── POST /supervisor/precrates/:id/suspend ───────────────────────
+export const suspendPrecrate = asyncHandler(async (req, res) => {
+  const { suspend = true, reason = '' } = req.body;
+
+  const freelancer = await Freelancer.findOne({ _id: req.params.id, mentorId: myId(req) });
+  if (!freelancer) throw new ApiError(404, 'Freelancer not found or not under your supervision');
+
+  freelancer.isSuspended = suspend;
+  await freelancer.save();
+
+  res.json(new ApiResponse(200, { isSuspended: freelancer.isSuspended }, suspend ? 'Freelancer suspended' : 'Freelancer reinstated'));
 });
 
 // ── GET /supervisor/group-projects ──────────────────────────────

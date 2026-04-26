@@ -51,6 +51,7 @@ import messagingRoutes from './routes/messaging.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import supervisorRoutes from './routes/supervisor.routes.js';
 import geoRoutes from './routes/geo.routes.js';
+import debugRoutes from './routes/debug.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/client', clientRoutes);
@@ -64,6 +65,7 @@ app.use('/api/messaging', messagingRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/supervisor', supervisorRoutes);
 app.use('/api/geo', geoRoutes);
+app.use('/api/debug', debugRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
   app.use('/api/seed', seedRoutes);

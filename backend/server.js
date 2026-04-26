@@ -22,6 +22,5 @@ connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     console.log(`Socket.io ready on port ${PORT}`);
-    console.log(`OTP Service: Supabase Email OTP enabled`);
   });
 });

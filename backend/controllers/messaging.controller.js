@@ -102,6 +102,56 @@ export const createConversation = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, { ...conv.toObject(), name: resolvedName }, 'Conversation created'));
 });
 
+// ── DELETE /api/messaging/conversations/:id ───────────────────────
+export const deleteConversation = asyncHandler(async (req, res) => {
+  const conv = await Conversation.findById(req.params.id);
+  if (!conv) return res.status(404).json(new ApiResponse(404, null, 'Conversation not found'));
+
+  const isMember = conv.members.map(String).includes(req.user._id.toString());
+  if (!isMember) return res.status(403).json(new ApiResponse(403, null, 'Not a member'));
+
+  // Remove this user from the conversation members
+  conv.members = conv.members.filter(m => m.toString() !== req.user._id.toString());
+
+  if (conv.members.length === 0) {
+    // No members left — delete everything
+    await Message.deleteMany({ conversationId: conv._id });
+    await conv.deleteOne();
+  } else {
+    await conv.save();
+  }
+
+  res.json(new ApiResponse(200, null, 'Conversation deleted'));
+});
+
+// ── POST /api/messaging/conversations/:id/block ───────────────────
+export const blockUser = asyncHandler(async (req, res) => {
+  const conv = await Conversation.findById(req.params.id).lean();
+  if (!conv) return res.status(404).json(new ApiResponse(404, null, 'Conversation not found'));
+
+  const isMember = conv.members.map(String).includes(req.user._id.toString());
+  if (!isMember) return res.status(403).json(new ApiResponse(403, null, 'Not a member'));
+
+  // Find the other user and add to blockedBy list
+  const otherId = conv.members.find(m => m.toString() !== req.user._id.toString());
+  if (!otherId) return res.status(400).json(new ApiResponse(400, null, 'No other member to block'));
+
+  // Store block on the conversation itself
+  await Conversation.findByIdAndUpdate(conv._id, {
+    $addToSet: { blockedBy: req.user._id },
+  });
+
+  res.json(new ApiResponse(200, null, 'User blocked'));
+});
+
+// ── POST /api/messaging/conversations/:id/unblock ─────────────────
+export const unblockUser = asyncHandler(async (req, res) => {
+  await Conversation.findByIdAndUpdate(req.params.id, {
+    $pull: { blockedBy: req.user._id },
+  });
+  res.json(new ApiResponse(200, null, 'User unblocked'));
+});
+
 // ── GET /api/messaging/default-conversation ───────────────────────
 // Returns (or creates) the pre-seeded conversation for the current user:
 //   precrate → DM with their assigned Momentum Supervisor (mentorId)

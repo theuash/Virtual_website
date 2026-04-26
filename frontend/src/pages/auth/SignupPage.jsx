@@ -73,7 +73,8 @@ export default function SignupPage() {
   const roleParam = params.get('role');
   const redirectTo = params.get('redirect') || null;
   const navigate = useNavigate();
-  const { signup, loading, verifySignupOTP, requestSignupOTP, completeAuth, signupWithGoogle } = useAuth();
+  const { signup, verifySignupOTP, requestSignupOTP, completeAuth, signupWithGoogle } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
 
   const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
@@ -96,6 +97,7 @@ export default function SignupPage() {
     prompt: 'select_account',
     onSuccess: async (codeResponse) => {
       setError('');
+      setSubmitting(true);
       try {
         if (!role) {
           setError('Please select a role first.');
@@ -110,6 +112,8 @@ export default function SignupPage() {
         navigate(redirectTo || getRoleRedirect(user.role, user));
       } catch (err) {
         setError(err?.message || 'Google signup failed. Please try again.');
+      } finally {
+        setSubmitting(false);
       }
     },
     onError: () => {
@@ -123,38 +127,62 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
     if (formData.password !== formData.confirmPassword) return setError('Passwords do not match.');
+    setSubmitting(true);
     try {
       const fullPhone = `${formData.countryCode}${formData.phone}`;
       const response = await signup({ ...formData, phone: fullPhone, role });
+      // Store supervisor code so onboarding can use it
+      if (formData.supervisorCode?.trim()) {
+        sessionStorage.setItem('pendingSupervisorCode', formData.supervisorCode.trim().toUpperCase());
+      }
       setPendingUser(response);
       setIsVerifying(true);
     } catch (err) {
-      setError(err?.message || err?.response?.data?.message || 'Error creating account. Please try again.');
+      const msg = err?.message || err?.response?.data?.message || 'Error creating account. Please try again.';
+      const alreadyExists = msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('already registered');
+      setError(
+        alreadyExists
+          ? 'An account with this email already exists. Please log in instead.'
+          : msg
+      );
+      if (alreadyExists) {
+        setTimeout(() => navigate(`/login?email=${encodeURIComponent(formData.email)}`), 3000);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
     try {
-      // Reconstruct full signup data with combined phone number
       const signupDataForVerification = {
         ...formData,
+        fullName: formData.name?.trim(),
         phone: `${formData.countryCode}${formData.phone}`,
         role,
       };
-      const verifiedAuth = await verifySignupOTP(pendingUser.user.email, otp, signupDataForVerification);
+      const pendingEmail = pendingUser?.user?.email ?? pendingUser?.email ?? formData.email;
+      const verifiedAuth = await verifySignupOTP(pendingEmail, otp, signupDataForVerification);
+      if (!verifiedAuth?.token) {
+        throw new Error('Verification succeeded but no token received. Please try logging in.');
+      }
       const user = completeAuth(verifiedAuth);
       navigate(redirectTo || getRoleRedirect(user.role, user));
     } catch (err) {
       setError(err?.response?.data?.message || err?.message || 'Invalid verification code.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleResendOtp = async () => {
     setError('');
     try {
-      await requestSignupOTP(pendingUser.user.email);
+      const pendingEmail = pendingUser?.user?.email ?? pendingUser?.email ?? formData.email;
+      await requestSignupOTP(pendingEmail);
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to resend code right now.');
     }
@@ -372,7 +400,7 @@ export default function SignupPage() {
             </h2>
             <p className="text-sm font-light opacity-50" style={{ color: 'var(--text-secondary)' }}>
               {isVerifying 
-                ? `Enter the 6-digit code sent to ${otpDestination}` 
+                ? `Enter the 6-digit code sent to ${pendingUser?.user?.email ?? pendingUser?.email ?? formData.email}` 
                 : 'Fill in your details to get started.'}
             </p>
           </div>
@@ -389,7 +417,12 @@ export default function SignupPage() {
                 style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-0.5" />
-                {error}
+                <span>
+                  {error}
+                  {(error.toLowerCase().includes('already exists') || error.toLowerCase().includes('already registered')) && (
+                    <> <Link to={`/login?email=${encodeURIComponent(formData.email)}`} className="underline font-black hover:opacity-70" style={{ color: '#f87171' }}>Log in now →</Link></>
+                  )}
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -411,16 +444,16 @@ export default function SignupPage() {
 
               <div className="text-center">
                 <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  Didn&apos;t receive the phone code?
+                  Didn&apos;t receive the email code?
                 </p>
                 <button type="button" onClick={handleResendOtp} className="text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity" style={{ color: 'var(--accent)' }}>
-                  Resend Phone Code
+                  Resend Email Code
                 </button>
               </div>
 
-              <button type="submit" disabled={loading}
+              <button type="submit" disabled={submitting}
                 className="btn-primary w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98]">
-                {loading ? 'Verifying...' : 'Authenticate & Access'}
+                {submitting ? 'Verifying...' : 'Authenticate & Access'}
               </button>
             </form>
           ) : (
@@ -429,7 +462,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => handleGoogleSignup()}
-                disabled={loading}
+                disabled={submitting}
                 className="w-full py-3 px-4 rounded-xl border transition-all flex items-center justify-center gap-3 hover:opacity-80 active:scale-[0.98] mb-2"
                 style={{ 
                   background: 'var(--bg-secondary)',
@@ -539,10 +572,26 @@ export default function SignupPage() {
                 </div>
               </div>
 
+              {/* Freelancer-only: Supervisor Code */}
+              {role === 'freelancer' && (
+                <Field label="Supervisor Code (Optional)" icon={ShieldCheck}>
+                  <input name="supervisorCode" type="text"
+                    className="w-full text-sm rounded-xl border outline-none transition-all font-mono"
+                    style={inputStyle}
+                    placeholder="e.g. V26INMS-LUM01"
+                    maxLength={20}
+                    value={formData.supervisorCode || ''}
+                    onChange={e => setFormData(f => ({ ...f, supervisorCode: e.target.value.toUpperCase() }))} />
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Have a code from your supervisor? Leave blank to be auto-assigned.
+                  </p>
+                </Field>
+              )}
+
               {/* Submit */}
-              <button type="submit" disabled={loading}
+              <button type="submit" disabled={submitting}
                 className="btn-primary w-full py-4 text-[11px] font-black uppercase tracking-[0.25em] rounded-xl transition-all active:scale-[0.98] mt-2">
-                {loading ? 'Initiating Verification...' : 'Send Phone Code'}
+                {submitting ? 'Initiating Verification...' : 'Send Email Code'}
               </button>
             </form>
           )}

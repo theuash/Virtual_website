@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 const unwrapResponse = (response) => response?.data?.data ?? response?.data ?? response;
 const normalizeRequestError = (error, fallbackMessage) => {
   if (error?.code === 'ECONNABORTED') {
-    return new Error('Request timed out while waiting for the OTP service. Make sure WhatsApp is connected, then try again.');
+    return new Error('Request timed out. Please try again.');
   }
 
   const message = error?.response?.data?.message || error?.message || fallbackMessage;

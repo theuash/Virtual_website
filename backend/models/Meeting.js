@@ -6,8 +6,8 @@ const meetingSchema = new mongoose.Schema({
   description: { type: String },
   
   // ── Participants ──────────────────────────────────────────────
-  initiatorId:  { type: mongoose.Schema.Types.ObjectId, required: true },  // who created the meeting
-  initiatorRole: { type: String, enum: ['client', 'freelancer'], required: true },
+  initiatorId:  { type: mongoose.Schema.Types.ObjectId, required: true },
+  initiatorRole: { type: String, enum: ['client', 'freelancer', 'momentum_supervisor', 'project_initiator'], required: true },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   
   // ── Scheduling ───────────────────────────────────────────────

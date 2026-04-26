@@ -1,12 +1,12 @@
 import 'dotenv/config.js';
 import { connectDB } from './config/db.js';
 import { MomentumSupervisor } from './models/MomentumSupervisor.js';
+import { generateSupervisorCode } from './utils/supervisorCode.js';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
 await connectDB();
 
-// Clean up any corrupt documents
 await mongoose.connection.collection('momentum_supervisors').deleteMany({ _id: {} });
 
 const email = 'lumetic19@gmail.com';
@@ -19,9 +19,13 @@ if (existing) {
   existing.passwordHash = passwordHash;
   existing.isVerified = true;
   existing.fullName = existing.fullName || 'Lumetic';
+  if (!existing.supervisorCode) {
+    existing.supervisorCode = await generateSupervisorCode(email, 'IN', existing.createdAt || new Date());
+  }
   await existing.save();
-  console.log('Updated:', existing.fullName, '| ID:', existing._id.toString());
+  console.log('Updated:', existing.fullName, '| Code:', existing.supervisorCode, '| ID:', existing._id.toString());
 } else {
+  const code = await generateSupervisorCode(email, 'IN');
   const sup = await MomentumSupervisor.create({
     email,
     passwordHash,
@@ -30,8 +34,9 @@ if (existing) {
     authMethod: 'password',
     isVerified: true,
     phoneVerified: false,
+    supervisorCode: code,
   });
-  console.log('Created:', sup.fullName, '| ID:', sup._id.toString());
+  console.log('Created:', sup.fullName, '| Code:', sup.supervisorCode, '| ID:', sup._id.toString());
 }
 
 process.exit(0);

@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import { findUserByEmail, modelForRole } from '../utils/findUser.js';
 import { generateTokens, sanitizeUser } from './auth.service.js';
+import { generateUserId } from '../utils/userId.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -52,6 +53,7 @@ export const signupWithGoogle = async (googleToken, role) => {
     }
 
     const Model = modelForRole(role);
+    const userId = await generateUserId('IN', new Date());
     const newUser = await Model.create({
       email:      googleData.email,
       role,
@@ -59,6 +61,7 @@ export const signupWithGoogle = async (googleToken, role) => {
       avatar:     googleData.picture,
       authMethod: 'google',
       isVerified: true,
+      userId,
       ...(role === 'client' && { companyName: '' }),
     });
 

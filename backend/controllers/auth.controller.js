@@ -1,6 +1,5 @@
 import * as authService from '../services/auth.service.js';
 import * as googleService from '../services/google.service.js';
-import { isSupabaseConfigured } from '../services/supabase.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -98,16 +97,15 @@ export const verifyOtpLogin = asyncHandler(async (req, res) => {
  * Verify OTP for signup
  */
 export const verifyOtpSignup = asyncHandler(async (req, res) => {
-  try {
-    const { email, token } = req.body;
-    if (!email || !token) {
-      throw new ApiError(400, 'Email and phone OTP token are required');
-    }
-    const data = await authService.verifySignupOtp(email, token);
-    res.json(new ApiResponse(200, data, data.message));
-  } catch (error) {
-    throw new ApiError(401, error.message);
+  const { email, token, signupData } = req.body;
+  if (!email || !token) {
+    throw new ApiError(400, 'Email and OTP token are required');
   }
+  if (!signupData) {
+    throw new ApiError(400, 'Signup data is required');
+  }
+  const data = await authService.verifySignupOtp(email, token, signupData);
+  res.json(new ApiResponse(200, data, data.message));
 });
 
 /**
@@ -121,15 +119,6 @@ export const getMe = asyncHandler(async (req, res) => {
   const fresh = await findUserById(req.user._id);
   if (!fresh) throw new ApiError(404, 'User not found');
   res.json(new ApiResponse(200, fresh));
-});
-
-export const getOtpStatus = asyncHandler(async (req, res) => {
-  const supabaseConfigured = isSupabaseConfigured();
-  res.json(new ApiResponse(200, {
-    otpService: 'Supabase Email OTP',
-    configured: supabaseConfigured,
-    status: supabaseConfigured ? 'active' : 'inactive'
-  }, 'OTP service status fetched'));
 });
 
 /**

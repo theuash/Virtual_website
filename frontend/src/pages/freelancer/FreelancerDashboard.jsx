@@ -8,7 +8,7 @@ import LockedBlock from '../../components/LockedBlock';
 import { motion } from 'framer-motion';
 import {
   FolderKanban, CheckCircle2, CircleDollarSign, ArrowRight,
-  TrendingUp, Clock, BookOpen, Play, Lock, ChevronRight, Zap
+  TrendingUp, Clock, BookOpen, Play, Lock, ChevronRight, Zap, PlayCircle, User
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -20,13 +20,6 @@ const TIER_DESCRIPTIONS = {
   momentum_supervisor: 'Oversees quality and delivery across departments.',
   admin:               'Full platform access.',
 };
-
-const LEARNING_MODULES = [
-  { id: 1, title: 'Platform Orientation',    desc: 'How Virtual works — departments, micro-tasks, and the chain of command.', duration: '8 min',  locked: false, completed: true },
-  { id: 2, title: 'Delivering Quality Work', desc: 'Standards expected at every tier. What Momentum Supervisors check.',       duration: '12 min', locked: false, completed: false },
-  { id: 3, title: 'Escrow & Payment Flow',   desc: 'How client funds move from wallet to escrow to your earnings.',            duration: '6 min',  locked: false, completed: false },
-  { id: 4, title: 'Advancing Through Tiers', desc: 'The three metrics that drive promotion: accuracy, speed, and volume.',     duration: '10 min', locked: true,  completed: false },
-];
 
 function StatCard({ label, value, icon, highlight }) {
   return (
@@ -80,6 +73,72 @@ export default function FreelancerDashboard() {
     },
   });
 
+  const { data: mentor } = useQuery({
+    queryKey: ['freelancerMentor', user?._id],
+    queryFn: async () => {
+      const res = await api.get('/freelancer/supervisor');
+      return res.data?.data ?? null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch real learning progress
+  const [progressMap, setProgressMap] = useState({});
+  const [catalogue, setCatalogue] = useState(null);
+  const [learningLoading, setLearningLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/freelancer/learning/progress'),
+      api.get('/learning/catalogue'),
+    ]).then(([progRes, catRes]) => {
+      setProgressMap(progRes.data?.data ?? {});
+      setCatalogue(catRes.data?.data ?? {});
+    }).catch(() => {}).finally(() => setLearningLoading(false));
+  }, []);
+
+  // Build flat list of all videos from user's skills
+  const allVideos = (() => {
+    if (!catalogue || !user?.primarySkill) return [];
+    const skills = [user.primarySkill, ...(user.secondarySkills || [])];
+    const videos = [];
+    for (const skill of skills) {
+      const skillData = catalogue[skill];
+      if (!skillData) continue;
+      for (const software of Object.keys(skillData)) {
+        const sw = skillData[software];
+        for (const t of (sw.tutorials || [])) {
+          videos.push({ ...t, skill, software, source: 'tutorial' });
+        }
+        for (const p of (sw.playlists || [])) {
+          for (const v of (p.videos || [])) {
+            videos.push({ ...v, skill, software, source: 'playlist', playlistTitle: p.title });
+          }
+        }
+        for (const c of (sw.crash_courses || [])) {
+          for (const v of (c.videos || [])) {
+            videos.push({ ...v, skill, software, source: 'crash_course', courseTitle: c.title });
+          }
+        }
+      }
+    }
+    // Deduplicate by youtubeId
+    const seen = new Set();
+    return videos.filter(v => { if (seen.has(v.youtubeId)) return false; seen.add(v.youtubeId); return true; });
+  })();
+
+  // Continue watching: videos with progress > 5% but not completed
+  const continueWatching = allVideos.filter(v => {
+    const p = progressMap[v.youtubeId];
+    if (!p || p.completed) return false;
+    const pct = p.durationSeconds > 0 ? p.watchedSeconds / p.durationSeconds : 0;
+    return pct > 0.05;
+  }).slice(0, 3);
+
+  // Completed count
+  const completedCount = allVideos.filter(v => progressMap[v.youtubeId]?.completed).length;
+  const totalCount = allVideos.length;
+
   const completedTasks = metrics?.stats?.completedTasks  ?? 0;
   const totalEarnings  = metrics?.stats?.totalEarnings   ?? 0;
   const projects       = metrics?.tasks ?? [];
@@ -92,7 +151,6 @@ export default function FreelancerDashboard() {
   const currentTierIdx = TIER_ORDER.indexOf(user?.tier || 'precrate');
   const nextTier = TIER_ORDER[currentTierIdx + 1];
   const nextTierLabel = nextTier ? TIER_LABELS[nextTier] : null;
-  const completedModules = LEARNING_MODULES.filter(m => m.completed).length;
 
   // Persist sidebar state
   useEffect(() => {
@@ -257,6 +315,45 @@ export default function FreelancerDashboard() {
           </motion.div>
         </div>
 
+        {/* ── Mentor card ──────────────────────────────────────── */}
+        {mentor && (
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-4 p-4 rounded-xl border"
+            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          >
+            {/* Avatar */}
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-black"
+              style={{ background: 'var(--accent)', color: '#fff' }}>
+              {mentor.avatar
+                ? <img src={mentor.avatar} alt={mentor.fullName} className="w-10 h-10 rounded-full object-cover" />
+                : (mentor.fullName?.[0] || 'S').toUpperCase()
+              }
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-secondary)' }}>
+                Your Momentum Supervisor
+              </div>
+              <div className="text-sm font-black truncate" style={{ color: 'var(--text-primary)' }}>
+                {mentor.fullName}
+              </div>
+              {mentor.supervisorCode && (
+                <div className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--accent)' }}>
+                  {mentor.supervisorCode}
+                </div>
+              )}
+            </div>
+            <div className="text-right shrink-0">
+              <div className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
+                Team size
+              </div>
+              <div className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>
+                {mentor.supervisedFreelancers?.length ?? 0}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* ── Stats row ────────────────────────────────────────── */}
         <motion.div
           variants={containerVariants}
@@ -284,7 +381,7 @@ export default function FreelancerDashboard() {
 
           <StatCard
             label="Learning Progress"
-            value={`${completedModules}/${LEARNING_MODULES.length}`}
+            value={learningLoading ? '…' : `${completedCount}/${totalCount}`}
             icon={<BookOpen size={17} strokeWidth={1.5} />}
           />
         </motion.div>
@@ -474,38 +571,108 @@ export default function FreelancerDashboard() {
                   <BookOpen size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} /> Learning
                 </h2>
                 <span className="text-[9px] font-black" style={{ color: 'var(--text-secondary)' }}>
-                  {completedModules}/{LEARNING_MODULES.length} done
+                  {learningLoading ? '…' : `${completedCount}/${totalCount} done`}
                 </span>
               </div>
               <div className="p-3 space-y-2">
-                {LEARNING_MODULES.map((module, idx) => (
-                  <motion.div
-                    key={module.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    whileHover={{ x: 4 }}
-                    className="flex items-start gap-3 p-3 rounded-lg border transition-all"
-                    style={{
-                      background: 'var(--bg-card)',
-                      borderColor: module.completed ? 'var(--accent)' : 'var(--border)',
-                      opacity: module.locked ? 0.5 : 1,
-                      cursor: module.locked ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all"
-                      style={{ background: module.completed ? 'var(--accent)' : 'var(--border)', color: module.completed ? '#fff' : 'var(--text-secondary)' }}>
-                      {module.locked ? <Lock size={11} strokeWidth={2} /> : module.completed ? <CheckCircle2 size={13} strokeWidth={2} /> : <Play size={11} strokeWidth={2} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{module.title}</div>
-                      <div className="text-[10px] mt-0.5 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
-                        <Clock size={9} /> {module.duration}
-                        {module.completed && <span style={{ color: 'var(--accent)' }}>✓ Complete</span>}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                {/* Continue Watching */}
+                {continueWatching.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-[9px] font-black uppercase tracking-widest px-1 mb-2" style={{ color: 'var(--accent)' }}>
+                      Continue Watching
+                    </p>
+                    {continueWatching.map((v, idx) => {
+                      const p = progressMap[v.youtubeId];
+                      const pct = p?.durationSeconds > 0 ? Math.round((p.watchedSeconds / p.durationSeconds) * 100) : 0;
+                      return (
+                        <motion.div
+                          key={v.youtubeId}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          whileHover={{ x: 4 }}
+                          onClick={() => navigate(`/freelancer/learning?resume=${v.youtubeId}`)}
+                          className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all mb-1.5"
+                          style={{ background: 'var(--bg-card)', borderColor: 'var(--accent)44' }}
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 relative bg-black">
+                            <img src={`https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`}
+                              alt={v.title} className="w-full h-full object-cover opacity-80" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <PlayCircle size={18} className="text-white" />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{v.title}</p>
+                            <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)' }} />
+                            </div>
+                            <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>{pct}% watched</p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Recent videos from catalogue */}
+                {learningLoading ? (
+                  <div className="space-y-2">
+                    {[1,2,3].map(i => <div key={i} className="h-14 rounded-lg animate-pulse" style={{ background: 'var(--bg-card)' }} />)}
+                  </div>
+                ) : allVideos.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <BookOpen size={24} strokeWidth={1} className="mx-auto mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.4 }} />
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>No videos yet. Complete onboarding to unlock learning.</p>
+                  </div>
+                ) : (
+                  allVideos.slice(0, 4).map((v, idx) => {
+                    const done = progressMap[v.youtubeId]?.completed;
+                    const p = progressMap[v.youtubeId];
+                    const pct = p?.durationSeconds > 0 ? Math.round((p.watchedSeconds / p.durationSeconds) * 100) : 0;
+                    return (
+                      <motion.div
+                        key={v.youtubeId}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        whileHover={{ x: 4 }}
+                        onClick={() => navigate('/freelancer/learning')}
+                        className="flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer"
+                        style={{
+                          background: 'var(--bg-card)',
+                          borderColor: done ? 'var(--accent)' : 'var(--border)',
+                        }}
+                      >
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                          style={{ background: done ? 'var(--accent)' : 'var(--border)', color: done ? '#fff' : 'var(--text-secondary)' }}>
+                          {done ? <CheckCircle2 size={13} strokeWidth={2} /> : <Play size={11} strokeWidth={2} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{v.title}</p>
+                          <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>
+                            {v.level} · {v.software?.replace(/_/g, ' ')}
+                          </p>
+                          {pct > 0 && !done && (
+                            <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--accent)', opacity: 0.6 }} />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[9px] font-black shrink-0" style={{ color: done ? 'var(--accent)' : 'var(--text-secondary)' }}>
+                          {done ? 'Done' : pct > 0 ? `${pct}%` : v.duration || ''}
+                        </span>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="px-3 pb-3">
+                <button onClick={() => navigate('/freelancer/learning')}
+                  className="w-full py-2 text-xs font-semibold rounded-lg border transition-all flex items-center justify-center gap-2 hover:gap-3"
+                  style={{ color: 'var(--accent)', borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+                  All Learning <ArrowRight size={12} />
+                </button>
               </div>
             </motion.div>
 
