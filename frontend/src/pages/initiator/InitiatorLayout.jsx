@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, FolderKanban, Users, MessageSquare,
   Settings, LogOut, Menu, X, DollarSign, Video,
-  Globe, Activity, UserCheck,
+  Globe, Activity, UserCheck, MoreHorizontal,
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
@@ -14,6 +14,7 @@ export default function InitiatorLayout() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
   const initial = (user?.fullName || 'I').charAt(0).toUpperCase();
@@ -33,10 +34,15 @@ export default function InitiatorLayout() {
     { path: '/initiator/settings', icon: <Settings size={17} strokeWidth={1.5} />,      label: 'Settings' },
   ];
 
+  // Bottom bar: first 4 main items + "More"
+  const bottomBarItems = mainNav.slice(0, 4);
+  const drawerItems = mainNav.slice(4);
+
   return (
     <div className="dashboard-layout">
+      {/* Mobile toggle — hidden on mobile via CSS */}
       <button
-        className="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
+        className="mobile-sidebar-toggle md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
@@ -109,6 +115,77 @@ export default function InitiatorLayout() {
       <main className="dashboard-main">
         <Outlet />
       </main>
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      <nav className="mobile-bottom-nav">
+        {bottomBarItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </NavLink>
+        ))}
+        <button onClick={() => setMoreOpen(true)}>
+          <span className="mobile-nav-icon"><MoreHorizontal size={17} strokeWidth={1.5} /></span>
+          <span className="mobile-nav-label">More</span>
+        </button>
+      </nav>
+
+      {/* ── More Drawer ── */}
+      {moreOpen && (
+        <>
+          <div className="mobile-more-drawer-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-more-drawer">
+            <div className="mobile-more-drawer-handle" />
+
+            {/* User info */}
+            <div className="mobile-more-drawer-user">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+                style={{ background: '#8b5cf6', color: '#fff' }}>{initial}</div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Initiator'}</div>
+                <div className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#8b5cf6' }}>Project Initiator</div>
+              </div>
+            </div>
+
+            {drawerItems.length > 0 && (
+              <>
+                <div className="mobile-more-drawer-section-label">Navigation</div>
+                <div className="mobile-more-drawer-grid">
+                  {drawerItems.map(item => (
+                    <NavLink key={item.path} to={item.path}
+                      className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                      onClick={() => setMoreOpen(false)}>
+                      {item.icon}
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="mobile-more-drawer-section-label">Account</div>
+            <div className="mobile-more-drawer-grid">
+              {accountNav.map(item => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                  onClick={() => setMoreOpen(false)}>
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <button className="mobile-more-drawer-logout" onClick={() => { setMoreOpen(false); handleLogout(); }}>
+              <LogOut size={16} strokeWidth={1.5} />
+              Logout
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

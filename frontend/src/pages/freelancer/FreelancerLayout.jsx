@@ -1,8 +1,8 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
-import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 import AvatarCircle, { resolveAvatar } from '../../components/AvatarCircle';
@@ -13,6 +13,7 @@ export default function FreelancerLayout() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { collapsed, setCollapsed } = useSidebar();
 
   const handleLogout = () => { logout(); navigate('/login'); };
@@ -27,7 +28,7 @@ export default function FreelancerLayout() {
     { path: '/freelancer/learning',  icon: <BookOpen size={17} strokeWidth={1.5} />,        label: 'Learning' },
     { path: '/freelancer/meet',      icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/freelancer/earnings',  icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Earnings' },
-    { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career Matrix' },
+    { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career' },
   ];
 
   const accountNavItems = [
@@ -35,14 +36,18 @@ export default function FreelancerLayout() {
     { path: '/freelancer/settings',  icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
   ];
 
+  // Bottom bar shows first 4 items + "More"
+  const bottomBarItems = mainNavItems.slice(0, 4);
+  const drawerItems = mainNavItems.slice(4);
+
   const initial = (user?.fullName || 'F').charAt(0).toUpperCase();
   const tierLabel = user?.tier ? TIER_LABELS[user.tier] : 'Precrate';
 
   return (
     <div className="dashboard-layout" style={{ '--sidebar-width': collapsed ? '64px' : '240px' }}>
-      {/* Mobile toggle */}
+      {/* Mobile toggle — hidden on mobile via CSS */}
       <button
-        className="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
+        className="mobile-sidebar-toggle md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
@@ -167,6 +172,81 @@ export default function FreelancerLayout() {
       <main className="dashboard-main">
         <Outlet />
       </main>
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      <nav className="mobile-bottom-nav">
+        {bottomBarItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </NavLink>
+        ))}
+        <button onClick={() => setMoreOpen(true)}>
+          <span className="mobile-nav-icon"><MoreHorizontal size={17} strokeWidth={1.5} /></span>
+          <span className="mobile-nav-label">More</span>
+        </button>
+      </nav>
+
+      {/* ── More Drawer ── */}
+      {moreOpen && (
+        <>
+          <div className="mobile-more-drawer-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-more-drawer">
+            <div className="mobile-more-drawer-handle" />
+
+            {/* User info */}
+            <div className="mobile-more-drawer-user">
+              {user?.avatar ? (
+                <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={36} />
+              ) : (
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+                  style={{ background: 'var(--accent)', color: '#fff' }}>{initial}</div>
+              )}
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Freelancer'}</div>
+                <div className="text-[9px] uppercase tracking-widest font-bold" style={{ color: 'var(--accent)' }}>{tierLabel}</div>
+              </div>
+            </div>
+
+            {drawerItems.length > 0 && (
+              <>
+                <div className="mobile-more-drawer-section-label">Navigation</div>
+                <div className="mobile-more-drawer-grid">
+                  {drawerItems.map(item => (
+                    <NavLink key={item.path} to={item.path}
+                      className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                      onClick={() => setMoreOpen(false)}>
+                      {item.icon}
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="mobile-more-drawer-section-label">Account</div>
+            <div className="mobile-more-drawer-grid">
+              {accountNavItems.map(item => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                  onClick={() => setMoreOpen(false)}>
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <button className="mobile-more-drawer-logout" onClick={() => { setMoreOpen(false); handleLogout(); }}>
+              <LogOut size={16} strokeWidth={1.5} />
+              Logout
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

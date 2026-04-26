@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -451,17 +451,51 @@ function PromotionProgressPanel({ onApplied }) {
 
   return (
     <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-      {/* Header row  always visible */}
-      <div className="px-5 py-4 flex items-center justify-between gap-4 flex-wrap"
+      {/* Header row — always visible */}
+      <div className="px-4 py-4 flex flex-col gap-3"
         style={{ borderBottom: expanded ? '1px solid var(--border)' : 'none' }}>
-        <div className="flex items-center gap-2 shrink-0">
-          <TrendingUp size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-          <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Crate Promotion</h2>
+
+        {/* Top row: title + action buttons */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+            <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Crate Promotion</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {!loading && status && (
+              applied ? (
+                <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: '#16a34a22', color: '#16a34a' }}>
+                  <Award size={12} /> Submitted
+                </span>
+              ) : status.eligible ? (
+                <button
+                  onClick={handleApply}
+                  disabled={applying}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  style={{ background: 'var(--accent)', color: '#fff', opacity: applying ? 0.7 : 1 }}
+                >
+                  <Award size={12} />
+                  {applying ? 'Applying...' : 'Apply'}
+                </button>
+              ) : null
+            )}
+            <button
+              onClick={() => setExpanded(v => !v)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-105"
+              style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}
+              title={expanded ? 'Hide software breakdown' : 'View per-software progress'}
+            >
+              <ChevronRight size={13} strokeWidth={2}
+                style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+              {expanded ? 'Hide' : 'Details'}
+            </button>
+          </div>
         </div>
 
-        {/* Compact inline progress bars */}
+        {/* Progress bars — always stacked vertically for clean mobile alignment */}
         {!loading && status && (
-          <div className="flex items-center gap-4 flex-1 min-w-0 flex-wrap">
+          <div className="grid grid-cols-3 gap-2">
             {['Beginner', 'Intermediate', 'Advanced'].map(level => {
               const current  = status.progress?.[level] ?? 0;
               const required = REQUIREMENTS[level];
@@ -469,13 +503,16 @@ function PromotionProgressPanel({ onApplied }) {
               const done     = current >= required;
               const colors   = LEVEL_COLORS[level];
               return (
-                <div key={level} className="flex items-center gap-2 min-w-[130px]">
-                  <span className="text-[10px] font-semibold shrink-0 w-24"
-                    style={{ color: done ? colors.text : 'var(--text-secondary)' }}>
-                    {level} {done ? '\u2713' : `${current}/${required}`}
-                  </span>
-                  <div className="flex-1 h-1.5 rounded-full overflow-hidden"
-                    style={{ background: 'var(--border)', minWidth: 60 }}>
+                <div key={level} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold" style={{ color: done ? colors.text : 'var(--text-secondary)' }}>
+                      {level.slice(0,3)}
+                    </span>
+                    <span className="text-[10px] font-bold" style={{ color: done ? colors.text : 'var(--text-secondary)' }}>
+                      {done ? '✓' : `${current}/${required}`}
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
@@ -489,38 +526,6 @@ function PromotionProgressPanel({ onApplied }) {
             })}
           </div>
         )}
-
-        {/* Right actions */}
-        <div className="flex items-center gap-2 shrink-0">
-          {!loading && status && (
-            applied ? (
-              <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
-                style={{ background: '#16a34a22', color: '#16a34a' }}>
-                <Award size={12} /> Submitted
-              </span>
-            ) : status.eligible ? (
-              <button
-                onClick={handleApply}
-                disabled={applying}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                style={{ background: 'var(--accent)', color: '#fff', opacity: applying ? 0.7 : 1 }}
-              >
-                <Award size={12} />
-                {applying ? 'Applying...' : 'Apply'}
-              </button>
-            ) : null
-          )}
-          <button
-            onClick={() => setExpanded(v => !v)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-105"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}
-            title={expanded ? 'Hide software breakdown' : 'View per-software progress'}
-          >
-            <ChevronRight size={13} strokeWidth={2}
-              style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
-            {expanded ? 'Hide' : 'Details'}
-          </button>
-        </div>
       </div>
 
       {/* Expandable per-software breakdown */}
@@ -533,7 +538,7 @@ function PromotionProgressPanel({ onApplied }) {
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}
           >
-            <div className="px-5 py-4">
+            <div className="px-4 py-4">
               {loading ? (
                 <div className="space-y-2">
                   {[...Array(4)].map((_, i) => (
@@ -542,68 +547,82 @@ function PromotionProgressPanel({ onApplied }) {
                 </div>
               ) : softwareRows.length === 0 ? (
                 <p className="text-xs text-center py-2" style={{ color: 'var(--text-secondary)' }}>
-                  No progress data yet  start watching videos!
+                  No progress data yet — start watching videos!
                 </p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs border-collapse">
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                        <th className="text-left pb-2 pr-4 font-semibold"
-                          style={{ color: 'var(--text-secondary)' }}>Software</th>
-                        {['Beginner', 'Intermediate', 'Advanced'].map(level => (
-                          <th key={level} className="text-center pb-2 px-3 font-semibold whitespace-nowrap"
-                            style={{ color: LEVEL_COLORS[level].text }}>
-                            {level.slice(0, 3)}
-                          </th>
-                        ))}
-                        <th className="text-center pb-2 px-3 font-semibold"
-                          style={{ color: 'var(--text-secondary)' }}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {softwareRows.map((row, i) => {
-                        const total = (row.Beginner ?? 0) + (row.Intermediate ?? 0) + (row.Advanced ?? 0);
-                        const isBest = (level) => status?.bestSoftware?.[level] === row.software;
-                        return (
-                          <tr key={i} style={{ borderBottom: '1px solid var(--border)22' }}>
-                            <td className="py-2 pr-4 font-medium" style={{ color: 'var(--text-primary)' }}>
-                              {SOFTWARE_LABELS[row.software] || row.software.replace(/_/g, ' ')}
-                              <span className="ml-1 text-[9px] opacity-50">
+                <div className="space-y-3">
+                  {/* Desktop Table Header — Hidden on small mobile */}
+                  <div className="hidden sm:grid grid-cols-6 gap-2 pb-2 border-b text-[10px] font-black uppercase tracking-widest" style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+                    <div className="col-span-2">Software</div>
+                    <div className="text-center">Beg</div>
+                    <div className="text-center">Int</div>
+                    <div className="text-center">Adv</div>
+                    <div className="text-center">Total</div>
+                  </div>
+
+                  {/* Software Rows — Responsive Card/Row layout */}
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {softwareRows.map((row, i) => {
+                      const total = (row.Beginner ?? 0) + (row.Intermediate ?? 0) + (row.Advanced ?? 0);
+                      const isBest = (level) => status?.bestSoftware?.[level] === row.software;
+                      
+                      return (
+                        <div key={i} className="group rounded-xl border p-3 flex flex-col sm:grid sm:grid-cols-6 gap-2 sm:items-center transition-all bg-card" 
+                             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                          
+                          {/* Software Info */}
+                          <div className="flex items-center gap-2 sm:col-span-2">
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                                {SOFTWARE_LABELS[row.software] || row.software.replace(/_/g, ' ')}
+                              </p>
+                              <p className="text-[9px] uppercase tracking-wider opacity-60" style={{ color: 'var(--text-secondary)' }}>
                                 {SKILL_LABELS[row.skill] || row.skill}
-                              </span>
-                            </td>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Stats Grid — Mobile: 4 columns, Desktop: Part of the 6-col grid */}
+                          <div className="grid grid-cols-4 sm:contents gap-2 mt-1 sm:mt-0">
                             {['Beginner', 'Intermediate', 'Advanced'].map(level => {
                               const val  = row[level] ?? 0;
                               const req  = REQUIREMENTS[level];
                               const best = isBest(level);
                               return (
-                                <td key={level} className="text-center py-2 px-3">
+                                <div key={level} className="flex flex-col sm:block items-center">
+                                  <span className="text-[8px] sm:hidden uppercase font-black opacity-40 mb-1" style={{ color: 'var(--text-secondary)' }}>
+                                    {level.slice(0,3)}
+                                  </span>
                                   <span
-                                    className="inline-flex items-center justify-center w-10 h-5 rounded font-bold text-[10px]"
+                                    className="inline-flex items-center justify-center w-full sm:w-10 h-6 sm:h-5 rounded font-bold text-[10px]"
                                     style={{
-                                      background: best ? LEVEL_COLORS[level].bg : val > 0 ? 'var(--bg-card)' : 'transparent',
+                                      background: best ? LEVEL_COLORS[level].bg : val > 0 ? 'rgba(var(--accent-rgb), 0.03)' : 'transparent',
                                       color: best ? LEVEL_COLORS[level].text : val > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
-                                      border: best ? `1px solid ${LEVEL_COLORS[level].bar}` : '1px solid transparent',
+                                      border: best ? `1px solid ${LEVEL_COLORS[level].bar}` : '1px solid var(--border)',
                                     }}
-                                    title={best ? `Best for ${level}  counts toward promotion` : undefined}
                                   >
                                     {val}/{req}
                                   </span>
-                                </td>
+                                </div>
                               );
                             })}
-                            <td className="text-center py-2 px-3 font-bold"
-                              style={{ color: total > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                              {total}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  <p className="text-[10px] mt-3" style={{ color: 'var(--text-secondary)' }}>
-                    Highlighted = best software per level (counts toward promotion). Requirements: Beg {REQUIREMENTS.Beginner}  Int {REQUIREMENTS.Intermediate}  Adv {REQUIREMENTS.Advanced}
+
+                            <div className="flex flex-col sm:block items-center">
+                              <span className="text-[8px] sm:hidden uppercase font-black opacity-40 mb-1" style={{ color: 'var(--text-secondary)' }}>Total</span>
+                              <div className="text-[11px] font-black sm:text-center h-6 sm:h-auto flex items-center justify-center" 
+                                   style={{ color: total > 0 ? 'var(--accent)' : 'var(--text-secondary)' }}>
+                                {total}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-[9px] mt-4 pt-3 border-t text-center sm:text-left" style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+                    <span className="inline-block px-1.5 py-0.5 rounded mr-1" style={{ background: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent)' }}>Highlighted</span> 
+                    Best software per level. Target: Beg {REQUIREMENTS.Beginner}, Int {REQUIREMENTS.Intermediate}, Adv {REQUIREMENTS.Advanced}
                   </p>
                 </div>
               )}
@@ -813,45 +832,65 @@ export default function FreelancerLearning() {
   return (
     <>
       <DashboardHeader title="Learning" />
-      <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-4 md:space-y-6">
         <PromotionProgressPanel onApplied={() => {}} />
 
-        {/* Skill selector */}
-        <div className="flex flex-wrap gap-2">
-          {userSkills.map(skill => (
-            <button
-              key={skill}
-              onClick={() => {
-                setActiveSkill(skill);
-                setActiveSoftware(SKILL_SOFTWARE[skill]?.[0] ?? null);
-                setSelectedVideo(null);
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${activeSkill === skill ? 'scale-105' : 'opacity-60'}`}
-              style={{ background: activeSkill === skill ? 'var(--accent)' : 'var(--bg-card)', color: activeSkill === skill ? '#fff' : 'var(--text-primary)' }}
-            >
-              {SKILL_LABELS[skill]}
-            </button>
-          ))}
-        </div>
-
-        {/* Software selector */}
-        {activeSkill && (
-          <div className="flex flex-wrap gap-2">
-            {SKILL_SOFTWARE[activeSkill]?.map(software => (
-              <button
-                key={software}
-                onClick={() => {
-                  setActiveSoftware(software);
-                  setSelectedVideo(null);
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${activeSoftware === software ? 'scale-105' : 'opacity-60'}`}
-                style={{ background: activeSoftware === software ? 'var(--accent)' : 'transparent', color: activeSoftware === software ? '#fff' : 'var(--text-primary)', borderColor: activeSoftware === software ? 'var(--accent)' : 'var(--border)' }}
-              >
-                {SOFTWARE_LABELS[software] || software}
-              </button>
-            ))}
+        {/* Skill + Software Selector — single clean block */}
+        <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+          {/* Skill row */}
+          <div className="px-4 pt-3 pb-2 border-b" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>Skill</p>
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {userSkills.map(skill => (
+                <button
+                  key={skill}
+                  onClick={() => {
+                    setActiveSkill(skill);
+                    setActiveSoftware(SKILL_SOFTWARE[skill]?.[0] ?? null);
+                    setSelectedVideo(null);
+                  }}
+                  className="shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
+                  style={{
+                    background: activeSkill === skill ? 'var(--accent)' : 'var(--bg-card)',
+                    color: activeSkill === skill ? '#fff' : 'var(--text-secondary)',
+                    border: activeSkill === skill ? '1px solid var(--accent)' : '1px solid var(--border)',
+                    opacity: activeSkill === skill ? 1 : 0.75,
+                  }}
+                >
+                  {SKILL_LABELS[skill]}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
+
+          {/* Software row */}
+          {activeSkill && (
+            <div className="px-4 pt-3 pb-3">
+              <p className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>Software</p>
+              <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {SKILL_SOFTWARE[activeSkill]?.map(software => (
+                  <button
+                    key={software}
+                    onClick={() => {
+                      setActiveSoftware(software);
+                      setSelectedVideo(null);
+                    }}
+                    className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                    style={{
+                      background: activeSoftware === software ? 'var(--accent)' : 'var(--bg-card)',
+                      color: activeSoftware === software ? '#fff' : 'var(--text-secondary)',
+                      border: activeSoftware === software ? '1px solid var(--accent)' : '1px solid var(--border)',
+                      opacity: activeSoftware === software ? 1 : 0.7,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {SOFTWARE_LABELS[software] || software}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Main content */}
         {videosLoading ? (
@@ -860,7 +899,7 @@ export default function FreelancerLearning() {
           <div className="space-y-6">
             {/* When video is selected - two column layout */}
             {selectedVideo ? (
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 md:gap-6">
                 {/* Left side - Video player */}
                 <div className="lg:col-span-3">
                   <motion.div
@@ -1201,11 +1240,11 @@ export default function FreelancerLearning() {
               </div>
             ) : (
               /* When no video selected - show content grid */
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Left side - Content grid */}
                 <div className="lg:col-span-2">
                   {/* Content type tabs */}
-                  <div className="flex gap-2 border-b mb-6" style={{ borderColor: 'var(--border)' }}>
+                  <div className="flex gap-1 border-b mb-4 md:mb-6 overflow-x-auto" style={{ borderColor: 'var(--border)' }}>
                     {[
                       { id: 'tutorials', label: 'Tutorials' },
                       { id: 'playlists', label: 'Playlists' },
@@ -1214,11 +1253,11 @@ export default function FreelancerLearning() {
                       <button
                         key={type.id}
                         onClick={() => setContentType(type.id)}
-                        className={`px-4 py-3 text-sm font-semibold border-b-2 transition-all ${
-                          contentType === type.id ? 'border-accent' : 'border-transparent opacity-60'
-                        }`}
+                        className="px-3 md:px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap shrink-0"
                         style={{
                           color: contentType === type.id ? 'var(--accent)' : 'var(--text-secondary)',
+                          borderBottom: contentType === type.id ? '2px solid var(--accent)' : '2px solid transparent',
+                          opacity: contentType === type.id ? 1 : 0.6,
                         }}
                       >
                         {type.label}
@@ -1228,7 +1267,7 @@ export default function FreelancerLearning() {
 
                   {/* Content grid */}
                   {contentType === 'tutorials' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                       {tutorials.length > 0 ? (
                         tutorials.map(tutorial => (
                           <TutorialCard
@@ -1244,7 +1283,7 @@ export default function FreelancerLearning() {
                       )}
                     </div>
                   ) : contentType === 'playlists' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                       {playlists.length > 0 ? (
                         playlists.map(playlist => (
                           <PlaylistCard
@@ -1260,7 +1299,7 @@ export default function FreelancerLearning() {
                       )}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
                       {crashCourses.length > 0 ? (
                         crashCourses.map(course => (
                           <CrashCourseCard

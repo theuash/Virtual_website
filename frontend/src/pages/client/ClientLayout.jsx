@@ -1,7 +1,7 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X, Wallet, Video } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X, Wallet, Video, MoreHorizontal } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -10,6 +10,7 @@ export default function ClientLayout() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -24,13 +25,17 @@ export default function ClientLayout() {
     { path: '/client/settings',     icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
   ];
 
+  // Bottom bar: first 4 items + "More"
+  const bottomBarItems = navItems.slice(0, 4);
+  const drawerItems = navItems.slice(4);
+
   const initial = (user?.fullName || 'C').charAt(0).toUpperCase();
 
   return (
     <div className="dashboard-layout">
-      {/* Mobile toggle */}
+      {/* Mobile toggle — hidden on mobile via CSS */}
       <button
-        className="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
+        className="mobile-sidebar-toggle md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
@@ -101,6 +106,63 @@ export default function ClientLayout() {
       <main className="dashboard-main">
         <Outlet />
       </main>
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      <nav className="mobile-bottom-nav">
+        {bottomBarItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </NavLink>
+        ))}
+        <button onClick={() => setMoreOpen(true)}>
+          <span className="mobile-nav-icon"><MoreHorizontal size={17} strokeWidth={1.5} /></span>
+          <span className="mobile-nav-label">More</span>
+        </button>
+      </nav>
+
+      {/* ── More Drawer ── */}
+      {moreOpen && (
+        <>
+          <div className="mobile-more-drawer-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-more-drawer">
+            <div className="mobile-more-drawer-handle" />
+
+            {/* User info */}
+            <div className="mobile-more-drawer-user">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                style={{ background: 'var(--accent)', color: '#fff' }}>{initial}</div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Client'}</div>
+                <div className="text-[10px] uppercase tracking-widest font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  {user?.companyName || 'Client Account'}
+                </div>
+              </div>
+            </div>
+
+            <div className="mobile-more-drawer-section-label">More Options</div>
+            <div className="mobile-more-drawer-grid">
+              {drawerItems.map(item => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                  onClick={() => setMoreOpen(false)}>
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <button className="mobile-more-drawer-logout" onClick={() => { setMoreOpen(false); handleLogout(); }}>
+              <LogOut size={16} strokeWidth={1.5} />
+              Logout
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

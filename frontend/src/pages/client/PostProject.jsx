@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -382,15 +382,35 @@ function StepServiceSelection({
   selectedService, setSelectedService,
   form, setForm, errors, convert
 }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const dept = catalogue.find(c => c.department === selectedDept) || catalogue[0];
 
-  // Flatten services: popularFormats first (with badge), then generalServices
-  const services = dept
-    ? [
-        ...(dept.popularFormats || []).map(s => ({ ...s, isPopular: true })),
-        ...(dept.generalServices || []).map(s => ({ ...s, isPopular: false })),
-      ]
-    : [];
+  let services = [];
+  const query = searchQuery.trim().toLowerCase();
+
+  if (query) {
+    // Search across all departments
+    catalogue.forEach(c => {
+      const deptName = c.displayName || SKILL_LABELS[c.department] || c.department;
+      const allInDept = [
+        ...(c.popularFormats || []).map(s => ({ ...s, isPopular: true, departmentName: deptName })),
+        ...(c.generalServices || []).map(s => ({ ...s, isPopular: false, departmentName: deptName }))
+      ];
+      services.push(...allInDept.filter(s => 
+        s.name.toLowerCase().includes(query) || 
+        (s.tags && s.tags.some(t => t.toLowerCase().includes(query)))
+      ));
+    });
+  } else {
+    // Show only selected department
+    services = dept
+      ? [
+          ...(dept.popularFormats || []).map(s => ({ ...s, isPopular: true })),
+          ...(dept.generalServices || []).map(s => ({ ...s, isPopular: false })),
+        ]
+      : [];
+  }
 
   if (catalogueLoading) {
     return (
@@ -415,29 +435,56 @@ function StepServiceSelection({
         </p>
       </div>
 
-      {/* Department tabs */}
-      <div className="flex flex-wrap gap-2">
-        {catalogue.map(c => (
+      {/* Search Input */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search size={16} style={{ color: 'var(--text-secondary)' }} />
+        </div>
+        <input 
+          type="text"
+          placeholder="Search for a service..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={inputCls}
+          style={{ ...inputStyle, paddingLeft: '2.5rem' }}
+        />
+        {searchQuery && (
           <button
-            key={c.department}
             type="button"
-            onClick={() => { setSelectedDept(c.department); setSelectedService(null); }}
-            className="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all"
-            style={
-              selectedDept === c.department
-                ? { background: 'var(--accent)', color: '#fff', borderColor: 'var(--accent)' }
-                : { background: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
-            }
+            onClick={() => setSearchQuery('')}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center hover:opacity-70 transition-opacity"
+            style={{ color: 'var(--text-secondary)' }}
           >
-            {c.displayName || SKILL_LABELS[c.department] || c.department}
+            <X size={16} />
           </button>
-        ))}
+        )}
       </div>
 
+      {/* Department tabs (hidden when searching) */}
+      {!query && (
+        <div className="flex flex-wrap gap-2">
+          {catalogue.map(c => (
+            <button
+              key={c.department}
+              type="button"
+              onClick={() => { setSelectedDept(c.department); setSelectedService(null); }}
+              className="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all"
+              style={
+                selectedDept === c.department
+                  ? { background: 'var(--accent)', color: '#fff', borderColor: 'var(--accent)' }
+                  : { background: 'var(--bg-card)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
+              }
+            >
+              {c.displayName || SKILL_LABELS[c.department] || c.department}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Service cards */}
-      {dept && (
+      {(dept || query) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-1">
-          {services.map(svc => {
+          {services.length > 0 ? services.map(svc => {
             const active = selectedService?._id === svc._id;
             return (
               <motion.button
@@ -446,13 +493,13 @@ function StepServiceSelection({
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => setSelectedService(svc)}
-                className="text-left p-4 rounded-xl border-2 transition-all"
+                className="text-left p-4 rounded-xl border-2 transition-all flex flex-col"
                 style={{
                   background: active ? 'rgba(110,44,242,0.08)' : 'var(--bg-secondary)',
                   borderColor: active ? 'var(--accent)' : 'var(--border)',
                 }}
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-2 w-full">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold leading-snug" style={{ color: 'var(--text-primary)' }}>
@@ -467,6 +514,11 @@ function StepServiceSelection({
                         </span>
                       )}
                     </div>
+                    {query && svc.departmentName && (
+                      <span className="text-[10px] mt-0.5 block font-semibold text-accent" style={{ color: 'var(--accent)', opacity: 0.8 }}>
+                        {svc.departmentName}
+                      </span>
+                    )}
                     {svc.tolerance && (
                       <span className="text-[10px] mt-0.5 block" style={{ color: 'var(--text-secondary)' }}>
                         Tolerance: {svc.tolerance}
@@ -483,7 +535,11 @@ function StepServiceSelection({
                 </div>
               </motion.button>
             );
-          })}
+          }) : (
+            <div className="col-span-full py-10 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
+              No services found matching "{searchQuery}"
+            </div>
+          )}
         </div>
       )}
 

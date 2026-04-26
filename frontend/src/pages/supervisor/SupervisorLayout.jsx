@@ -1,11 +1,11 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, FolderKanban, Users, MessageSquare,
   Settings, LogOut, Menu, X, DollarSign, Wallet,
-  Bell, Users2, Globe, Briefcase, TrendingUp, Video,
+  Bell, Users2, Globe, Briefcase, TrendingUp, Video, MoreHorizontal,
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import api from '../../services/api';
@@ -16,6 +16,7 @@ export default function SupervisorLayout() {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotif, setShowNotif] = useState(false);
 
@@ -47,9 +48,14 @@ export default function SupervisorLayout() {
     { path: '/supervisor/settings', icon: <Settings size={17} strokeWidth={1.5} />,      label: 'Settings' },
   ];
 
+  // Bottom bar: first 4 main items + "More"
+  const bottomBarItems = mainNav.slice(0, 4);
+  const drawerItems = mainNav.slice(4);
+
   return (
     <div className="dashboard-layout">
-      <button className="md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
+      {/* Mobile toggle — hidden on mobile via CSS */}
+      <button className="mobile-sidebar-toggle md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         onClick={() => setSidebarOpen(!sidebarOpen)}>
         {sidebarOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
@@ -159,6 +165,90 @@ export default function SupervisorLayout() {
       </aside>
 
       <main className="dashboard-main"><Outlet /></main>
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      <nav className="mobile-bottom-nav">
+        {bottomBarItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+          </NavLink>
+        ))}
+        <button onClick={() => setMoreOpen(true)}>
+          <span className="mobile-nav-icon" style={{ position: 'relative' }}>
+            <MoreHorizontal size={17} strokeWidth={1.5} />
+            {notifications.length > 0 && (
+              <span style={{
+                position: 'absolute', top: -4, right: -4,
+                width: 10, height: 10, borderRadius: '50%',
+                background: '#ef4444', display: 'block'
+              }} />
+            )}
+          </span>
+          <span className="mobile-nav-label">More</span>
+        </button>
+      </nav>
+
+      {/* ── More Drawer ── */}
+      {moreOpen && (
+        <>
+          <div className="mobile-more-drawer-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-more-drawer">
+            <div className="mobile-more-drawer-handle" />
+
+            {/* User info + notification badge */}
+            <div className="mobile-more-drawer-user">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+                style={{ background: '#f59e0b', color: '#fff' }}>{initial}</div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Supervisor'}</div>
+                <div className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#f59e0b' }}>Momentum Supervisor</div>
+              </div>
+              {notifications.length > 0 && (
+                <button onClick={() => { navigate('/supervisor/projects'); setMoreOpen(false); }}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold"
+                  style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <Bell size={12} strokeWidth={1.5} />
+                  {notifications.length}
+                </button>
+              )}
+            </div>
+
+            <div className="mobile-more-drawer-section-label">Navigation</div>
+            <div className="mobile-more-drawer-grid">
+              {drawerItems.map(item => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                  onClick={() => setMoreOpen(false)}>
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <div className="mobile-more-drawer-section-label">Account</div>
+            <div className="mobile-more-drawer-grid">
+              {accountNav.map(item => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) => isActive ? 'active-mobile' : ''}
+                  onClick={() => setMoreOpen(false)}>
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+
+            <button className="mobile-more-drawer-logout" onClick={() => { setMoreOpen(false); handleLogout(); }}>
+              <LogOut size={16} strokeWidth={1.5} />
+              Logout
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
