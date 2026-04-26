@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -66,7 +66,7 @@ function MeetingCard({ meeting, canJoin, onCopy, copied, onStart }) {
             </div>
           ) : (
             <>
-              {/* Join button — always shown for scheduled/live, precrates can join anytime */}
+              {/* Join button - always shown for scheduled/live, precrates can join anytime */}
               <a href={`/meet/${meeting._id}`} target="_blank" rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:opacity-90"
                 style={{ background: isLive ? '#22c55e' : 'var(--accent)', color: '#fff' }}>

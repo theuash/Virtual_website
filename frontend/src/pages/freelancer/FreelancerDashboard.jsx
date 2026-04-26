@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, TIER_LABELS } from '../../utils/roleGuards';
@@ -14,8 +14,8 @@ import { useState, useEffect } from 'react';
 
 const TIER_ORDER = ['precrate', 'crate', 'project_initiator', 'momentum_supervisor', 'admin'];
 const TIER_DESCRIPTIONS = {
-  precrate:            'Entry level — complete your learning modules and get your first project to advance.',
-  crate:               'Proven contributor — eligible for complex tasks.',
+  precrate:            'Entry level - complete your learning modules and get your first project to advance.',
+  crate:               'Proven contributor - eligible for complex tasks.',
   project_initiator:   'Leads project fragmentation and task assignment.',
   momentum_supervisor: 'Oversees quality and delivery across departments.',
   admin:               'Full platform access.',
@@ -242,7 +242,7 @@ export default function FreelancerDashboard() {
               </p>
             </div>
             <div className="mt-4 flex items-center gap-3 flex-wrap">
-              {/* View Projects — locked for precrate */}
+              {/* View Projects - locked for precrate */}
               {isPrecrate ? (
                 <div
                   className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold cursor-not-allowed select-none"
@@ -361,19 +361,19 @@ export default function FreelancerDashboard() {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-3 gap-4"
         >
-          {/* Projects Done — locked */}
+          {/* Projects Done - locked */}
           {isPrecrate ? (
             <LockedBlock label="Unlocks at Crate">
-              <StatCard label="Projects Done" value="—" icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
+              <StatCard label="Projects Done" value="-" icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
             </LockedBlock>
           ) : (
             <StatCard label="Projects Done" value={completedTasks} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
           )}
 
-          {/* Total Earnings — locked */}
+          {/* Total Earnings - locked */}
           {isPrecrate ? (
             <LockedBlock label="Unlocks at Crate">
-              <StatCard label="Total Earnings" value="—" icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
+              <StatCard label="Total Earnings" value="-" icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
             </LockedBlock>
           ) : (
             <StatCard label="Total Earnings" value={formatCurrency(totalEarnings)} icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
@@ -389,7 +389,7 @@ export default function FreelancerDashboard() {
         {/* ── Main grid ────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-          {/* Active Projects — locked for precrate */}
+          {/* Active Projects - locked for precrate */}
           {isPrecrate ? (
             <LockedBlock label="Unlocks at Crate" className="lg:col-span-3 rounded-xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
               <motion.div
@@ -485,7 +485,7 @@ export default function FreelancerDashboard() {
           {/* Right column */}
           <div className="lg:col-span-2 space-y-4">
 
-            {/* Rank Progression — locked for precrate */}
+            {/* Rank Progression - locked for precrate */}
             {isPrecrate ? (
               <LockedBlock label="Unlocks at Crate" className="rounded-xl border p-5" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
                 <motion.div

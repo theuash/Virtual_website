@@ -1,4 +1,4 @@
-﻿import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
@@ -66,7 +66,7 @@ const MeshGrid = ({ count = 5, speed = 10 }) => (
   </div>
 );
 
-// Hero CTA â€” same pop â†’ expand as floating pill and pricing CTA
+// Hero CTA - same pop → expand as floating pill and pricing CTA
 function HeroExpandingCTA({ onClick }) {
   const [popped, setPopped] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -102,7 +102,7 @@ function HeroExpandingCTA({ onClick }) {
       transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
       whileHover={{ scale: 1.05 }}
     >
-      {/* Arrow â€” anchor dot */}
+      {/* Arrow - anchor dot */}
       <span className="flex items-center justify-center pl-5 pr-3 py-3.5">
         <ArrowRight size={16} style={{ color: 'var(--accent)' }} />
       </span>
@@ -124,7 +124,7 @@ function HeroExpandingCTA({ onClick }) {
   );
 }
 
-// Floating Pill â€” pop-up first, then content reveals after
+// Floating Pill - pop-up first, then content reveals after
 function FloatingPill({ splitProgress, navigate, logo, isDark }) {
   const [visible,   setVisible]   = useState(false);
   const [expanded,  setExpanded]  = useState(false);
@@ -428,14 +428,14 @@ export default function LandingPage() {
     >
       <Header />
 
-      {/* Responsive wrapper - floating window on desktop, full-width on mobile */}
-      <div className="sm:pt-14 sm:pb-8 sm:px-4">
-        <div className="sm:max-w-7xl sm:mx-auto sm:rounded-2xl sm:border sm:p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+      {/* Responsive wrapper - floating window on all screen sizes */}
+      <div className="pt-8 pb-8 px-4">
+        <div className="max-w-7xl mx-auto rounded-2xl border p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
 
       {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
-          {/* Background — video served from backend */}
+          {/* Background - video served from backend */}
           <div className="absolute inset-0 z-0 bg-black overflow-hidden">
             <video
               ref={videoRef}
@@ -469,9 +469,9 @@ export default function LandingPage() {
             />
           </div>
 
-          {/* Sound toggle — bottom right */}
+          {/* Sound toggle - bottom right */}
           <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 z-50 flex flex-col items-end gap-2">
-            {/* Tooltip — shown when muted */}
+            {/* Tooltip - shown when muted */}
             <AnimatePresence>
               {isMuted && (
                 <motion.div
@@ -567,13 +567,13 @@ export default function LandingPage() {
               Not a freelance platform. A structured creative agency.
             </h2>
             <p className="font-normal leading-relaxed text-base sm:text-lg mb-6 sm:mb-8 opacity-80" style={{ color: 'var(--text-secondary)' }}>
-              Every category operates as its own department with a designated head â€” personally accountable for every deliverable. You get a professional chain of command, not a random freelancer.
+              Every category operates as its own department with a designated head - personally accountable for every deliverable. You get a professional chain of command, not a random freelancer.
             </p>
             <ul className="space-y-4 sm:space-y-6">
               {[
-                "Structured execution â€” defined chain of command",
-                "Quality assurance â€” Momentum Supervisor reviews every deliverable",
-                "On-time delivery â€” timelines tracked live, delays flagged internally"
+                "Structured execution - defined chain of command",
+                "Quality assurance - Momentum Supervisor reviews every deliverable",
+                "On-time delivery - timelines tracked live, delays flagged internally"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 sm:gap-4 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                   <CheckCircle size={20} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
@@ -670,7 +670,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Strip â€” right after split section */}
+      {/* Pricing Strip - right after split section */}
       <PricingStrip />
 
       {/* The Core Engine */}
@@ -680,11 +680,11 @@ export default function LandingPage() {
           {/* Mobile: simple stacked cards */}
           <div className="lg:hidden py-12 space-y-10">
             {[
-              { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist â€” not just whoever is available." },
+              { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist - not just whoever is available." },
               { tag: "Security", title: "Wallet & Escrow Protection", desc: "Funds lock into escrow when a project is posted. Released only after you formally approve the completed work." },
-              { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "Every dispute is handled by a trained Dispute Handler â€” not a chatbot. A structured meeting with all parties inside Virtual's own video meet window." },
-              { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement is driven by data â€” accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically." },
-              { tag: "Visibility", title: "Live Command Dashboard", desc: "See every micro-task in real time â€” in progress, under review, completed. Communicate directly with your Project Initiator." },
+              { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "Every dispute is handled by a trained Dispute Handler - not a chatbot. A structured meeting with all parties inside Virtual's own video meet window." },
+              { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement is driven by data - accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically." },
+              { tag: "Visibility", title: "Live Command Dashboard", desc: "See every micro-task in real time - in progress, under review, completed. Communicate directly with your Project Initiator." },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -1099,7 +1099,7 @@ export default function LandingPage() {
                 {
                   tag: "Intelligence",
                   title: "Micro-Task Distribution Engine",
-                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist â€” not just whoever is available.",
+                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist - not just whoever is available.",
                   color: "from-accent to-forest"
                 },
                 {
@@ -1111,19 +1111,19 @@ export default function LandingPage() {
                 {
                   tag: "Accountability",
                   title: "Human-Led Dispute Resolution",
-                  desc: "Every dispute is handled by a trained Dispute Handler â€” not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
+                  desc: "Every dispute is handled by a trained Dispute Handler - not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
                   color: "from-accent to-forest"
                 },
                 {
                   tag: "Meritocracy",
                   title: "Algorithmic Growth System",
-                  desc: "Advancement is driven by data â€” accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
+                  desc: "Advancement is driven by data - accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
                   color: "from-forest to-accent"
                 },
                 {
                   tag: "Visibility",
                   title: "Live Command Dashboard",
-                  desc: "See every micro-task in real time â€” in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
+                  desc: "See every micro-task in real time - in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
                   color: "from-accent to-forest"
                 }
               ].map((item, i) => (
@@ -1189,7 +1189,7 @@ export default function LandingPage() {
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>a real team behind you?</span>
             </h2>
             <p className="text-base sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
-              Post your project and get a structured department working on it â€” escrow-protected, supervisor-reviewed, and delivered on time.
+              Post your project and get a structured department working on it - escrow-protected, supervisor-reviewed, and delivered on time.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
               <button onClick={() => navigate('/signup?role=client&redirect=/client/post-project')} className="btn-primary w-full sm:w-auto py-4 px-8 text-base font-bold tracking-wide">Post a Project</button>
@@ -1263,3 +1263,6 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
+

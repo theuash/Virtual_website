@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 
 /**
@@ -8,7 +8,7 @@ import { Lock } from 'lucide-react';
 export default function LockedBlock({ children, label = 'Unlocks at Crate', className = '' }) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* Actual content — blurred */}
+      {/* Actual content - blurred */}
       <div style={{ filter: 'blur(3px)', pointerEvents: 'none', userSelect: 'none', opacity: 0.5 }}>
         {children}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -73,7 +73,7 @@ function InitiatorCard({ initiator }) {
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <Tag size={12} />
-            {SKILL_LABELS[initiator.primarySkill] || initiator.primarySkill || '—'}
+            {SKILL_LABELS[initiator.primarySkill] || initiator.primarySkill || '-'}
           </div>
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <UserCheck size={12} />
@@ -126,7 +126,7 @@ function MemberCard({ member, isMe }) {
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {SKILL_LABELS[member.primarySkill] || '—'}
+            {SKILL_LABELS[member.primarySkill] || '-'}
           </span>
           {member.rating > 0 && (
             <span className="flex items-center gap-0.5 text-[10px]" style={{ color: '#f59e0b' }}>

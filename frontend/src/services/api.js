@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -8,7 +8,7 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// ── Request interceptor — attach access token ─────────────────────
+// ── Request interceptor - attach access token ─────────────────────
 api.interceptors.request.use((config) => {
   try {
     const stored = localStorage.getItem('virtual_user');
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response interceptor — silent token refresh on 401 ───────────
+// ── Response interceptor - silent token refresh on 401 ───────────
 let isRefreshing = false;
 let refreshQueue = []; // queued requests waiting for the new token
 
@@ -53,14 +53,14 @@ api.interceptors.response.use(
       } catch { /* ignore */ }
 
       if (!storedRefreshToken) {
-        // No refresh token — clear session and redirect
+        // No refresh token - clear session and redirect
         localStorage.removeItem('virtual_user');
         window.location.href = '/login';
         return Promise.reject(err);
       }
 
       if (isRefreshing) {
-        // Another refresh is already in flight — queue this request
+        // Another refresh is already in flight - queue this request
         return new Promise((resolve, reject) => {
           refreshQueue.push({ resolve, reject });
         }).then((newToken) => {

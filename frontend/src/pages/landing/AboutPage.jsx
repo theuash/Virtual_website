@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+﻿import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, ShieldCheck, Users, MonitorPlay, Scale, ChevronLeft, ArrowLeft
@@ -93,7 +93,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto font-normal leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Virtual is not a marketplace where you post a job and hope for the best. It's a fully departmentalized creative agency — with real accountability at every level.
+            Virtual is not a marketplace where you post a job and hope for the best. It's a fully departmentalized creative agency - with real accountability at every level.
           </p>
         </motion.div>
       </section>
@@ -109,7 +109,7 @@ export default function AboutPage() {
               Department Structure
             </h2>
             <p className="text-lg max-w-2xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Every creative category — Video Editing, 3D Animation, CGI, Script Writing, Graphic Design — is its own independent department with a designated head. These heads actively manage project flow, enforce quality standards, and are personally accountable for every deliverable that leaves their department.
+              Every creative category - Video Editing, 3D Animation, CGI, Script Writing, Graphic Design - is its own independent department with a designated head. These heads actively manage project flow, enforce quality standards, and are personally accountable for every deliverable that leaves their department.
             </p>
             <p className="text-lg max-w-2xl leading-relaxed mt-4" style={{ color: 'var(--text-secondary)' }}>
               When you hire Virtual for video editing, you're not getting a random freelancer. You're getting an organized team with a professional chain of command behind every frame.
@@ -118,7 +118,7 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { label: "Structured Execution", desc: "A defined chain of command handles your project — not a single person working in isolation." },
+              { label: "Structured Execution", desc: "A defined chain of command handles your project - not a single person working in isolation." },
               { label: "Quality Assurance", desc: "Every deliverable passes through a Momentum Supervisor review before it reaches you." },
               { label: "On-Time Delivery", desc: "Timelines are set at the start, tracked live, and enforced by the department head. Delays are flagged internally before they become your problem." }
             ].map((item, i) => (
@@ -152,13 +152,13 @@ export default function AboutPage() {
               Wallet & Escrow System
             </h2>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Clients maintain a personal wallet on the platform. When a project is posted, the required payment moves into a locked escrow state tied directly to that project — visible as reserved, but completely inaccessible to any freelancer until the project clears all approval stages.
+              Clients maintain a personal wallet on the platform. When a project is posted, the required payment moves into a locked escrow state tied directly to that project - visible as reserved, but completely inaccessible to any freelancer until the project clears all approval stages.
             </p>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
               The client cannot lose money without receiving the work. The freelancer cannot lose the work without receiving payment. Security is symmetric on both sides.
             </p>
             <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              The project also operates under a content lock — clients can view progress, previews, and milestone reports in real time, but cannot access or download any final deliverable until they formally approve the completed work. Approval triggers the escrow release. No approval, no release.
+              The project also operates under a content lock - clients can view progress, previews, and milestone reports in real time, but cannot access or download any final deliverable until they formally approve the completed work. Approval triggers the escrow release. No approval, no release.
             </p>
           </motion.div>
 
@@ -195,7 +195,7 @@ export default function AboutPage() {
               Dispute Resolution System
             </h2>
             <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
-              Disputes on Virtual are not handled by a chatbot or a ticket system. Every dispute is managed by a dedicated Dispute Handler — a trained human mediator assigned to the case.
+              Disputes on Virtual are not handled by a chatbot or a ticket system. Every dispute is managed by a dedicated Dispute Handler - a trained human mediator assigned to the case.
             </p>
           </motion.div>
 
@@ -209,7 +209,7 @@ export default function AboutPage() {
               {
                 icon: <MonitorPlay size={20} />,
                 label: "Built-In Video Meet Window",
-                desc: "The meeting takes place inside Virtual's own dispute resolution web meet window — a private, recorded video environment integrated directly into the platform. No third-party tools, no email chains."
+                desc: "The meeting takes place inside Virtual's own dispute resolution web meet window - a private, recorded video environment integrated directly into the platform. No third-party tools, no email chains."
               },
               {
                 icon: <Scale size={20} />,
@@ -219,7 +219,7 @@ export default function AboutPage() {
               {
                 icon: <CheckCircle size={20} />,
                 label: "Human Accountability",
-                desc: "The Dispute Handler facilitates the session and drives resolution. A real person — not an algorithm — is responsible for the outcome."
+                desc: "The Dispute Handler facilitates the session and drives resolution. A real person - not an algorithm - is responsible for the outcome."
               }
             ].map((item, i) => (
               <motion.div
@@ -252,13 +252,13 @@ export default function AboutPage() {
               Not a group of freelancers.<br />A structured team.
             </h2>
             <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
-              Every project on Virtual is executed by a structured team — not a random collection of individuals. Each team is built around a Project Initiator who owns the project outcome, a set of Crate-level specialists who execute the micro-tasks, and a Momentum Supervisor who reviews quality before anything reaches the client.
+              Every project on Virtual is executed by a structured team - not a random collection of individuals. Each team is built around a Project Initiator who owns the project outcome, a set of Crate-level specialists who execute the micro-tasks, and a Momentum Supervisor who reviews quality before anything reaches the client.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { label: 'Defined Roles', desc: 'Every team member has a clear role — Crate executes, Initiator leads, Supervisor reviews. No ambiguity about who is responsible for what.' },
-              { label: 'Accountability at Every Level', desc: 'The Project Initiator is personally accountable for the team\'s output. If a task fails quality review, it goes back — not to the client.' },
+              { label: 'Defined Roles', desc: 'Every team member has a clear role - Crate executes, Initiator leads, Supervisor reviews. No ambiguity about who is responsible for what.' },
+              { label: 'Accountability at Every Level', desc: 'The Project Initiator is personally accountable for the team\'s output. If a task fails quality review, it goes back - not to the client.' },
               { label: 'Scalable by Design', desc: 'Teams are assembled per project based on skill requirements. The right people are matched to the right work, every time.' },
             ].map((item, i) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
@@ -281,13 +281,13 @@ export default function AboutPage() {
               The learning process pays you.
             </h2>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Traditional skill development costs money — courses, bootcamps, certifications. Virtual flips this entirely. From your very first micro-task as a Precrate, you are earning real compensation for real work delivered to real clients.
+              Traditional skill development costs money - courses, bootcamps, certifications. Virtual flips this entirely. From your very first micro-task as a Precrate, you are earning real compensation for real work delivered to real clients.
             </p>
             <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Every task you complete builds your portfolio, your earnings, and your tier progression simultaneously. There is no separation between learning and earning — they happen in the same moment, on the same task.
+              Every task you complete builds your portfolio, your earnings, and your tier progression simultaneously. There is no separation between learning and earning - they happen in the same moment, on the same task.
             </p>
             <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              The more you improve, the more complex the tasks you receive, and the higher the compensation. Growth is not just career advancement — it is a direct increase in your income.
+              The more you improve, the more complex the tasks you receive, and the higher the compensation. Growth is not just career advancement - it is a direct increase in your income.
             </p>
           </motion.div>
           <motion.div custom={1} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -320,15 +320,15 @@ export default function AboutPage() {
               Every task is real work.<br />For real clients.
             </h2>
             <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
-              Nothing on Virtual is simulated. Every micro-task you complete is part of an actual client project — real briefs, real deadlines, real deliverables. When you finish a task, it goes into a real product that a real client receives and pays for.
+              Nothing on Virtual is simulated. Every micro-task you complete is part of an actual client project - real briefs, real deadlines, real deliverables. When you finish a task, it goes into a real product that a real client receives and pays for.
             </p>
           </motion.div>
           <div className="grid md:grid-cols-2 gap-4">
             {[
               { label: 'Client-Grade Deliverables', desc: 'Your work meets the same quality bar as any professional agency output. Momentum Supervisors review everything before it ships.' },
-              { label: 'Attributable Work History', desc: 'Every completed task is logged to your profile — the skill, the complexity, the client category, and the outcome. Your track record builds automatically.' },
+              { label: 'Attributable Work History', desc: 'Every completed task is logged to your profile - the skill, the complexity, the client category, and the outcome. Your track record builds automatically.' },
               { label: 'No Spec Work', desc: 'You are never asked to work for free "to prove yourself." Every task is compensated from the moment it is assigned.' },
-              { label: 'Portfolio That Speaks for Itself', desc: 'When you apply for higher-tier work or external opportunities, your Virtual portfolio shows verified, real-world output — not personal projects or course assignments.' },
+              { label: 'Portfolio That Speaks for Itself', desc: 'When you apply for higher-tier work or external opportunities, your Virtual portfolio shows verified, real-world output - not personal projects or course assignments.' },
             ].map((item, i) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
                 className="p-6 rounded-2xl border flex gap-4" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
@@ -352,7 +352,7 @@ export default function AboutPage() {
               Accountability flows in one direction.
             </h2>
             <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
-              Virtual operates on a strict chain of command. Every person in the system reports to someone above them, and is responsible for someone below them. This is not bureaucracy — it is the mechanism that makes quality and accountability possible at scale.
+              Virtual operates on a strict chain of command. Every person in the system reports to someone above them, and is responsible for someone below them. This is not bureaucracy - it is the mechanism that makes quality and accountability possible at scale.
             </p>
           </motion.div>
           <div className="space-y-3">
@@ -391,7 +391,7 @@ export default function AboutPage() {
             Ready to work with a real team?
           </h2>
           <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
-            Post your project and get a structured department behind it — escrow-protected, supervisor-reviewed, delivered on time.
+            Post your project and get a structured department behind it - escrow-protected, supervisor-reviewed, delivered on time.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button

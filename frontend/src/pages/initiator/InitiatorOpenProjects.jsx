@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -90,7 +90,7 @@ function OpenProjectCard({ project, onAccept, accepting }) {
           {accepting === project._id
             ? <Loader2 size={14} className="animate-spin" />
             : <ArrowRight size={14} />}
-          {accepting === project._id ? 'Accepting…' : 'Accept Project'}
+          {accepting === project._id ? 'Accepting�' : 'Accept Project'}
         </button>
       </div>
     </motion.div>
@@ -153,7 +153,7 @@ export default function InitiatorOpenProjects() {
             <Globe size={40} strokeWidth={1} className="mb-4" style={{ color: 'var(--text-secondary)', opacity: 0.3 }} />
             <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>No open projects available</p>
             <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-              Check back later — clients post new projects regularly.
+              Check back later - clients post new projects regularly.
             </p>
           </div>
         ) : (
@@ -167,3 +167,4 @@ export default function InitiatorOpenProjects() {
     </>
   );
 }
+

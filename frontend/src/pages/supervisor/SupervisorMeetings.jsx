@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -112,7 +112,7 @@ function MeetingCard({ meeting, onCancel, onCopy, copied }) {
   );
 }
 
-// ── Participant picker — sectioned by role ────────────────────────
+// ── Participant picker - sectioned by role ────────────────────────
 function ParticipantPicker({ selected, onChange }) {
   const [precrates, setPrecrates]   = useState([]);
   const [initiators, setInitiators] = useState([]);
@@ -352,7 +352,7 @@ export default function SupervisorMeetings() {
                 {/* Two-column body */}
                 <div className="flex flex-1 overflow-hidden">
 
-                  {/* Left — form */}
+                  {/* Left - form */}
                   <form onSubmit={handleSubmit} className="flex-1 p-5 space-y-4 overflow-y-auto border-r" style={{ borderColor: 'var(--border)' }}>
                     {error && (
                       <div className="p-3 rounded-xl text-xs font-semibold flex items-center gap-2"
@@ -411,7 +411,7 @@ export default function SupervisorMeetings() {
                     </button>
                   </form>
 
-                  {/* Right — participant list */}
+                  {/* Right - participant list */}
                   <div className="w-64 shrink-0 flex flex-col overflow-hidden">
                     <div className="px-4 py-3 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
                       <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>

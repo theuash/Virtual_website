@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
@@ -456,7 +456,7 @@ export default function ClientProjects() {
                       Deadline
                     </p>
                     <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      {viewProject.deadline ? new Date(viewProject.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {viewProject.deadline ? new Date(viewProject.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                     </p>
                   </div>
                 </div>

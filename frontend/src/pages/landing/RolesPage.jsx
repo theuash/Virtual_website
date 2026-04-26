@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -87,7 +87,7 @@ export default function RolesPage() {
             </span>
           </h1>
           <p className="text-lg max-w-2xl mx-auto opacity-70 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Virtual provides a structured hierarchy where every role builds on the last — ensuring mentorship, accountability, and continuous growth at every level.
+            Virtual provides a structured hierarchy where every role builds on the last - ensuring mentorship, accountability, and continuous growth at every level.
           </p>
         </motion.div>
 
@@ -143,7 +143,7 @@ export default function RolesPage() {
               Growth is Earned, Not Given
             </h2>
             <p className="text-base opacity-70 max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Virtual's promotion system is built on <strong style={{ color: 'var(--text-primary)' }}>objective milestones</strong> — not opinions, not relationships. Every promotion reflects genuine skill development and measurable platform contribution.
+              Virtual's promotion system is built on <strong style={{ color: 'var(--text-primary)' }}>objective milestones</strong> - not opinions, not relationships. Every promotion reflects genuine skill development and measurable platform contribution.
             </p>
           </motion.div>
 
@@ -153,7 +153,7 @@ export default function RolesPage() {
               {
                 num: '01', from: 'Precrate', to: 'Crate', fromColor: '#6b7280', toColor: '#3b82f6',
                 trigger: 'Automatic',
-                desc: 'Triggered automatically upon successful completion of all verification steps and foundational training modules. No human decision required — the system promotes you.',
+                desc: 'Triggered automatically upon successful completion of all verification steps and foundational training modules. No human decision required - the system promotes you.',
                 metric: 'Complete all modules + pass mentor verification',
               },
               {
@@ -165,7 +165,7 @@ export default function RolesPage() {
               {
                 num: '03', from: 'Project Initiator', to: 'Momentum Supervisor', fromColor: '#8b5cf6', toColor: '#f59e0b',
                 trigger: 'Interview-Based',
-                desc: 'Deliver across all three project types — main, team, and personal. Highlighted to Admins, followed by a comprehensive online interview to assess leadership readiness.',
+                desc: 'Deliver across all three project types - main, team, and personal. Highlighted to Admins, followed by a comprehensive online interview to assess leadership readiness.',
                 metric: 'Multi-project delivery + Admin interview',
               },
             ].map((item, i) => (
@@ -280,10 +280,11 @@ export default function RolesPage() {
             </span>
           </h1>
           <p className="text-lg max-w-2xl mx-auto opacity-70 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Virtual provides a structured hierarchy where every role builds on the last — ensuring mentorship, accountability, and continuous growth at every level.
+            Virtual provides a structured hierarchy where every role builds on the last - ensuring mentorship, accountability, and continuous growth at every level.
           </p>
         </motion.div>
       </div>
     </div>
   );
 }
+

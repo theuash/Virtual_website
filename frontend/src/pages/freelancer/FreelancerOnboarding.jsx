@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -327,7 +327,7 @@ export default function FreelancerOnboarding() {
                 ))}
               </div>
 
-              {/* Supervisor code — optional */}
+              {/* Supervisor code - optional */}
               <div className="mt-5">
                 <label className="block text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: 'var(--text-secondary)' }}>
                   Supervisor Code <span className="normal-case font-medium opacity-60">(optional)</span>

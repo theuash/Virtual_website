@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -199,8 +199,8 @@ function ProjectDetailModal({ project, onClose }) {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Budget', value: project.totalAmount ? `₹${project.totalAmount.toLocaleString('en-IN')}` : '—' },
-              { label: 'Deadline', value: project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN') : '—' },
+              { label: 'Budget', value: project.totalAmount ? `₹${project.totalAmount.toLocaleString('en-IN')}` : '-' },
+              { label: 'Deadline', value: project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN') : '-' },
               { label: 'Tasks', value: project.tasks?.length ?? 0 },
             ].map(s => (
               <div key={s.label} className="p-3 rounded-xl text-center" style={{ background: 'var(--bg-card)' }}>
@@ -226,7 +226,7 @@ function ProjectDetailModal({ project, onClose }) {
                       <p className="text-xs mt-0.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>{task.description}</p>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                          Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN') : '—'}
+                          Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN') : '-'}
                         </span>
                         <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>
                           ₹{task.earnings?.toLocaleString('en-IN')}

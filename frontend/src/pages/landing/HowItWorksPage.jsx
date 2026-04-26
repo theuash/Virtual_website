@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -58,7 +58,7 @@ export default function HowItWorksPage() {
           </p>
         </motion.div>
 
-        {/* Core Platform — How the platform works */}
+        {/* Core Platform - How the platform works */}
         <div id="core-platform">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-12">
             <div className="text-xs font-bold uppercase tracking-[0.4em] mb-4" style={{ color: 'var(--accent)' }}>
@@ -68,7 +68,7 @@ export default function HowItWorksPage() {
               How the platform works
             </h2>
             <p className="text-base opacity-70 max-w-2xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              Three core mechanics power everything on Virtual — from the moment a project is posted to the moment it's delivered.
+              Three core mechanics power everything on Virtual - from the moment a project is posted to the moment it's delivered.
             </p>
           </motion.div>
           <div className="space-y-0 border rounded-2xl overflow-hidden" style={{ borderColor: 'var(--border)' }}>
@@ -76,7 +76,7 @@ export default function HowItWorksPage() {
               {
                 tag: 'Micro-Task Distribution',
                 title: 'Every project is broken down, not handed off whole.',
-                desc: "Virtual's Project Initiators fragment every incoming project into precision-scoped micro-tasks. Each task is sized and defined based on the skill it requires, the complexity it carries, and the tier of specialist best suited to execute it. Work is matched to specialists through AI-driven mastery tiers — the system knows who is ready for what, and assigns accordingly.",
+                desc: "Virtual's Project Initiators fragment every incoming project into precision-scoped micro-tasks. Each task is sized and defined based on the skill it requires, the complexity it carries, and the tier of specialist best suited to execute it. Work is matched to specialists through AI-driven mastery tiers - the system knows who is ready for what, and assigns accordingly.",
               },
               {
                 tag: 'Algorithmic Growth',
@@ -86,7 +86,7 @@ export default function HowItWorksPage() {
               {
                 tag: 'Live Command Dashboard',
                 title: 'You always know exactly where your project stands.',
-                desc: 'Clients have access to a command center that gives total transparency over every project in real time. The dashboard displays the full micro-task breakdown — which tasks are in progress, under review, and completed — live, as it happens. Clients can communicate directly with their assigned Project Initiator from inside the dashboard.',
+                desc: 'Clients have access to a command center that gives total transparency over every project in real time. The dashboard displays the full micro-task breakdown - which tasks are in progress, under review, and completed - live, as it happens. Clients can communicate directly with their assigned Project Initiator from inside the dashboard.',
               },
             ].map((item, i) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
@@ -112,9 +112,9 @@ export default function HowItWorksPage() {
           </motion.h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { num: '01', title: 'Large Project Arrives', desc: 'A complex creative assignment — video editing, design, animation — lands on the platform from a verified client with escrow-protected payment.' },
-              { num: '02', title: 'Strategic Splitting', desc: 'A Project Initiator intelligently fragments it into precision-scoped micro-tasks: Cutting, Color Grading, SFX & Music, and more — each sized for a specific skill level.' },
-              { num: '03', title: 'Distributed Learning', desc: 'Each micro-task is matched to skilled learners (Crates) based on their tier, skill level, and learning goals — ensuring optimal fit and real growth.' },
+              { num: '01', title: 'Large Project Arrives', desc: 'A complex creative assignment - video editing, design, animation - lands on the platform from a verified client with escrow-protected payment.' },
+              { num: '02', title: 'Strategic Splitting', desc: 'A Project Initiator intelligently fragments it into precision-scoped micro-tasks: Cutting, Color Grading, SFX & Music, and more - each sized for a specific skill level.' },
+              { num: '03', title: 'Distributed Learning', desc: 'Each micro-task is matched to skilled learners (Crates) based on their tier, skill level, and learning goals - ensuring optimal fit and real growth.' },
               { num: '04', title: 'Quality Delivery', desc: 'A Momentum Supervisor reviews every deliverable before it reaches the client. Final integration, seamless delivery, and payment released from escrow.' },
             ].map((step, i) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
@@ -140,7 +140,7 @@ export default function HowItWorksPage() {
             <h3 className="text-xl font-bold mb-6" style={{ color: '#ef4444' }}>The Freelance Gap</h3>
             <ul className="space-y-5">
               {[
-                { bold: '"No experience, no job"', rest: ' — a barrier that locks newcomers out of opportunities entirely.' },
+                { bold: '"No experience, no job"', rest: ' - a barrier that locks newcomers out of opportunities entirely.' },
                 { bold: 'Large projects overwhelm beginners', rest: ' who lack the skills to break them down into manageable work.' },
                 { bold: 'Traditional learning is theoretical and unpaid', rest: ', creating financial barriers to skill development.' },
               ].map((item, i) => (
@@ -159,7 +159,7 @@ export default function HowItWorksPage() {
               {[
                 { bold: 'Democratize Access:', rest: ' Break complex projects into learnable, manageable micro-tasks anyone can start with.' },
                 { bold: 'Guided Growth:', rest: ' Structured mentorship with a clear, progressive career path from day one.' },
-                { bold: 'Earn from Day One:', rest: ' Monetize the learning process itself — get paid while you develop real, portfolio-grade skills.' },
+                { bold: 'Earn from Day One:', rest: ' Monetize the learning process itself - get paid while you develop real, portfolio-grade skills.' },
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <CheckCircle size={16} className="shrink-0 mt-0.5" style={{ color: '#10b981' }} />
@@ -183,10 +183,10 @@ export default function HowItWorksPage() {
 
           <div className="max-w-2xl mx-auto">
             {[
-              { num: 1, title: 'Sign Up', desc: 'Provide basic info (Name, Email, DOB 16+) and choose your primary skill — Video Editor, Graphic Designer, Writer, and more.' },
+              { num: 1, title: 'Sign Up', desc: 'Provide basic info (Name, Email, DOB 16+) and choose your primary skill - Video Editor, Graphic Designer, Writer, and more.' },
               { num: 2, title: 'Start as Precrate', desc: 'Complete curated learning modules and get verified by experienced mentors to ensure foundational competency.' },
               { num: 3, title: 'Become a Crate', desc: 'Get matched with a Project Initiator who guides your work. Start earning immediately on micro-tasks aligned with your skills.' },
-              { num: 4, title: 'Promote to Project Initiator', desc: 'Hit specific milestones — projects completed, earnings thresholds. Get highlighted for promotion by your Supervisor.' },
+              { num: 4, title: 'Promote to Project Initiator', desc: 'Hit specific milestones - projects completed, earnings thresholds. Get highlighted for promotion by your Supervisor.' },
               { num: 5, title: 'Ascend to Momentum Supervisor', desc: 'Excel in team leadership and project delivery. Undergo Admin vetting via online interview to join the strategic tier.' },
             ].map((step, i, arr) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show"
@@ -220,9 +220,9 @@ export default function HowItWorksPage() {
           </motion.h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[
-              { title: 'Smart Task Distribution', desc: 'Project Initiators intelligently split and assign work based on Crate skill levels, availability, and learning goals — ensuring optimal matching.' },
+              { title: 'Smart Task Distribution', desc: 'Project Initiators intelligently split and assign work based on Crate skill levels, availability, and learning goals - ensuring optimal matching.' },
               { title: 'Integrated Payment & Tracking', desc: 'Seamless payment gateway with transparent tracking for every micro-task. Escrow protection ensures fair compensation and trust for all parties.' },
-              { title: 'Realtime Notification Hub', desc: 'Instant alerts for new task assignments, approvals, team messages, and promotion eligibility — keeping everyone connected and informed.' },
+              { title: 'Realtime Notification Hub', desc: 'Instant alerts for new task assignments, approvals, team messages, and promotion eligibility - keeping everyone connected and informed.' },
               { title: 'Performance Analytics Dashboard', desc: 'Users track progress, earnings, task completion rates, and promotion eligibility in real-time with intuitive visual dashboards.' },
             ].map((item, i) => (
               <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
@@ -284,3 +284,4 @@ export default function HowItWorksPage() {
     </div>
   );
 }
+

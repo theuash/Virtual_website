@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonTable } from '../../components/SkeletonLoader';
@@ -179,7 +179,7 @@ export default function ClientWallet() {
                 {card.label}
               </div>
               <div className="text-2xl font-black" style={{ color: card.accent ? '#fff' : 'var(--text-primary)' }}>
-                {loading ? '—' : `₹${card.value.toLocaleString()}`}
+                {loading ? '-' : `₹${card.value.toLocaleString()}`}
               </div>
             </motion.div>
           ))}

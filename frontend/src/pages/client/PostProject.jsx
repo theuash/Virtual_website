@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -196,7 +196,7 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
           {/* Quantity row */}
           <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
             <span>{hasQuantity ? `${form.quantity} ${selectedService.unit}s` : 'Quantity not set'}</span>
-            <span className="font-semibold">{hasQuantity ? fmt(pricing.base) : '—'}</span>
+            <span className="font-semibold">{hasQuantity ? fmt(pricing.base) : '-'}</span>
           </div>
 
           <div className="border-t" style={{ borderColor: 'var(--border)' }} />
@@ -205,14 +205,14 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
           {form.timeSensitive && (
             <div className="flex items-center justify-between text-sm" style={{ color: '#f59e0b' }}>
               <span>+60% surcharge</span>
-              <span className="font-semibold">{hasQuantity ? fmt(pricing.timeFee) : '—'}</span>
+              <span className="font-semibold">{hasQuantity ? fmt(pricing.timeFee) : '-'}</span>
             </div>
           )}
 
           {/* Platform fee row */}
           <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
             <span>+5% platform fee</span>
-            <span className="font-semibold">{hasQuantity ? fmt(pricing.platformFee) : '—'}</span>
+            <span className="font-semibold">{hasQuantity ? fmt(pricing.platformFee) : '-'}</span>
           </div>
 
           <div className="border-t" style={{ borderColor: 'var(--border)' }} />
@@ -235,7 +235,7 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
                 </span>
               )}
               <span className="text-base font-black" style={{ color: hasQuantity ? '#22c55e' : 'var(--text-secondary)', opacity: hasQuantity ? 1 : 0.45 }}>
-                {hasQuantity ? fmt(pricing.total) : '—'}
+                {hasQuantity ? fmt(pricing.total) : '-'}
               </span>
             </div>
           </div>
@@ -253,7 +253,7 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
                 </p>
               </div>
               <span className="font-bold" style={{ color: hasQuantity ? 'var(--accent)' : undefined }}>
-                {hasQuantity ? fmt(pricing.deposit) : '—'}
+                {hasQuantity ? fmt(pricing.deposit) : '-'}
               </span>
             </div>
 
@@ -267,7 +267,7 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
                 </p>
               </div>
               <span className="font-semibold">
-                {hasQuantity ? fmt(pricing.total - pricing.deposit) : '—'}
+                {hasQuantity ? fmt(pricing.total - pricing.deposit) : '-'}
               </span>
             </div>
           </div>
@@ -700,7 +700,7 @@ function StepProjectDetails({ form, setForm, errors }) {
         <input
           className={inputCls}
           style={inputStyle}
-          placeholder="e.g. YouTube vlog edit — 10 min"
+          placeholder="e.g. YouTube vlog edit - 10 min"
           value={form.title}
           onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
           maxLength={120}
@@ -1093,14 +1093,14 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
       ? (form.startDate === 'today' ? 'Today' : form.startDate === 'tomorrow' ? 'Tomorrow' : form.startDate)
       : `In ${form.startDate} days` 
     },
-    { label: 'Duration',    value: form.duration ? `${form.duration} ${form.durationUnit || 'days'}` : '—' },
+    { label: 'Duration',    value: form.duration ? `${form.duration} ${form.durationUnit || 'days'}` : '-' },
     {
       label: 'Service',
       value: mode === 'service' && selectedService
-        ? `${selectedService.name} — ${fmt(selectedService.rate)} / ${selectedService.unit} × ${form.quantity || 0}`
+        ? `${selectedService.name} - ${fmt(selectedService.rate)} / ${selectedService.unit} �- ${form.quantity || 0}`
         : mode === 'open'
-        ? `Open Budget — ${fmt(form.openBudget || 0)} / ${form.openUnit}`
-        : '—',
+        ? `Open Budget - ${fmt(form.openBudget || 0)} / ${form.openUnit}`
+        : '-',
     },
     { label: 'Time-Sensitive', value: form.timeSensitive ? 'Yes (+60%)' : 'No' },
     { label: 'NDA Required',   value: form.ndaRequired ? 'Yes' : 'No' },
@@ -1142,7 +1142,7 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
                 wordBreak: 'break-word',
               }}
             >
-              {row.value || '—'}
+              {row.value || '-'}
             </span>
           </div>
         ))}
@@ -1298,7 +1298,7 @@ export default function PostProject() {
   const OPEN_STEPS    = ['Tags & Budget', 'Details', 'Extras', 'Review'];
   const stepLabels    = mode === 'service' ? SERVICE_STEPS : OPEN_STEPS;
 
-  // Validation — validates the CURRENT step before moving forward
+  // Validation - validates the CURRENT step before moving forward
   const validate = (currentStep) => {
     const errs = {};
     const minDur = minDuration(form.timeSensitive);
@@ -1431,14 +1431,14 @@ export default function PostProject() {
 
       <div className="p-6 md:p-8 max-w-6xl mx-auto">
 
-        {/* Step 0 — Choose path (full width, centered) */}
+        {/* Step 0 - Choose path (full width, centered) */}
         {step === 0 && (
           <div className="max-w-2xl mx-auto">
             <StepChoosePath onSelect={handleModeSelect} />
           </div>
         )}
 
-        {/* Steps 1-4 — two-column for service mode, single for open */}
+        {/* Steps 1-4 - two-column for service mode, single for open */}
         {step > 0 && (
           <div className={`grid gap-8 ${isServiceMode ? 'lg:grid-cols-3' : 'max-w-2xl mx-auto'}`}>
 
@@ -1598,3 +1598,4 @@ export default function PostProject() {
     </>
   );
 }
+

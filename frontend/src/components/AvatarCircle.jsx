@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AvatarCircle
  * - Circle with an organic blob SVG background (75-85% coverage)
  * - Bottom half of image clipped inside circle, top overflows freely
@@ -67,7 +67,7 @@ function generateBlobPath(seed, size) {
   return d;
 }
 
-// Accent-based blob color — uses CSS variable accent with opacity
+// Accent-based blob color - uses CSS variable accent with opacity
 const BLOB_COLORS = [
   'rgba(14, 246, 242, 0.59)',  // purple (default accent)
   'rgba(110, 44, 242, 0.14)',
@@ -133,7 +133,7 @@ export default function AvatarCircle({ src, initial = '?', size = 40 }) {
           </span>
         )}
 
-        {/* Image inside circle — bottom portion clipped */}
+        {/* Image inside circle - bottom portion clipped */}
         {src && (
           <img
             src={src}
@@ -154,7 +154,7 @@ export default function AvatarCircle({ src, initial = '?', size = 40 }) {
         )}
       </div>
 
-      {/* Top overflow — same image, clips below circle midpoint */}
+      {/* Top overflow - same image, clips below circle midpoint */}
       
     </div>
   );

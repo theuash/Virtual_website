@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState, useEffect } from 'react';
+﻿import { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
@@ -25,13 +25,13 @@ const mapSignupPayload = (formData) => ({
   portfolioUrl: formData.portfolioUrl?.trim() || '',
 });
 
-// Decode JWT payload and check expiry — no libraries, just atob
+// Decode JWT payload and check expiry - no libraries, just atob
 const isTokenValid = (token) => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return false;
     const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-    if (!payload.exp) return true; // no expiry claim — treat as valid
+    if (!payload.exp) return true; // no expiry claim - treat as valid
     return payload.exp * 1000 > Date.now();
   } catch {
     return false;
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
               });
               const fresh = data?.data ?? data;
               if (fresh) {
-                // Preserve auth tokens — /auth/me response doesn't include them
+                // Preserve auth tokens - /auth/me response doesn't include them
                 const updated = {
                   ...parsed,
                   ...fresh,
@@ -75,10 +75,10 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('virtual_user', JSON.stringify(updated));
               }
             } catch {
-              // /me failed (e.g. network) — keep the cached user, still usable
+              // /me failed (e.g. network) - keep the cached user, still usable
             }
           } else {
-            // Token missing or expired — clear storage
+            // Token missing or expired - clear storage
             localStorage.removeItem('virtual_user');
             delete api.defaults.headers.common['Authorization'];
           }

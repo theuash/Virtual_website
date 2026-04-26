@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+﻿import { Routes, Route, Navigate } from 'react-router-dom';
 import { RoleGuard } from './utils/roleGuards';
 import PublicRoute from './components/PublicRoute';
 
@@ -85,7 +85,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 function App() {
   return (
     <Routes>
-      {/* Public — redirect to dashboard if already logged in */}
+      {/* Public - redirect to dashboard if already logged in */}
       <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/pricing" element={<PricingPage />} />
@@ -96,7 +96,7 @@ function App() {
       <Route path="/meet/:meetingId" element={<MeetRoom />} />
       <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
 
-      {/* Client — protected */}
+      {/* Client - protected */}
       <Route path="/client" element={<RoleGuard allowedRoles={['client']}><ClientLayout /></RoleGuard>}>
         <Route index element={<Navigate to="/client/dashboard" replace />} />
         <Route path="dashboard" element={<ClientDashboard />} />
@@ -110,7 +110,7 @@ function App() {
         <Route path="settings" element={<ClientSettings />} />
       </Route>
 
-      {/* Freelancer — protected */}
+      {/* Freelancer - protected */}
       <Route path="/freelancer" element={<RoleGuard allowedRoles={['freelancer']}><SidebarProvider><FreelancerLayout /></SidebarProvider></RoleGuard>}>
         <Route index element={<Navigate to="/freelancer/dashboard" replace />} />
         <Route path="dashboard" element={<FreelancerDashboard />} />
@@ -125,7 +125,7 @@ function App() {
         <Route path="settings" element={<FreelancerSettings />} />
       </Route>
 
-      {/* Initiator — protected */}
+      {/* Initiator - protected */}
       <Route path="/initiator" element={<RoleGuard allowedRoles={['freelancer']}><InitiatorLayout /></RoleGuard>}>
         <Route index element={<Navigate to="/initiator/dashboard" replace />} />
         <Route path="dashboard"     element={<InitiatorDashboard />} />
@@ -139,7 +139,7 @@ function App() {
         <Route path="settings"      element={<InitiatorSettings />} />
       </Route>
 
-      {/* Supervisor — protected */}
+      {/* Supervisor - protected */}
       <Route path="/supervisor" element={<RoleGuard allowedRoles={['momentum_supervisor']}><SupervisorLayout /></RoleGuard>}>
         <Route index element={<Navigate to="/supervisor/dashboard" replace />} />
         <Route path="dashboard"     element={<SupervisorDashboard />} />
@@ -157,7 +157,7 @@ function App() {
         <Route path="settings"      element={<SupervisorSettings />} />
       </Route>
 
-      {/* Admin — direct URL only */}
+      {/* Admin - direct URL only */}
       <Route path="/admin" element={<RoleGuard allowedRoles={['admin']}><AdminLayout /></RoleGuard>}>
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />

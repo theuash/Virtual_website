@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -90,7 +90,7 @@ export default function SupervisorDispatch() {
 
         <div className="flex flex-col lg:flex-row gap-6">
 
-          {/* ── Left: Project Details (60%) ── */}
+          {/* -- Left: Project Details (60%) -- */}
           <div className="lg:w-[60%] space-y-4">
             <motion.div variants={fadeUp} initial="hidden" animate="show"
               className="p-6 rounded-xl border"
@@ -106,9 +106,9 @@ export default function SupervisorDispatch() {
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{project?.title || '—'}</h2>
+                  <h2 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{project?.title || '-'}</h2>
                   <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    {project?.clientName || project?.client?.fullName || '—'} · {project?.clientCompany || project?.client?.company || ''}
+                    {project?.clientName || project?.client?.fullName || '-'} � {project?.clientCompany || project?.client?.company || ''}
                   </p>
                 </div>
                 <span className="shrink-0 px-3 py-1 rounded-full text-xs font-bold capitalize"
@@ -125,9 +125,9 @@ export default function SupervisorDispatch() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { label: 'Budget',   value: `₹${(project?.budget ?? 0).toLocaleString()}` },
-                  { label: 'Deadline', value: project?.deadline ? new Date(project.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—' },
-                  { label: 'Category', value: project?.category || '—' },
+                  { label: 'Budget',   value: `?${(project?.budget ?? 0).toLocaleString()}` },
+                  { label: 'Deadline', value: project?.deadline ? new Date(project.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-' },
+                  { label: 'Category', value: project?.category || '-' },
                 ].map(m => (
                   <div key={m.label} className="p-3 rounded-lg" style={{ background: 'var(--bg-card)' }}>
                     <div className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>{m.label}</div>
@@ -168,7 +168,7 @@ export default function SupervisorDispatch() {
             )}
           </div>
 
-          {/* ── Right: Assign Team (40%) ── */}
+          {/* -- Right: Assign Team (40%) -- */}
           <div className="lg:w-[40%] space-y-4">
             <motion.div custom={2} variants={fadeUp} initial="hidden" animate="show"
               className="rounded-xl border overflow-hidden"
@@ -231,7 +231,7 @@ export default function SupervisorDispatch() {
                   <button onClick={handleDispatch} disabled={!selected || dispatching}
                     className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                     style={{ background: 'var(--accent)', color: '#fff' }}>
-                    {dispatching ? <><Loader2 size={15} className="animate-spin" /> Dispatching…</> : 'Dispatch Project'}
+                    {dispatching ? <><Loader2 size={15} className="animate-spin" /> Dispatching�</> : 'Dispatch Project'}
                   </button>
                 </div>
               )}
@@ -242,3 +242,4 @@ export default function SupervisorDispatch() {
     </>
   );
 }
+

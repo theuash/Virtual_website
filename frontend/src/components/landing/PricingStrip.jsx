@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+﻿import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Zap, TrendingDown } from 'lucide-react';
@@ -49,12 +49,12 @@ function ExpandingCTA({ onClick }) {
       transition={{ type: 'spring', stiffness: 500, damping: 32, mass: 0.7 }}
       whileHover={{ scale: 1.05 }}
     >
-      {/* Icon dot — always visible anchor */}
+      {/* Icon dot - always visible anchor */}
       <span className="flex items-center justify-center pl-4 pr-3 py-3.5">
         <ArrowRight size={15} style={{ color: 'var(--accent)' }} />
       </span>
 
-      {/* Text — expands in after pop */}
+      {/* Text - expands in after pop */}
       <motion.span
         className="text-sm font-bold whitespace-nowrap overflow-hidden pr-6"
         style={{ color: 'var(--accent)' }}
@@ -124,7 +124,7 @@ export default function PricingStrip() {
             className="text-base max-w-3xl mx-auto leading-relaxed"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Every service priced by the unit — per minute, per second, per design. You pay for exactly what you get.
+            Every service priced by the unit - per minute, per second, per design. You pay for exactly what you get.
           </p>
         </motion.div>
 

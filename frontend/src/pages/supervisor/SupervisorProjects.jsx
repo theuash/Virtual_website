@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardHeader from "../../components/DashboardHeader";
@@ -57,7 +57,7 @@ function ProjectCard({ project, index }) {
         <div>
           <h3 className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{project.title}</h3>
           <p className="text-xs mt-0.5 truncate" style={{ color: "var(--text-secondary)" }}>
-            {project.clientId?.fullName || "—"} {project.clientId?.company ? `· ${project.clientId.company}` : ""}
+            {project.clientId?.fullName || "-"} {project.clientId?.company ? `� ${project.clientId.company}` : ""}
           </p>
         </div>
 
@@ -68,7 +68,7 @@ function ProjectCard({ project, index }) {
           </span>
           {(project.totalAmount || project.openBudget) && (
             <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--text-secondary)" }}>
-              <DollarSign size={10} />₹{(project.totalAmount || project.openBudget).toLocaleString("en-IN")}
+              <DollarSign size={10} />?{(project.totalAmount || project.openBudget).toLocaleString("en-IN")}
             </span>
           )}
           {daysLeft !== null && (
@@ -140,8 +140,8 @@ export default function SupervisorProjects() {
           <div className="flex gap-2 flex-wrap">
             {[
               { id: "all",         label: "All",          count: projects.length },
-              { id: "urgent",      label: "⚡ Urgent",    count: urgentCount,   color: "#ef4444" },
-              { id: "consultancy", label: "🎯 Consultancy", count: consultCount, color: "#f59e0b" },
+              { id: "urgent",      label: "? Urgent",    count: urgentCount,   color: "#ef4444" },
+              { id: "consultancy", label: "?? Consultancy", count: consultCount, color: "#f59e0b" },
               { id: "open",        label: "Open",         count: projects.filter(p => p.status === "open").length },
               { id: "in_progress", label: "In Progress",  count: projects.filter(p => p.status === "in_progress").length },
               { id: "completed",   label: "Completed",    count: projects.filter(p => p.status === "completed").length },
@@ -191,3 +191,4 @@ export default function SupervisorProjects() {
     </>
   );
 }
+

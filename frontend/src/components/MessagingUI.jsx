@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, MessageSquare, Search, Plus, X, Loader2, Check, CheckCheck, MoreVertical, Trash2, Ban, ShieldOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -79,7 +79,7 @@ function ConvItem({ conv, isActive, onClick, currentUserId, onDelete, onBlock, o
         </div>
       </button>
 
-      {/* ⋮ menu — always visible on hover, sits at far right */}
+      {/* ⋮ menu - always visible on hover, sits at far right */}
       <div ref={menuRef} className="relative shrink-0">
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
@@ -259,7 +259,7 @@ export default function MessagingUI({ initialConvId = null }) {
       if (initialConvId && !list.find(c => c._id === initialConvId)) {
         try {
           const convRes = await api.get(`/messaging/conversations`);
-          // Already fetched — just set active
+          // Already fetched - just set active
         } catch { /* silent */ }
       }
     } catch {

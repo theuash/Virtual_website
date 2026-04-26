@@ -31,15 +31,6 @@ export const learningVideos = [
         instructor: 'SonduckFilm',
         youtubeId: 'JSV9uMEosOo',
       },
-      {
-        id: 'dr-advanced',
-        title: 'DaVinci Resolve 19 Advanced Tutorial – Effects, Keyframes & Multi-Cam',
-        desc: 'Advanced editing (effects, keyframes, multi-cam) Full production (graphics, sound design)',
-        duration: '~1.5 hr',
-        level: 'Advanced',
-        instructor: 'Darren Mostyn',
-        youtubeId: 'b2OYhIUSNpA',
-      },
     ],
     playlists: [
       {
@@ -277,7 +268,7 @@ export const learningVideos = [
           { youtubeId: 'x6Jm9pS8Ukw', title: 'Voiceover Integration', desc: 'Blending narration with B-roll and music.', duration: '~10 min', level: 'Intermediate' },
           { youtubeId: 'wqQ0_YpL-zE', title: 'Final Delivery Settings', desc: 'Best export settings for TV and Web docs.', duration: '~08 min', level: 'Beginner' }
         ],
-      }
+      },
 
     ],
     crash_courses: [

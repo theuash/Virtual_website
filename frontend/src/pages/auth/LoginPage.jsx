@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,10 +124,10 @@ export default function LoginPage() {
         {/* Static dark overlay for text legibility */}
         <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)' }} />
 
-        {/* Content — logo moves up, text reveals behind it */}
+        {/* Content - logo moves up, text reveals behind it */}
         <div className="absolute inset-0 z-20 flex flex-col justify-end p-12 xl:p-20 pb-20 overflow-hidden">
 
-          {/* Badge — fades in first */}
+          {/* Badge - fades in first */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -142,7 +142,7 @@ export default function LoginPage() {
 
           {/* Logo moves up from below, text reveals underneath */}
           <div className="relative overflow-hidden mb-4">
-            {/* Heading — starts hidden below logo, revealed as logo moves up */}
+            {/* Heading - starts hidden below logo, revealed as logo moves up */}
             <motion.h1
               className="text-5xl xl:text-6xl font-black tracking-tighter leading-[0.95] text-white"
               initial={{ opacity: 0, y: 30 }}
@@ -156,7 +156,7 @@ export default function LoginPage() {
             </motion.h1>
           </div>
 
-          {/* Logo — moves up over the heading */}
+          {/* Logo - moves up over the heading */}
           <motion.img
             src={logo}
             className="absolute"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -35,7 +35,7 @@ function StatCard({ label, value, icon, i = 0 }) {
         </span>
       </div>
       <div className="text-2xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
-        {value ?? '—'}
+        {value ?? '-'}
       </div>
     </motion.div>
   );
@@ -117,7 +117,7 @@ export default function SupervisorDashboard() {
         {/* ── Stats ────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard i={0} label="Total Reviews"   value={user?.totalReviews   ?? 0} icon={<Star size={17} strokeWidth={1.5} />} />
-          <StatCard i={1} label="Approval Rate"   value={user?.approvalRate   ? `${user.approvalRate}%` : '—'} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
+          <StatCard i={1} label="Approval Rate"   value={user?.approvalRate   ? `${user.approvalRate}%` : '-'} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
           <StatCard i={2} label="Supervised"      value={user?.supervisedFreelancers?.length ?? 0} icon={<Users size={17} strokeWidth={1.5} />} />
           <StatCard i={3} label="Unread Messages" value={unreadTotal}          icon={<MessageSquare size={17} strokeWidth={1.5} />} />
         </div>
@@ -125,7 +125,7 @@ export default function SupervisorDashboard() {
         {/* ── Main grid ────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* Recent conversations — 2 cols */}
+          {/* Recent conversations - 2 cols */}
           <motion.div
             custom={4} variants={fadeUp} initial="hidden" animate="show"
             className="lg:col-span-2 rounded-xl border overflow-hidden"
@@ -205,7 +205,7 @@ export default function SupervisorDashboard() {
             </div>
           </motion.div>
 
-          {/* Right column — 1 col */}
+          {/* Right column - 1 col */}
           <div className="space-y-4">
 
             {/* Role info */}

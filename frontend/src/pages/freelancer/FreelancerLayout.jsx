@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
@@ -88,7 +88,7 @@ export default function FreelancerLayout() {
           </div>
         )}
 
-        {/* User card — hidden when collapsed */}
+        {/* User card - hidden when collapsed */}
         {!collapsed && (
           <div className="px-3 pb-4">
             <div className="flex items-center gap-3 p-3 rounded-xl border"

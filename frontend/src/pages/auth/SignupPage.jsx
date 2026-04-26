@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
@@ -363,7 +363,7 @@ export default function SignupPage() {
           transition={{ duration: 1, delay: 1.4 }}
         >
           <span className="text-[9px] font-black uppercase tracking-[0.3em]">Registry: New_Identity</span>
-          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Role: {role?.toUpperCase() || '—'}</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Role: {role?.toUpperCase() || '-'}</span>
         </motion.div>
       </div>
 

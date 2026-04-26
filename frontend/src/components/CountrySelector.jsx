@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search } from 'lucide-react';
 import { useCurrency } from '../context/CurrencyContext';
 
-// 180 major freelancing countries — code, name, flag emoji
+// 180 major freelancing countries - code, name, flag emoji
 const COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
@@ -222,7 +222,7 @@ export default function CountrySelector() {
     setDetectedCountry(selected);
   }, []);
 
-  // Auto-detect via backend geo endpoint — overrides locale on response
+  // Auto-detect via backend geo endpoint - overrides locale on response
   useEffect(() => {
     const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     fetch(`${BASE}/geo/country`)

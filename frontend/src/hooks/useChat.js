@@ -1,21 +1,21 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 const MESSAGING_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
 
 /**
- * useChat — connects to the messaging server, joins a conversation room,
+ * useChat - connects to the messaging server, joins a conversation room,
  * and exposes messages state + sendMessage function.
  *
- * @param {string|null} conversationId  — the conversation to join (null = not connected)
- * @param {string|null} token           — JWT access token from AuthContext
+ * @param {string|null} conversationId  - the conversation to join (null = not connected)
+ * @param {string|null} token           - JWT access token from AuthContext
  *
  * @returns {{
  *   messages:     object[],
  *   sendMessage:  (content: string) => void,
  *   isConnected:  boolean,
- *   isTyping:     boolean,        — true if the other party is typing
- *   sendTyping:   (bool) => void, — call with true/false to broadcast typing state
+ *   isTyping:     boolean,        - true if the other party is typing
+ *   sendTyping:   (bool) => void, - call with true/false to broadcast typing state
  *   error:        string|null,
  * }}
  */
@@ -102,7 +102,7 @@ export function useChat(conversationId, token) {
       .then((res) => {
         if (res.success) setMessages(res.data);
       })
-      .catch(() => {}); // silent — socket will deliver new messages anyway
+      .catch(() => {}); // silent - socket will deliver new messages anyway
   }, [conversationId, token]);
 
   // ── sendMessage ───────────────────────────────────────────────
