@@ -428,10 +428,6 @@ export default function LandingPage() {
     >
       <Header />
 
-      {/* Responsive wrapper - edge-to-edge on mobile, floating window on desktop */}
-      <div className="md:pt-1 md:pb-1 md:px-4">
-        <div className="max-w-7xl mx-auto md:rounded-2xl border-x-0 border-t-0 md:border p-0 md:p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-
       {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
@@ -1257,8 +1253,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-        </div>
-      </div>
     </div>
   );
 }

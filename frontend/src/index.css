@@ -151,6 +151,15 @@ body {
   background: var(--accent);
 }
 
+/* ─── Utilities ──────────────────────────────────────────────── */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* ─── Components ─────────────────────────────────────────────── */
 .glass-card {
   background: var(--bg-secondary);

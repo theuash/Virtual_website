@@ -5,7 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
 import {
-  Clock, ArrowRight, Star, TrendingUp, Zap, Briefcase
+  Clock, ArrowRight, Star, TrendingUp, Zap, Briefcase,
+  MessageSquare, CheckCircle2, ShieldCheck, Users
 } from 'lucide-react';
 
 const fadeUp = {

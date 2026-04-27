@@ -128,24 +128,28 @@ export default function PricingStrip() {
           </p>
         </motion.div>
 
-        {/* Department cards */}
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {[...Array(5)].map((_, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                custom={i}
-                className="h-56 rounded-2xl"
-                style={{ background: 'var(--bg-secondary)' }}
-              />
-            ))}
+          <div className="border rounded-[2.2rem] p-2 bg-white/[0.02] shadow-[0_0_20px_rgba(0,0,0,0.3)]" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className="h-[280px] w-[220px] sm:w-[240px] shrink-0 rounded-[1.5rem] snap-center"
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+                >
+                  <div className="w-full h-full animate-pulse bg-white/5 rounded-[1.5rem]" />
+                </motion.div>
+              ))}
+            </div>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="border rounded-[2.5rem] p-3 bg-white/[0.03] shadow-[0_0_30px_rgba(0,0,0,0.4)]" style={{ borderColor: 'rgba(255,255,255,0.15)' }}>
+            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2">
             {departments.map((dept, i) => {
               const discountedPrice = discounted(dept.startingFrom);
               const savings = dept.startingFrom - discountedPrice;
@@ -162,25 +166,35 @@ export default function PricingStrip() {
                   whileInView="show"
                   viewport={{ once: true }}
                   onClick={() => navigate(`/pricing#${dept.department}`)}
-                  className="group relative overflow-hidden rounded-2xl border transition-all duration-300 p-6 flex flex-col justify-between h-full"
+                  className="group relative overflow-hidden rounded-[1.5rem] border p-6 flex flex-col justify-between h-[280px] w-[220px] sm:w-[240px] shrink-0 snap-center text-left transition-all duration-500"
                   style={{
-                    background: 'var(--bg-secondary)',
-                    borderColor: 'var(--border)',
+                    background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(20,20,20,0.4) 100%)',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    boxShadow: '0 8px 24px -8px rgba(0,0,0,0.5)',
+                    backdropFilter: 'blur(8px)',
                   }}
-                  whileHover={{ y: -4, borderColor: 'var(--accent)' }}
+                  whileHover={{ 
+                    scale: 1.02, 
+                    y: -5,
+                    boxShadow: '0 20px 40px -10px rgba(110,44,242,0.25)',
+                    borderColor: 'rgba(110,44,242,0.5)'
+                  }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 >
+                  {/* Subtle Inner Glow */}
+                  <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
+                    style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent) 0%, transparent 70%)' }} />
+                  
                   {/* Top accent line on hover */}
                   <div
-                    className="absolute top-0 left-0 right-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{
-                      background: 'linear-gradient(to right, transparent, var(--accent), transparent)',
-                    }}
+                    className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-x-0 group-hover:scale-x-100 origin-center"
+                    style={{ background: 'var(--accent)' }}
                   />
 
                   {/* Content */}
                   <div className="relative z-10">
                     <div
-                      className="text-[11px] font-bold uppercase tracking-[0.35em] mb-4"
+                      className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 break-words leading-tight"
                       style={{ color: 'var(--text-secondary)', opacity: 0.6 }}
                     >
                       {dept.displayName}
@@ -191,17 +205,17 @@ export default function PricingStrip() {
                       STARTING FROM
                     </div>
 
-                    {/* Discounted Price - LARGER */}
-                    <div className="mb-3">
-                      <div className="flex items-baseline gap-1.5">
+                    {/* Discounted Price - Smaller responsive sizing */}
+                    <div className="mb-2">
+                      <div className="flex items-baseline flex-wrap gap-1">
                         <span
-                          className="text-5xl font-black tracking-tight"
+                          className="text-2xl sm:text-3xl font-black tracking-tight"
                           style={{ color: 'var(--accent)' }}
                         >
                           {convertedDiscounted.symbol}{convertedDiscounted.value}
                         </span>
                         <span
-                          className="text-sm font-bold"
+                          className="text-[10px] font-bold"
                           style={{ color: 'var(--text-secondary)' }}
                         >
                           /{dept.startingUnit}
@@ -210,18 +224,18 @@ export default function PricingStrip() {
                     </div>
 
                     {/* Original Price - smaller, strikethrough */}
-                    <div className="mb-4 flex items-center gap-2">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
                       <span
-                        className="text-sm line-through opacity-40"
+                        className="text-xs line-through opacity-40"
                         style={{ color: 'var(--text-secondary)' }}
                       >
                         {convertedNormal.symbol}{convertedNormal.value}
                       </span>
                       <span
-                        className="text-xs font-bold px-2 py-1 rounded"
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
                         style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}
                       >
-                        Save {convertedNormal.symbol}{convertedSavings}
+                        -{convertedNormal.symbol}{convertedSavings}
                       </span>
                     </div>
 
@@ -233,23 +247,16 @@ export default function PricingStrip() {
                       <Sparkles size={11} />
                       First project offer
                     </div>
-                  </div>
-
-                  {/* Arrow indicator */}
-                  <div className="relative z-10 mt-6 flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                    <span className="text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--accent)' }}>
-                      View all
-                    </span>
-                    <ArrowRight
-                      size={16}
-                      className="opacity-40 group-hover:opacity-100 transition-opacity"
-                      style={{ color: 'var(--accent)' }}
-                    />
+                    {/* Minimal Arrow */}
+                    <div className="flex justify-end mt-auto pt-4">
+                      <ArrowRight size={14} className="opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" style={{ color: 'var(--accent)' }} />
+                    </div>
                   </div>
                 </motion.button>
               );
             })}
           </div>
+        </div>
         )}
 
         {/* CTA */}
