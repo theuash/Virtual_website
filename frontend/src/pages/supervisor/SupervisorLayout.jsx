@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, FolderKanban, Users, MessageSquare,
   Settings, LogOut, Menu, X, DollarSign, Wallet,
-  Bell, Users2, Globe, Briefcase, TrendingUp, Video, MoreHorizontal,
+  Users2, Globe, Briefcase, TrendingUp, Video, MoreHorizontal, Info, ShieldCheck
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import api from '../../services/api';
@@ -17,18 +17,9 @@ export default function SupervisorLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [showNotif, setShowNotif] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
   const initial = (user?.fullName || 'S').charAt(0).toUpperCase();
-
-  // Fetch urgent notifications
-  useEffect(() => {
-    api.get('/supervisor/notifications')
-      .then(res => setNotifications(res.data?.data ?? []))
-      .catch(() => {});
-  }, []);
 
   const mainNav = [
     { path: '/supervisor/dashboard',      icon: <LayoutDashboard size={17} strokeWidth={1.5} />, label: 'Dashboard' },
@@ -41,16 +32,20 @@ export default function SupervisorLayout() {
     { path: '/supervisor/payouts',        icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Payouts' },
     { path: '/supervisor/earnings',       icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Earnings' },
     { path: '/supervisor/wallet',         icon: <Wallet size={17} strokeWidth={1.5} />,          label: 'Wallet' },
+    { path: '/supervisor/messages',            icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
+    { path: '/supervisor/verification-portal', icon: <ShieldCheck size={17} strokeWidth={1.5} />,     label: 'Verification Portal' },
   ];
 
   const accountNav = [
-    { path: '/supervisor/messages', icon: <MessageSquare size={17} strokeWidth={1.5} />, label: 'Messages' },
     { path: '/supervisor/settings', icon: <Settings size={17} strokeWidth={1.5} />,      label: 'Settings' },
+    { path: '/supervisor/info',     icon: <Info size={17} strokeWidth={1.5} />,          label: 'Info' },
   ];
 
+  const allNavItems = [...mainNav, ...accountNav];
+
   // Bottom bar: first 4 main items + "More"
-  const bottomBarItems = mainNav.slice(0, 4);
-  const drawerItems = mainNav.slice(4);
+  const bottomBarItems = allNavItems.slice(0, 4);
+  const drawerItems = allNavItems.slice(4);
 
   return (
     <div className="dashboard-layout">
@@ -72,8 +67,9 @@ export default function SupervisorLayout() {
             </span>
           </div>
 
-          {/* User card + notification bell */}
-          <div className="flex items-center gap-3 p-3 rounded-xl border"
+          {/* User card */}
+          <div className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+            onClick={() => { setSidebarOpen(false); navigate('/supervisor/profile'); }}
             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
               style={{ background: '#f59e0b', color: '#fff' }}>
@@ -88,52 +84,9 @@ export default function SupervisorLayout() {
                 Momentum Supervisor
               </div>
             </div>
-            {/* Notification bell */}
-            <div className="relative">
-              <button onClick={() => setShowNotif(v => !v)}
-                className="p-1.5 rounded-lg transition-all hover:scale-110"
-                style={{ color: notifications.length > 0 ? '#ef4444' : 'var(--text-secondary)' }}>
-                <Bell size={15} strokeWidth={1.5} />
-              </button>
-              {notifications.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-black flex items-center justify-center"
-                  style={{ background: '#ef4444', color: '#fff' }}>
-                  {notifications.length > 9 ? '9+' : notifications.length}
-                </span>
-              )}
-            </div>
           </div>
 
-          {/* Notification dropdown */}
-          <AnimatePresence>
-            {showNotif && notifications.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                className="mt-2 rounded-xl border overflow-hidden"
-                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-                <div className="px-3 py-2 border-b text-[10px] font-black uppercase tracking-widest"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
-                  Urgent Projects
-                </div>
-                <div className="max-h-48 overflow-y-auto">
-                  {notifications.map((n, i) => (
-                    <button key={i} onClick={() => { navigate(`/supervisor/projects`); setShowNotif(false); }}
-                      className="w-full flex items-start gap-2 px-3 py-2.5 text-left border-b last:border-b-0 hover:opacity-80 transition-opacity"
-                      style={{ borderColor: 'var(--border)' }}>
-                      <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-                        style={{ background: n.timeSensitive ? '#ef4444' : '#f59e0b' }} />
-                      <div>
-                        <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{n.title}</p>
-                        <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                          {n.timeSensitive ? ' Time Sensitive' : ' Consultancy'}  {n.clientId?.company || n.clientId?.fullName}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
         </div>
 
         {/* Nav */}
@@ -181,13 +134,6 @@ export default function SupervisorLayout() {
         <button onClick={() => setMoreOpen(true)}>
           <span className="mobile-nav-icon" style={{ position: 'relative' }}>
             <MoreHorizontal size={17} strokeWidth={1.5} />
-            {notifications.length > 0 && (
-              <span style={{
-                position: 'absolute', top: -4, right: -4,
-                width: 10, height: 10, borderRadius: '50%',
-                background: '#ef4444', display: 'block'
-              }} />
-            )}
           </span>
           <span className="mobile-nav-label">More</span>
         </button>
@@ -200,22 +146,16 @@ export default function SupervisorLayout() {
           <div className="mobile-more-drawer">
             <div className="mobile-more-drawer-handle" />
 
-            {/* User info + notification badge */}
+            {/* User info */}
             <div className="mobile-more-drawer-user">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
-                style={{ background: '#f59e0b', color: '#fff' }}>{initial}</div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Supervisor'}</div>
-                <div className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#f59e0b' }}>Momentum Supervisor</div>
+              <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => { setMoreOpen(false); navigate('/supervisor/profile'); }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
+                  style={{ background: '#f59e0b', color: '#fff' }}>{initial}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user?.fullName || 'Supervisor'}</div>
+                  <div className="text-[9px] uppercase tracking-widest font-bold" style={{ color: '#f59e0b' }}>Momentum Supervisor</div>
+                </div>
               </div>
-              {notifications.length > 0 && (
-                <button onClick={() => { navigate('/supervisor/projects'); setMoreOpen(false); }}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold"
-                  style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                  <Bell size={12} strokeWidth={1.5} />
-                  {notifications.length}
-                </button>
-              )}
             </div>
 
             <div className="mobile-more-drawer-section-label">Navigation</div>

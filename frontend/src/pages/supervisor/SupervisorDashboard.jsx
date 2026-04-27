@@ -1,12 +1,11 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
 import {
-  ShieldCheck, Users, MessageSquare, CheckCircle2,
-  Clock, ArrowRight, Star, TrendingUp, Zap
+  Clock, ArrowRight, Star, TrendingUp, Zap, Briefcase
 } from 'lucide-react';
 
 const fadeUp = {
@@ -45,13 +44,20 @@ export default function SupervisorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
+  const [clients, setClients] = useState([]);
   const [convsLoading, setConvsLoading]   = useState(true);
+  const [clientsLoading, setClientsLoading] = useState(true);
 
   useEffect(() => {
     api.get('/messaging/conversations')
       .then(res => setConversations(res.data?.data ?? []))
       .catch(() => {})
       .finally(() => setConvsLoading(false));
+
+    api.get('/supervisor/clients')
+      .then(res => setClients(res.data?.data ?? []))
+      .catch(() => {})
+      .finally(() => setClientsLoading(false));
   }, []);
 
   const unreadTotal = conversations.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
@@ -118,7 +124,7 @@ export default function SupervisorDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard i={0} label="Total Reviews"   value={user?.totalReviews   ?? 0} icon={<Star size={17} strokeWidth={1.5} />} />
           <StatCard i={1} label="Approval Rate"   value={user?.approvalRate   ? `${user.approvalRate}%` : '-'} icon={<CheckCircle2 size={17} strokeWidth={1.5} />} />
-          <StatCard i={2} label="Supervised"      value={user?.supervisedFreelancers?.length ?? 0} icon={<Users size={17} strokeWidth={1.5} />} />
+          <StatCard i={2} label="My Clients"      value={clients.length} icon={<Briefcase size={17} strokeWidth={1.5} />} />
           <StatCard i={3} label="Unread Messages" value={unreadTotal}          icon={<MessageSquare size={17} strokeWidth={1.5} />} />
         </div>
 
@@ -201,6 +207,63 @@ export default function SupervisorDashboard() {
                     )}
                   </button>
                 ))
+              )}
+            </div>
+          </motion.div>
+
+          {/* My Clients Portfolio */}
+          <motion.div
+            custom={5} variants={fadeUp} initial="hidden" animate="show"
+            className="lg:col-span-2 rounded-xl border overflow-hidden"
+            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b"
+              style={{ borderColor: 'var(--border)' }}>
+              <h2 className="text-sm font-bold flex items-center gap-2"
+                style={{ color: 'var(--text-primary)' }}>
+                <Briefcase size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+                My Portfolio Clients
+              </h2>
+              <button
+                onClick={() => navigate('/supervisor/clients')}
+                className="text-xs font-semibold flex items-center gap-1 transition-all hover:gap-2"
+                style={{ color: 'var(--accent)' }}
+              >
+                View all <ArrowRight size={12} />
+              </button>
+            </div>
+
+            <div className="p-5">
+              {clientsLoading ? (
+                <div className="space-y-3">
+                   {[...Array(2)].map((_, i) => <div key={i} className="h-16 rounded-lg animate-pulse bg-white/5" />)}
+                </div>
+              ) : clients.length === 0 ? (
+                <div className="py-8 text-center text-xs opacity-40">No clients assigned yet.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {clients.slice(0, 4).map(client => (
+                    <div 
+                      key={client._id} 
+                      onClick={() => navigate('/supervisor/clients')}
+                      className="p-3 rounded-xl border bg-bg-card flex items-center gap-3 cursor-pointer hover:scale-[1.02] transition-all"
+                      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-black text-accent shrink-0">
+                         {client.fullName?.[0]}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                         <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-[11px] font-bold truncate" style={{ color: 'var(--text-primary)' }}>{client.fullName}</span>
+                            <span className="px-1 py-0.5 rounded-[4px] text-[7px] font-black uppercase tracking-tighter bg-accent/10 text-accent">
+                               {client.clientType || 'CG'}
+                            </span>
+                         </div>
+                         <p className="text-[9px] font-mono opacity-40 truncate" style={{ color: 'var(--text-secondary)' }}>{client.clientId}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </motion.div>

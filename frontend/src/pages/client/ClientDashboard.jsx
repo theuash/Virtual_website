@@ -1,11 +1,11 @@
-﻿import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/roleGuards';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonDashboard } from '../../components/SkeletonLoader';
-import { FolderKanban, Clock, Wallet, ArrowRight, PlusCircle, ShieldCheck, Activity } from 'lucide-react';
+import { FolderKanban, Clock, Wallet, ArrowRight, PlusCircle, ShieldCheck, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const STATUS_COLORS = {
   open:         { bg: 'rgba(110,44,242,0.1)', text: 'var(--accent)' },
@@ -80,13 +80,60 @@ export default function ClientDashboard() {
       <DashboardHeader title="Dashboard" />
       <div className="p-6 md:p-8 space-y-6 max-w-6xl mx-auto">
 
+        {/* Verification Banner */}
+        {user?.verificationStatus !== 'verified' && (
+          <div 
+            className="p-5 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all hover:shadow-lg"
+            style={{ 
+              background: user?.verificationStatus === 'pending' ? 'var(--bg-glass)' : 'rgba(110,44,242,0.05)',
+              borderColor: user?.verificationStatus === 'pending' ? 'var(--accent)' : 'var(--border)'
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: 'var(--bg-card)', color: 'var(--accent)' }}
+              >
+                {user?.verificationStatus === 'pending' ? <Clock className="animate-spin-slow" /> : <ShieldCheck size={24} />}
+              </div>
+              <div>
+                <h3 className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>
+                  {user?.verificationStatus === 'unverified' && "Complete Your Identity Verification"}
+                  {user?.verificationStatus === 'pending' && "Identity Verification Pending"}
+                  {user?.verificationStatus === 'on_hold' && "Verification On Hold"}
+                </h3>
+                <p className="text-[11px] mt-1 opacity-70 leading-relaxed max-w-md" style={{ color: 'var(--text-secondary)' }}>
+                  {user?.verificationStatus === 'unverified' && "To build trust and unlock full platform capabilities, please verify your account with your location and contact details."}
+                  {user?.verificationStatus === 'pending' && "A Momentum Supervisor is currently reviewing your details. This usually takes 5-10 minutes."}
+                  {user?.verificationStatus === 'on_hold' && "Your verification is currently paused. You can still post projects, but some features might be restricted until fully verified."}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/client/verification')}
+              className="px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shrink-0"
+              style={{ background: 'var(--accent)', color: '#fff' }}
+            >
+              {user?.verificationStatus === 'pending' ? 'View Status' : 'Start Verification'}
+            </button>
+          </div>
+        )}
+
         {/* Quick actions */}
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-base font-bold flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
               Good to see you, {user?.fullName?.split(' ')[0] || 'there'}.
+              {user?.verificationStatus === 'verified' && user?.clientId && (
+                <span 
+                  className="px-2 py-0.5 rounded text-[9px] font-black tracking-widest border"
+                  style={{ background: 'rgba(var(--accent-rgb), 0.05)', color: 'var(--accent)', borderColor: 'var(--border)' }}
+                >
+                  {user.clientId}
+                </span>
+              )}
             </h2>
-            <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Here's what's happening with your projects.
             </p>
           </div>

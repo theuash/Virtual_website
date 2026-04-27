@@ -11,12 +11,20 @@ const clientSchema = new mongoose.Schema({
 
   // Profile
   fullName:       { type: String, required: true },
+  clientId:       { type: String, unique: true, sparse: true },
+  clientType:     { type: String, enum: ['CG', 'CP', 'CS'], default: 'CG' },
   userId:         { type: String, unique: true, sparse: true },
   phone:          { type: String },
   avatar:         { type: String },
   companyName:    { type: String, default: '' },
 
   // Verification
+  verificationStatus: { type: String, enum: ['unverified', 'pending', 'on_hold', 'verified'], default: 'unverified' },
+  country:          { type: String },
+  address:          { type: String },
+  verificationSubmittedAt: { type: Date },
+  assignedSupervisorId:    { type: mongoose.Schema.Types.ObjectId, ref: 'MomentumSupervisor' },
+  
   isVerified:     { type: Boolean, default: false },
   isSuspended:    { type: Boolean, default: false },
   phoneVerified:  { type: Boolean, default: false },

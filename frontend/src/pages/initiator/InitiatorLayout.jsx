@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, FolderKanban, Users, MessageSquare,
   Settings, LogOut, Menu, X, DollarSign, Video,
-  Globe, Activity, UserCheck, MoreHorizontal,
+  Globe, Activity, UserCheck, MoreHorizontal, Info
 } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
@@ -27,16 +27,19 @@ export default function InitiatorLayout() {
     { path: '/initiator/work',          icon: <Activity size={17} strokeWidth={1.5} />,        label: 'Work' },
     { path: '/initiator/meet',          icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/initiator/earnings',      icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Earnings' },
+    { path: '/initiator/messages',      icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
   ];
 
   const accountNav = [
-    { path: '/initiator/messages', icon: <MessageSquare size={17} strokeWidth={1.5} />, label: 'Messages' },
     { path: '/initiator/settings', icon: <Settings size={17} strokeWidth={1.5} />,      label: 'Settings' },
+    { path: '/initiator/info',     icon: <Info size={17} strokeWidth={1.5} />,          label: 'Info' },
   ];
 
+  const allNavItems = [...mainNav, ...accountNav];
+
   // Bottom bar: first 4 main items + "More"
-  const bottomBarItems = mainNav.slice(0, 4);
-  const drawerItems = mainNav.slice(4);
+  const bottomBarItems = allNavItems.slice(0, 4);
+  const drawerItems = allNavItems.slice(4);
 
   return (
     <div className="dashboard-layout">
@@ -61,7 +64,8 @@ export default function InitiatorLayout() {
           </div>
 
           {/* User card */}
-          <div className="flex items-center gap-3 p-3 rounded-xl border"
+          <div className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+            onClick={() => { setSidebarOpen(false); navigate('/initiator/profile'); }}
             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
               style={{ background: '#8b5cf6', color: '#fff' }}>
@@ -142,7 +146,7 @@ export default function InitiatorLayout() {
             <div className="mobile-more-drawer-handle" />
 
             {/* User info */}
-            <div className="mobile-more-drawer-user">
+            <div className="mobile-more-drawer-user cursor-pointer" onClick={() => { setMoreOpen(false); navigate('/initiator/profile'); }}>
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black shrink-0"
                 style={{ background: '#8b5cf6', color: '#fff' }}>{initial}</div>
               <div className="min-w-0">

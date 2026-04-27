@@ -1,4 +1,4 @@
-﻿import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, TIER_LABELS } from '../../utils/roleGuards';
@@ -11,6 +11,7 @@ import {
   TrendingUp, Clock, BookOpen, Play, Lock, ChevronRight, Zap, PlayCircle, User
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import GuidedTour from '../../components/GuidedTour';
 
 const TIER_ORDER = ['precrate', 'crate', 'project_initiator', 'momentum_supervisor', 'admin'];
 const TIER_DESCRIPTIONS = {
@@ -210,6 +211,7 @@ export default function FreelancerDashboard() {
 
   return (
     <>
+      <GuidedTour />
       <DashboardHeader title="Dashboard" />
       <motion.div
         className="p-6 md:p-8 max-w-7xl mx-auto space-y-6"
@@ -241,7 +243,7 @@ export default function FreelancerDashboard() {
                 {tierDesc}
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-3 flex-wrap">
+            <div id="tour-welcome-card" className="mt-4 flex items-center gap-3 flex-wrap">
               {/* View Projects - locked for precrate */}
               {isPrecrate ? (
                 <div
@@ -354,8 +356,8 @@ export default function FreelancerDashboard() {
           </motion.div>
         )}
 
-        {/*  Stats row  */}
         <motion.div
+          id="tour-stats-row"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -510,6 +512,7 @@ export default function FreelancerDashboard() {
               </LockedBlock>
             ) : (
               <motion.div
+                id="tour-rank-card"
                 variants={itemVariants}
                 className="rounded-xl border p-5 transition-all"
                 style={{

@@ -37,6 +37,7 @@ const supervisorSchema = new mongoose.Schema({
   supervisedFreelancers:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer' }],
   totalReviews:           { type: Number, default: 0 },
   approvalRate:           { type: Number, default: 0 },
+  isOnline:               { type: Boolean, default: false },
 }, { timestamps: true, collection: 'momentum_supervisors' });
 
 supervisorSchema.methods.matchPassword = async function (password) {

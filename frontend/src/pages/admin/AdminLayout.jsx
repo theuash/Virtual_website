@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Users, Folder, Scale, Award, Settings, LogOut, Menu, X, MoreHorizontal } from 'lucide-react';
+import { LayoutDashboard, Users, Folder, Scale, Award, Settings, LogOut, Menu, X, MoreHorizontal, Info } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 export default function AdminLayout() {
@@ -15,18 +15,24 @@ export default function AdminLayout() {
     navigate('/login');
   };
 
-  const navItems = [
+  const mainNav = [
     { path: '/admin/dashboard',   icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: 'Overview' },
     { path: '/admin/users',       icon: <Users size={18} strokeWidth={1.5} />,           label: 'All Users' },
     { path: '/admin/projects',    icon: <Folder size={18} strokeWidth={1.5} />,          label: 'Projects' },
     { path: '/admin/disputes',    icon: <Scale size={18} strokeWidth={1.5} />,           label: 'Disputes' },
     { path: '/admin/promotions',  icon: <Award size={18} strokeWidth={1.5} />,           label: 'Tier Promotions' },
-    { path: '/admin/settings',    icon: <Settings size={18} strokeWidth={1.5} />,        label: 'Settings' },
   ];
 
+  const accountNav = [
+    { path: '/admin/settings',    icon: <Settings size={18} strokeWidth={1.5} />,        label: 'Settings' },
+    { path: '/admin/info',        icon: <Info size={18} strokeWidth={1.5} />,            label: 'Info' },
+  ];
+
+  const allNavItems = [...mainNav, ...accountNav];
+
   // Bottom bar: first 4 items + "More"
-  const bottomBarItems = navItems.slice(0, 4);
-  const drawerItems = navItems.slice(4);
+  const bottomBarItems = allNavItems.slice(0, 4);
+  const drawerItems = allNavItems.slice(4);
 
   const initial = (user?.name || user?.email || 'A').charAt(0).toUpperCase();
 
@@ -49,7 +55,8 @@ export default function AdminLayout() {
             <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-secondary)', fontWeight: 300 }}>Ops</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-colors"
+            onClick={() => { setSidebarOpen(false); navigate('/admin/profile'); }}>
             <div className="w-10 h-10 rounded-full border flex items-center justify-center font-medium text-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
               {user?.name?.charAt(0) || 'A'}
             </div>
@@ -61,7 +68,25 @@ export default function AdminLayout() {
         </div>
 
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-          {navItems.map(item => (
+          <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2" style={{ color: 'var(--text-secondary)' }}>Main</div>
+          {mainNav.map(item => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `nav-link group transition-all ${isActive ? 'active' : ''}`}
+              style={({ isActive }) => isActive ? {
+                backgroundColor: 'var(--accent)',
+                color: 'white'
+              } : {}}
+            >
+              <span className="opacity-70 group-hover:opacity-100 transition-opacity">{item.icon}</span>
+              <span className="text-sm font-medium">{item.label}</span>
+            </NavLink>
+          ))}
+
+          <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2 mt-3" style={{ color: 'var(--text-secondary)' }}>Account</div>
+          {accountNav.map(item => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -117,7 +142,7 @@ export default function AdminLayout() {
             <div className="mobile-more-drawer-handle" />
 
             {/* User info */}
-            <div className="mobile-more-drawer-user">
+            <div className="mobile-more-drawer-user cursor-pointer" onClick={() => { setMoreOpen(false); navigate('/admin/profile'); }}>
               <div className="w-9 h-9 rounded-full border flex items-center justify-center font-medium text-sm shrink-0"
                 style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
                 {initial}

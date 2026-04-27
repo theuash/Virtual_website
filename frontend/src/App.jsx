@@ -1,6 +1,7 @@
-﻿import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { RoleGuard } from './utils/roleGuards';
 import PublicRoute from './components/PublicRoute';
+import { Toaster } from 'react-hot-toast';
 
 // Landing
 import LandingPage from './pages/landing/LandingPage';
@@ -21,12 +22,15 @@ import ClientLayout from './pages/client/ClientLayout';
 import ClientDashboard from './pages/client/ClientDashboard';
 import PostProject from './pages/client/PostProject';
 import ClientProjects from './pages/client/ClientProjects';
+import ClientInfo from './pages/client/ClientInfo';
+import ClientProfile from './pages/client/ClientProfile';
 import ProjectDetail from './pages/client/ProjectDetail';
 import ClientPayments from './pages/client/ClientPayments';
 import ClientMessages from './pages/client/ClientMessages';
 import ClientSettings from './pages/client/ClientSettings';
 import ClientWallet from './pages/client/ClientWallet';
 import ClientMeet from './pages/client/ClientMeet';
+import ClientVerification from './pages/client/ClientVerification';
 
 // Freelancer
 import FreelancerLayout from './pages/freelancer/FreelancerLayout';
@@ -40,6 +44,8 @@ import FreelancerSettings from './pages/freelancer/FreelancerSettings';
 import FreelancerLearning from './pages/freelancer/FreelancerLearning';
 import FreelancerMeet from './pages/freelancer/FreelancerMeet';
 import FreelancerOnboarding from './pages/freelancer/FreelancerOnboarding';
+import FreelancerInfo from './pages/freelancer/FreelancerInfo';
+import FreelancerProfile from './pages/freelancer/FreelancerProfile';
 import CrateMyTeam from './pages/freelancer/CrateMyTeam';
 import { SidebarProvider } from './context/SidebarContext';
 
@@ -51,6 +57,8 @@ import InitiatorClients from './pages/initiator/InitiatorClients';
 import InitiatorOpenProjects from './pages/initiator/InitiatorOpenProjects';
 import InitiatorWork from './pages/initiator/InitiatorWork';
 import InitiatorMessages from './pages/initiator/InitiatorMessages';
+import InitiatorInfo from './pages/initiator/InitiatorInfo';
+import InitiatorProfile from './pages/initiator/InitiatorProfile';
 import InitiatorSettings from './pages/initiator/InitiatorSettings';
 import InitiatorMeet from './pages/initiator/InitiatorMeet';
 import InitiatorEarnings from './pages/initiator/InitiatorEarnings';
@@ -69,7 +77,10 @@ import SupervisorPayouts from './pages/supervisor/SupervisorPayouts';
 import SupervisorEarnings from './pages/supervisor/SupervisorEarnings';
 import SupervisorWallet from './pages/supervisor/SupervisorWallet';
 import SupervisorSettings from './pages/supervisor/SupervisorSettings';
+import SupervisorInfo from './pages/supervisor/SupervisorInfo';
+import SupervisorProfile from './pages/supervisor/SupervisorProfile';
 import SupervisorMeetings from './pages/supervisor/SupervisorMeetings';
+import SupervisorVerifications from './pages/supervisor/SupervisorVerifications';
 
 // Admin
 import AdminLayout from './pages/admin/AdminLayout';
@@ -81,12 +92,16 @@ import AdminProjects from './pages/admin/AdminProjects';
 import AdminDisputes from './pages/admin/AdminDisputes';
 import AdminPromotions from './pages/admin/AdminPromotions';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminInfo from './pages/admin/AdminInfo';
+import AdminProfile from './pages/admin/AdminProfile';
 
 function App() {
   return (
-    <Routes>
-      {/* Public - redirect to dashboard if already logged in */}
-      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+    <>
+      <Toaster position="top-right" />
+      <Routes>
+        {/* Public - redirect to dashboard if already logged in */}
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/how-it-works" element={<HowItWorksPage />} />
@@ -108,6 +123,9 @@ function App() {
         <Route path="messages" element={<ClientMessages />} />
         <Route path="meet" element={<ClientMeet />} />
         <Route path="settings" element={<ClientSettings />} />
+        <Route path="info" element={<ClientInfo />} />
+        <Route path="profile" element={<ClientProfile />} />
+        <Route path="verification" element={<ClientVerification />} />
       </Route>
 
       {/* Freelancer - protected */}
@@ -123,6 +141,8 @@ function App() {
         <Route path="progress" element={<FreelancerProgress />} />
         <Route path="messages" element={<FreelancerMessages />} />
         <Route path="settings" element={<FreelancerSettings />} />
+        <Route path="info" element={<FreelancerInfo />} />
+        <Route path="profile" element={<FreelancerProfile />} />
       </Route>
 
       {/* Initiator - protected */}
@@ -137,6 +157,8 @@ function App() {
         <Route path="earnings"      element={<InitiatorEarnings />} />
         <Route path="messages"      element={<InitiatorMessages />} />
         <Route path="settings"      element={<InitiatorSettings />} />
+        <Route path="info"          element={<InitiatorInfo />} />
+        <Route path="profile"       element={<InitiatorProfile />} />
       </Route>
 
       {/* Supervisor - protected */}
@@ -155,6 +177,9 @@ function App() {
         <Route path="earnings"      element={<SupervisorEarnings />} />
         <Route path="wallet"        element={<SupervisorWallet />} />
         <Route path="settings"      element={<SupervisorSettings />} />
+        <Route path="info"          element={<SupervisorInfo />} />
+        <Route path="profile"       element={<SupervisorProfile />} />
+        <Route path="verification-portal" element={<SupervisorVerifications />} />
       </Route>
 
       {/* Admin - direct URL only */}
@@ -168,11 +193,14 @@ function App() {
         <Route path="disputes" element={<AdminDisputes />} />
         <Route path="promotions" element={<AdminPromotions />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="info" element={<AdminInfo />} />
+        <Route path="profile" element={<AdminProfile />} />
       </Route>
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 

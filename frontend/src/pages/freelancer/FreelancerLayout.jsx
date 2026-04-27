@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
-import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users, ChevronLeft, ChevronRight, MoreHorizontal, Info } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 import AvatarCircle, { resolveAvatar } from '../../components/AvatarCircle';
@@ -28,12 +28,13 @@ export default function FreelancerLayout() {
     { path: '/freelancer/learning',  icon: <BookOpen size={17} strokeWidth={1.5} />,        label: 'Learning' },
     { path: '/freelancer/meet',      icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/freelancer/earnings',  icon: <DollarSign size={17} strokeWidth={1.5} />,      label: 'Earnings' },
-    { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career' },
+    { path: '/freelancer/messages',  icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
   ];
 
   const accountNavItems = [
-    { path: '/freelancer/messages',  icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
+    { path: '/freelancer/progress',  icon: <TrendingUp size={17} strokeWidth={1.5} />,      label: 'Career' },
     { path: '/freelancer/settings',  icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
+    { path: '/freelancer/info',      icon: <Info size={17} strokeWidth={1.5} />,            label: 'Info' },
   ];
 
   // Bottom bar shows first 4 items + "More"
@@ -96,7 +97,8 @@ export default function FreelancerLayout() {
         {/* User card - hidden when collapsed */}
         {!collapsed && (
           <div className="px-3 pb-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl border"
+            <div className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              onClick={() => { setSidebarOpen(false); navigate('/freelancer/profile'); }}
               style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
               {user?.avatar ? (
                 <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={36} />
@@ -121,7 +123,9 @@ export default function FreelancerLayout() {
 
         {/* Collapsed: just avatar */}
         {collapsed && (
-          <div className="flex justify-center py-3">
+          <div className="flex justify-center py-3 cursor-pointer hover:opacity-80 transition-opacity"
+               onClick={() => { setSidebarOpen(false); navigate('/freelancer/profile'); }}
+               title="View Profile">
             {user?.avatar ? (
               <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={36} />
             ) : (
@@ -136,8 +140,9 @@ export default function FreelancerLayout() {
         {/* Nav */}
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto overflow-x-hidden">
           {!collapsed && <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2" style={{ color: 'var(--text-secondary)' }}>Main</div>}
-          {mainNavItems.map(item => (
+           {mainNavItems.map(item => (
             <NavLink key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
+              id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={({ isActive }) => `nav-link group ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-2' : ''}`}
               title={collapsed ? item.label : undefined}>
               <span className="opacity-60 group-hover:opacity-100 transition-opacity shrink-0">{item.icon}</span>
@@ -149,6 +154,7 @@ export default function FreelancerLayout() {
           {collapsed && <div className="my-2 border-t" style={{ borderColor: 'var(--border)' }} />}
           {accountNavItems.map(item => (
             <NavLink key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
+              id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               className={({ isActive }) => `nav-link group ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-2' : ''}`}
               title={collapsed ? item.label : undefined}>
               <span className="opacity-60 group-hover:opacity-100 transition-opacity shrink-0">{item.icon}</span>

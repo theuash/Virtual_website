@@ -6,6 +6,8 @@ import { Payment } from '../models/Payment.js';
 import { Client } from '../models/Client.js';
 import { Wallet } from '../models/Wallet.js';
 import { Pricing } from '../models/Pricing.js';
+import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { Notification } from '../models/Notification.js';
 
 const PLATFORM_FEE_RATE    = 0.05;   // 5%
 const TIME_SENSITIVE_RATE  = 0.60;   // +60%
@@ -204,3 +206,74 @@ export const payFinal = asyncHandler(async (req, res) => {
 
   res.json(new ApiResponse(200, { project, wallet }, 'Final payment made. Project complete.'));
 });
+
+// ── Verification: Submit ──────────────────────────────────────────
+export const submitVerification = asyncHandler(async (req, res) => {
+  const { country, phone, address } = req.body;
+  if (!country || !phone || !address) {
+    return res.status(400).json(new ApiResponse(400, null, 'All fields are required'));
+  }
+
+  const client = await Client.findById(req.user._id);
+  if (!client) return res.status(404).json(new ApiResponse(404, null, 'Client not found'));
+
+  // Logic: Find best supervisor
+  let targetSupervisor = null;
+  const onlineSupervisors = await MomentumSupervisor.find({ isOnline: true }).lean();
+  
+  if (onlineSupervisors.length > 0) {
+    const counts = await Promise.all(onlineSupervisors.map(async (s) => {
+      const clientCount = await Client.countDocuments({ assignedSupervisorId: s._id });
+      return { id: s._id, count: clientCount };
+    }));
+    counts.sort((a, b) => a.count - b.count);
+    targetSupervisor = counts[0].id;
+  } else {
+    const allSupervisors = await MomentumSupervisor.find({}).lean();
+    if (allSupervisors.length > 0) {
+      const counts = await Promise.all(allSupervisors.map(async (s) => {
+        const clientCount = await Client.countDocuments({ assignedSupervisorId: s._id });
+        return { id: s._id, count: clientCount };
+      }));
+      counts.sort((a, b) => a.count - b.count);
+      targetSupervisor = counts[0].id;
+    }
+  }
+
+  client.country = country;
+  client.phone = phone;
+  client.address = address;
+  client.verificationStatus = 'pending';
+  client.verificationSubmittedAt = new Date();
+  client.assignedSupervisorId = targetSupervisor;
+  await client.save();
+
+  if (targetSupervisor) {
+    await Notification.create({
+      recipientId: targetSupervisor,
+      recipientModel: 'MomentumSupervisor',
+      title: 'New Client Verification Request',
+      message: `${client.fullName} is waiting for verification.`,
+      type: 'system',
+      link: '/supervisor/verification-portal'
+    });
+  }
+
+  res.json(new ApiResponse(200, client, 'Verification submitted. Please wait 5-10 minutes.'));
+});
+
+// ── Verification: Bypass ──────────────────────────────────────────
+export const bypassVerification = asyncHandler(async (req, res) => {
+  const client = await Client.findById(req.user._id);
+  if (!client) return res.status(404).json(new ApiResponse(404, null, 'Client not found'));
+
+  if (client.verificationStatus !== 'pending') {
+    return res.status(400).json(new ApiResponse(400, null, 'No pending verification to bypass'));
+  }
+
+  client.verificationStatus = 'on_hold';
+  await client.save();
+
+  res.json(new ApiResponse(200, client, 'Verification is now on hold. You can proceed for now.'));
+});
+

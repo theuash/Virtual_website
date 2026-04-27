@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -32,13 +32,22 @@ function ClientCard({ client }) {
             {(client.fullName || client.company || 'C').charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
-              {client.fullName || 'Client'}
-            </p>
-            {client.company && (
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
+                {client.fullName || 'Client'}
+              </p>
+              {client.clientType && (
+                <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-accent/10 text-accent">
+                  {client.clientType}
+                </span>
+              )}
+            </div>
+            {client.companyName ? (
+              <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{client.companyName}</p>
+            ) : client.company ? (
               <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{client.company}</p>
-            )}
-            <p className="text-[10px] truncate" style={{ color: 'var(--text-secondary)' }}>{client.email}</p>
+            ) : null}
+            <p className="text-[10px] font-mono opacity-60" style={{ color: 'var(--text-secondary)' }}>{client.clientId || client.email}</p>
           </div>
         </div>
 

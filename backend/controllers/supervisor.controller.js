@@ -11,8 +11,40 @@ import { SupervisorWallet } from '../models/SupervisorWallet.js';
 import { Conversation } from '../models/Conversation.js';
 import { FreelancerWallet } from '../models/FreelancerWallet.js';
 import { Client } from '../models/Client.js';
+import { Notification } from '../models/Notification.js';
 
 const myId = (req) => req.user._id;
+
+// ── Helper: Generate Client ID ──────────────────────────────────
+// Format: V-[TYPE]-[CC][YY][RANDOM] (e.g. V-CG-IN26FGINM6)
+const generateClientId = async (client) => {
+  const type = client.clientType || 'CG';
+  const countryCode = (client.country?.substring(0, 2) || 'XX').toUpperCase();
+  const year = new Date().getFullYear().toString().substring(2);
+  
+  const generateRandom = () => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    let res = '';
+    for (let i = 0; i < 5; i++) res += letters.charAt(Math.floor(Math.random() * letters.length));
+    res += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    return res;
+  };
+
+  let finalId = '';
+  let isUnique = false;
+  let attempts = 0;
+
+  while (!isUnique && attempts < 10) {
+    const random = generateRandom();
+    finalId = `V-${type}-${countryCode}${year}${random}`;
+    const existing = await Client.findOne({ clientId: finalId });
+    if (!existing) isUnique = true;
+    attempts++;
+  }
+
+  return finalId;
+};
 
 // ── GET /supervisor/projects ─────────────────────────────────────
 export const getSupervisorProjects = asyncHandler(async (req, res) => {
@@ -199,12 +231,10 @@ export const getGroupProjects = asyncHandler(async (req, res) => {
 
 // ── GET /supervisor/clients ──────────────────────────────────────
 export const getSupervisorClients = asyncHandler(async (req, res) => {
-  // Clients who have active projects
-  const projects = await Project.find({ status: { $in: ['open', 'in_progress', 'under_review'] } })
-    .distinct('clientId');
-
-  const clients = await Client.find({ _id: { $in: projects } })
-    .select('fullName email company avatar createdAt')
+  // Only clients assigned to this supervisor
+  const clients = await Client.find({ assignedSupervisorId: myId(req) })
+    .select('fullName email companyName avatar createdAt verificationStatus clientId clientType')
+    .sort({ createdAt: -1 })
     .lean();
 
   const enriched = await Promise.all(clients.map(async (c) => {
@@ -216,7 +246,7 @@ export const getSupervisorClients = asyncHandler(async (req, res) => {
     return { ...c, activeProjects, totalProjects };
   }));
 
-  res.json(new ApiResponse(200, enriched, 'Clients fetched'));
+  res.json(new ApiResponse(200, enriched, 'Portfolio clients fetched'));
 });
 
 // ── GET /supervisor/payouts ──────────────────────────────────────
@@ -323,4 +353,52 @@ export const getSupervisorNotifications = asyncHandler(async (req, res) => {
     .lean();
 
   res.json(new ApiResponse(200, urgent, 'Notifications fetched'));
+});
+// ── GET /supervisor/verifications ────────────────────────────────
+export const getVerificationRequests = asyncHandler(async (req, res) => {
+  const requests = await Client.find({
+    assignedSupervisorId: myId(req),
+    verificationStatus: { $in: ['pending', 'on_hold'] }
+  })
+  .select('fullName email country phone address verificationStatus verificationSubmittedAt')
+  .sort({ verificationSubmittedAt: 1 })
+  .lean();
+
+  res.json(new ApiResponse(200, requests, 'Verification requests fetched'));
+});
+
+// ── POST /supervisor/verify-client/:id ────────────────────────────
+export const verifyClient = asyncHandler(async (req, res) => {
+  const { status = 'verified' } = req.body; // allow 'verified' or 'unverified' (rejected)
+  
+  const client = await Client.findOne({ _id: req.params.id, assignedSupervisorId: myId(req) });
+  if (!client) throw new ApiError(404, 'Verification request not found');
+
+  client.verificationStatus = status;
+  if (status === 'verified') {
+    client.isVerified = true;
+    // Set client type if provided by supervisor, otherwise default 'CG'
+    if (req.body.clientType) {
+      client.clientType = req.body.clientType;
+    }
+    // Generate only if not already set
+    if (!client.clientId) {
+      client.clientId = await generateClientId(client);
+    }
+  }
+  await client.save();
+
+  // Notify client
+  await Notification.create({
+    recipientId: client._id,
+    recipientModel: 'Client',
+    title: status === 'verified' ? 'Account Verified!' : 'Verification Update',
+    message: status === 'verified' 
+      ? 'Your account has been successfully verified. You now have full access.'
+      : 'There was an issue with your verification. Please contact support.',
+    type: 'system',
+    link: '/client/dashboard'
+  });
+
+  res.json(new ApiResponse(200, client, `Client ${status}`));
 });

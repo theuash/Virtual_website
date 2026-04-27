@@ -1,4 +1,4 @@
-﻿import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
@@ -153,8 +153,8 @@ function FloatingPill({ splitProgress, navigate, logo, isDark }) {
       {visible && (
         <motion.div
           key="floating-pill"
-          className="fixed bottom-6 left-1/2 z-[100] pointer-events-auto group"
-          style={{ x: '-50%' }}
+          className="fixed left-1/2 z-[100] pointer-events-auto group"
+          style={{ x: '-50%', bottom: 'calc(24px + env(safe-area-inset-bottom))' }}
           initial={{ opacity: 0, y: 40, scale: 0.5 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.8, transition: { duration: 0.25, ease: 'easeIn' } }}
@@ -428,9 +428,9 @@ export default function LandingPage() {
     >
       <Header />
 
-      {/* Responsive wrapper - floating window on all screen sizes */}
-      <div className="pt-1 pb-1 px-4">
-        <div className="max-w-7xl mx-auto rounded-2xl border p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+      {/* Responsive wrapper - edge-to-edge on mobile, floating window on desktop */}
+      <div className="md:pt-1 md:pb-1 md:px-4">
+        <div className="max-w-7xl mx-auto md:rounded-2xl border-x-0 border-t-0 md:border p-0 md:p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
 
       {/* Hero Section (Sticky Parallax) */}
       <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
@@ -535,7 +535,7 @@ export default function LandingPage() {
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
               The New Standard
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center mb-4 sm:mb-6 leading-[1.08] text-white drop-shadow-2xl">
+            <h1 className="text-[clamp(2.1rem,9vw,5rem)] md:text-7xl lg:text-8xl font-bold tracking-tighter text-center mb-4 sm:mb-6 leading-[1.08] text-white drop-shadow-2xl px-2">
               The team you never
               <br />
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--accent) 100%)' }}>
@@ -1202,8 +1202,8 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="pt-16 sm:pt-32 pb-12 sm:pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <footer className="pt-16 sm:pt-32 pb-12 sm:pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)', paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-16 mb-12 sm:mb-24">
             <div className="md:col-span-4">
               <div className="flex items-end mb-6 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>

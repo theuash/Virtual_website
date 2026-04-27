@@ -1,5 +1,6 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import DashboardHeader from "../../components/DashboardHeader";
 import api from "../../services/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,8 +8,11 @@ import ImageCropModal from "../../components/ImageCropModal";
 import {
   Camera, User, Mail, Phone, Calendar, Link, Clock,
   CheckCircle2, AlertCircle, Loader2, Trash2, Save, Sparkles,
+  Shield, Bell, Moon, Sun
 } from "lucide-react";
 import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
+import { toast } from "react-hot-toast";
+import { requestNotificationPermission } from "../../services/notificationService";
 
 // -- Constants -----------------------------------------------------
 const HOURS_OPTIONS = [
@@ -25,10 +29,10 @@ const MONTHS = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
 ];
-const BASE_URL = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5001";
+
 function Field({ label, icon: Icon, children }) {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5 text-left">
       <label className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest"
         style={{ color: "var(--text-secondary)" }}>
         {Icon && <Icon size={11} strokeWidth={2} />}
@@ -81,10 +85,12 @@ function DOBPicker({ value, onChange }) {
 const inputCls = "w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all";
 const inputStyle = { background: "var(--bg-card)", borderColor: "var(--border)", color: "var(--text-primary)" };
 
-// -- Main Component ------------------------------------------------
 export default function FreelancerSettings() {
   const { user, setUser } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const fileRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('profile');
+  const [pushEnabled, setPushEnabled] = useState(Notification.permission === 'granted');
 
   const [form, setForm] = useState({
     fullName: "", phone: "", dateOfBirth: "", portfolioUrl: "",
@@ -96,14 +102,11 @@ export default function FreelancerSettings() {
   const [avatarFile, setAvatarFile]       = useState(null);
   const [bgRemoving, setBgRemoving]       = useState(false);
   const [saving, setSaving]               = useState(false);
-  const [status, setStatus]               = useState(null);
   const [removingAvatar, setRemovingAvatar] = useState(false);
-  const [cropSrc, setCropSrc]             = useState(null); // raw src for crop modal
+  const [cropSrc, setCropSrc]             = useState(null);
 
   useEffect(() => {
     if (!user) return;
-
-    // Parse preferredContactTime - stored as "Mon, Tue  9am-12pm"
     let parsedDays = [];
     let parsedTime = "";
     if (user.preferredContactTime) {
@@ -111,10 +114,7 @@ export default function FreelancerSettings() {
       if (parts.length === 2) {
         parsedDays = parts[0].split(', ').map(d => d.trim()).filter(Boolean);
         parsedTime = parts[1].trim();
-      } else {
-        // Legacy: just a time string
-        parsedTime = user.preferredContactTime;
-      }
+      } else parsedTime = user.preferredContactTime;
     }
 
     setForm({
@@ -128,369 +128,177 @@ export default function FreelancerSettings() {
     });
     setContactDays(parsedDays);
     setContactTime(parsedTime);
-
     if (user.avatar) setAvatarPreview(resolveAvatar(user.avatar));
   }, [user]);
 
-  const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
-  // Open crop modal when user picks a file
-  const handleAvatarChange = useCallback((e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Reset input so same file can be re-selected
-    e.target.value = '';
-    const reader = new FileReader();
-    reader.onload = () => setCropSrc(reader.result);
-    reader.readAsDataURL(file);
-  }, []);
-
-  // Called when user confirms crop - always attempt bg removal
-  const handleCropDone = useCallback(async (croppedFile, previewUrl) => {
-    setCropSrc(null);
-    setAvatarFile(croppedFile);
-    setAvatarPreview(previewUrl);
-    setStatus(null);
-
-    const apiKey = import.meta.env.VITE_REMOVE_BG_API_KEY;
-    if (!apiKey) {
-      setStatus({ type: 'success', msg: 'Photo cropped. Save to apply.' });
-      setTimeout(() => setStatus(null), 3000);
+  const handlePushToggle = async () => {
+    if (pushEnabled) {
+      toast.error('Browser push permissions must be revoked in site settings.');
       return;
     }
-
-    setBgRemoving(true);
-    setStatus({ type: 'info', msg: 'Removing background' });
-    try {
-      const fd = new FormData();
-      fd.append("image_file", croppedFile);
-      fd.append("size", "auto");
-      const res = await fetch("https://api.remove.bg/v1.0/removebg", {
-        method: "POST",
-        headers: { "X-Api-Key": apiKey },
-        body: fd,
-      });
-      if (!res.ok) throw new Error(`remove.bg ${res.status}`);
-      const blob = await res.blob();
-      const pngFile = new File([blob], "avatar.png", { type: "image/png" });
-      setAvatarFile(pngFile);
-      setAvatarPreview(URL.createObjectURL(blob));
-      setStatus({ type: "success", msg: "Background removed! Save to apply." });
-      setTimeout(() => setStatus(null), 4000);
-    } catch {
-      setStatus({ type: "success", msg: "Photo cropped. Save to apply." });
-      setTimeout(() => setStatus(null), 3000);
-    } finally {
-      setBgRemoving(false);
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      setPushEnabled(true);
+      toast.success('Push notifications enabled!');
+    } else {
+      toast.error('Permission denied or dismissed.');
     }
-  }, []);
+  };
 
   const handleSave = async () => {
     setSaving(true);
-    setStatus(null);
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => { if (v !== undefined && v !== "") fd.append(k, v); });
-
-      // Combine days + time into the stored format
       if (contactDays.length > 0 || contactTime) {
         const combined = contactDays.length > 0 && contactTime
           ? `${contactDays.join(', ')}  ${contactTime}`
           : contactTime || contactDays.join(', ');
         fd.append("preferredContactTime", combined);
       }
-
-      if (avatarFile) {
-        fd.append("avatar", avatarFile, avatarFile.name || "avatar.png");
-      }
-
+      if (avatarFile) fd.append("avatar", avatarFile, avatarFile.name || "avatar.png");
+      
       const res = await api.patch("/profile/update", fd);
       const updated = res.data?.data;
       if (updated) {
-        // Preserve auth tokens - the profile update response doesn't include them
         const stored = JSON.parse(localStorage.getItem("virtual_user") || "{}");
-        const merged = {
-          ...stored,
-          ...updated,
-          token:        stored.token,
-          refreshToken: stored.refreshToken,
-        };
+        const merged = { ...stored, ...updated, token: stored.token, refreshToken: stored.refreshToken };
         localStorage.setItem("virtual_user", JSON.stringify(merged));
         setUser?.(merged);
-        if (updated.avatar) {
-          setAvatarPreview(resolveAvatar(updated.avatar));
-        }
-        setAvatarFile(null);
+        toast.success("Profile saved successfully.");
       }
-      setStatus({ type: "success", msg: "Profile saved successfully." });
-      setTimeout(() => setStatus(null), 4000);
     } catch (err) {
-      console.error("[settings] save error:", err?.response?.status, err?.response?.data, err?.message);
-      setStatus({ type: "error", msg: err?.response?.data?.message || "Failed to save profile." });
+      toast.error(err?.response?.data?.message || "Failed to save profile.");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleRemoveAvatar = async () => {
-    setRemovingAvatar(true);
+  const handleCropDone = useCallback(async (croppedFile, previewUrl) => {
+    setCropSrc(null);
+    setAvatarFile(croppedFile);
+    setAvatarPreview(previewUrl);
+    const apiKey = import.meta.env.VITE_REMOVE_BG_API_KEY;
+    if (!apiKey) return;
+
+    setBgRemoving(true);
     try {
-      await api.delete("/profile/avatar");
-      setAvatarPreview(null);
-      setAvatarFile(null);
-      const stored = JSON.parse(localStorage.getItem("virtual_user") || "{}");
-      delete stored.avatar;
-      localStorage.setItem("virtual_user", JSON.stringify(stored));
-      setUser?.(prev => ({ ...prev, avatar: undefined }));
-    } catch { /* silent */ }
-    finally { setRemovingAvatar(false); }
-  };
+      const fd = new FormData();
+      fd.append("image_file", croppedFile);
+      const res = await fetch("https://api.remove.bg/v1.0/removebg", { method: "POST", headers: { "X-Api-Key": apiKey }, body: fd });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const pngFile = new File([blob], "avatar.png", { type: "image/png" });
+      setAvatarFile(pngFile);
+      setAvatarPreview(URL.createObjectURL(blob));
+    } catch { /* silent fallback */ }
+    finally { setBgRemoving(false); }
+  }, []);
+
+  const tabs = [
+    { id: 'profile',  label: 'Profile',  icon: <User size={16} /> },
+    { id: 'security', label: 'Security', icon: <Shield size={16} /> },
+    { id: 'app',      label: 'System',   icon: <SettingsIcon size={16} /> },
+  ];
 
   const initial = (user?.fullName || "U").charAt(0).toUpperCase();
 
   return (
     <>
-      {/* Image crop modal */}
-      {cropSrc && (
-        <ImageCropModal
-          imageSrc={cropSrc}
-          onDone={handleCropDone}
-          onCancel={() => { setCropSrc(null); fileRef.current && (fileRef.current.value = ''); }}
-        />
-      )}
-      <DashboardHeader title="Settings" />
-      <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
-
-        {/* -- Avatar ----------------------------------------------- */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
-          <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-2">
-              <User size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
-              <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Profile Picture</h2>
-            </div>
-            {/* Save button - top right of this section */}
-            <button onClick={handleSave} disabled={saving || bgRemoving}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-              style={{ background: "var(--accent)", color: "#fff" }}>
-              {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-              {saving ? "Saving" : "Save Changes"}
-            </button>
-          </div>
-          <div className="p-6 flex items-center gap-6">
-            {/* Avatar */}
-            <div className="relative shrink-0">
-              <AvatarCircle src={avatarPreview} initial={initial} size={120} />
-              {bgRemoving && (
-                <div className="absolute inset-0 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(0,0,0,0.5)" }}>
-                  <Loader2 size={20} className="animate-spin text-white" />
-                </div>
-              )}
-              <button onClick={() => fileRef.current?.click()} disabled={bgRemoving}
-                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all hover:scale-110 disabled:opacity-50"
-                style={{ background: "var(--accent)", borderColor: "var(--bg-secondary)", color: "#fff", zIndex: 10 }}>
-                <Camera size={13} strokeWidth={2} />
+      {cropSrc && <ImageCropModal imageSrc={cropSrc} onDone={handleCropDone} onCancel={() => setCropSrc(null)} />}
+      <DashboardHeader title="Freelancer Settings" />
+      <div className="p-6 md:p-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          
+          <div className="lg:col-span-1 space-y-2">
+            {tabs.map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  activeTab === tab.id ? 'bg-accent text-white shadow-lg' : 'text-text-secondary hover:bg-white/5 opacity-60'
+                }`}>
+                {tab.icon} {tab.label}
               </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-            </div>
-
-            <div className="flex-1 space-y-2">
-              <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{user?.fullName || "Your Name"}</p>
-              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{user?.email}</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <Sparkles size={10} style={{ color: "var(--accent)" }} />
-                <p className="text-[10px]" style={{ color: "var(--accent)" }}>Background auto-removed via AI</p>
-              </div>
-              <div className="flex gap-2 mt-2">
-                <button onClick={() => fileRef.current?.click()} disabled={bgRemoving}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-[1.02] disabled:opacity-50"
-                  style={{ borderColor: "var(--border)", color: "var(--text-primary)", background: "var(--bg-card)" }}>
-                  {bgRemoving ? "Processing" : "Upload Photo"}
-                </button>
-                {avatarPreview && (
-                  <button onClick={handleRemoveAvatar} disabled={removingAvatar}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:scale-[1.02] flex items-center gap-1 disabled:opacity-50"
-                    style={{ borderColor: "#ef444444", color: "#ef4444", background: "transparent" }}>
-                    {removingAvatar ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
-                    Remove
-                  </button>
-                )}
-              </div>
-              <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>JPG, PNG, WebP  Max 5MB</p>
-            </div>
-          </div>
-        </div>
-
-        {/* -- Personal Info ----------------------------------------- */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
-          <div className="px-6 py-4 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
-            <User size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
-            <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Personal Information</h2>
-          </div>
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="Full Name" icon={User}>
-              <input name="fullName" value={form.fullName} onChange={handleChange}
-                className={inputCls} style={inputStyle} placeholder="Your full name" />
-            </Field>
-            <Field label="Email" icon={Mail}>
-              <input value={user?.email || ""} disabled
-                className={inputCls} style={{ ...inputStyle, opacity: 0.5, cursor: "not-allowed" }} />
-            </Field>
-            <Field label="Phone" icon={Phone}>
-              <input name="phone" value={form.phone} onChange={handleChange}
-                className={inputCls} style={inputStyle} placeholder="+91 98765 43210" />
-            </Field>
-            <Field label="Date of Birth" icon={Calendar}>
-              <DOBPicker value={form.dateOfBirth} onChange={val => setForm(f => ({ ...f, dateOfBirth: val }))} />
-            </Field>
-            <div className="sm:col-span-2">
-              <Field label="Portfolio URL" icon={Link}>
-                <input name="portfolioUrl" value={form.portfolioUrl} onChange={handleChange}
-                  className={inputCls} style={inputStyle} placeholder="https://yourportfolio.com" />
-              </Field>
-            </div>
-
-            {/* Skills - read-only, set during onboarding */}
-            {user?.primarySkill && (
-              <div className="sm:col-span-2">
-                <Field label="Skills">
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <span className="px-3 py-1.5 rounded-full text-xs font-bold"
-                      style={{ background: "var(--accent)", color: "#fff" }}>
-                      {user.primarySkill.replace(/_/g, " ")}  Primary
-                    </span>
-                    {(user.secondarySkills || []).map(s => (
-                      <span key={s} className="px-3 py-1.5 rounded-full text-xs font-semibold border"
-                        style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--bg-card)" }}>
-                        {s.replace(/_/g, " ")}
-                      </span>
-                    ))}
-                    <span className="text-[10px] self-center" style={{ color: "var(--text-secondary)" }}>
-                       Change via onboarding
-                    </span>
-                  </div>
-                </Field>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* -- Work Preferences -------------------------------------- */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
-          <div className="px-6 py-4 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
-            <Clock size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
-            <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Work Preferences</h2>
-          </div>
-          <div className="p-6 space-y-6">
-            {/* Hours per week */}
-            <Field label="Hours per Week" icon={Clock}>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {HOURS_OPTIONS.map(opt => (
-                  <button key={opt.value} type="button"
-                    onClick={() => setForm(f => ({ ...f, hoursPerWeek: opt.value }))}
-                    className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
-                    style={{
-                      background: form.hoursPerWeek === opt.value ? "var(--accent)" : "var(--bg-card)",
-                      borderColor: form.hoursPerWeek === opt.value ? "var(--accent)" : "var(--border)",
-                      color: form.hoursPerWeek === opt.value ? "#fff" : "var(--text-secondary)",
-                    }}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </Field>
-
-            {/* Contact days */}
-            <Field label="Preferred Contact Days" icon={Clock}>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {DAYS.map(day => (
-                  <button key={day} type="button"
-                    onClick={() => setContactDays(prev =>
-                      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-                    )}
-                    className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
-                    style={{
-                      background: contactDays.includes(day) ? "var(--accent)" : "var(--bg-card)",
-                      borderColor: contactDays.includes(day) ? "var(--accent)" : "var(--border)",
-                      color: contactDays.includes(day) ? "#fff" : "var(--text-secondary)",
-                    }}>
-                    {day}
-                  </button>
-                ))}
-              </div>
-            </Field>
-
-            {/* Contact time */}
-            <Field label="Preferred Contact Time" icon={Clock}>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {CONTACT_TIMES.map(t => (
-                  <button key={t} type="button"
-                    onClick={() => setContactTime(t)}
-                    className="px-4 py-2 rounded-full text-xs font-semibold border transition-all"
-                    style={{
-                      background: contactTime === t ? "var(--accent)" : "var(--bg-card)",
-                      borderColor: contactTime === t ? "var(--accent)" : "var(--border)",
-                      color: contactTime === t ? "#fff" : "var(--text-secondary)",
-                    }}>
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </Field>
-
-            {/* Preview */}
-            {(contactDays.length > 0 || contactTime) && (
-              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                Contact window: <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                  {contactDays.length > 0 ? `${contactDays.join(', ')}  ` : ''}{contactTime}
-                </span>
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* -- Account Status ---------------------------------------- */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
-          <div className="px-6 py-4 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
-            <CheckCircle2 size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
-            <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Account Status</h2>
-          </div>
-          <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label: "User ID",      value: user?.userId || "-" },
-              { label: "Tier",         value: user?.tier || "-" },
-              { label: "Role",         value: user?.role || "-" },
-              { label: "Verified",     value: user?.isVerified ? "Yes" : "No" },
-              { label: "Member Since", value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "-" },
-            ].map(s => (
-              <div key={s.label} className="p-3 rounded-xl text-center" style={{ background: "var(--bg-card)" }}>
-                <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: "var(--text-secondary)" }}>{s.label}</p>
-                <p className="text-sm font-bold capitalize font-mono" style={{ color: "var(--text-primary)" }}>{s.value}</p>
-              </div>
             ))}
           </div>
+
+          <div className="lg:col-span-3">
+             <AnimatePresence mode="wait">
+                {activeTab === 'profile' && (
+                  <motion.div key="profile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                    {/* Avatar Card */}
+                    <div className="p-8 rounded-3xl border" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+                      <div className="flex flex-col sm:flex-row items-center gap-6">
+                        <div className="relative shrink-0">
+                          <AvatarCircle src={avatarPreview} initial={initial} size={120} />
+                          <button onClick={() => fileRef.current?.click()} className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center border-2 bg-accent shadow-lg text-white"><Camera size={13} /></button>
+                          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                             const file = e.target.files?.[0];
+                             if (file) { const r = new FileReader(); r.onload = () => setCropSrc(r.result); r.readAsDataURL(file); }
+                          }} />
+                        </div>
+                        <div className="text-center sm:text-left flex-1">
+                          <h3 className="text-base font-black">{user?.fullName}</h3>
+                          <p className="text-xs opacity-50 mb-4">{user?.email}</p>
+                          <button onClick={handleSave} disabled={saving} className="px-6 py-2.5 rounded-xl bg-accent text-white text-[10px] font-black uppercase tracking-widest transition-all">
+                             {saving ? "Saving..." : "Save Changes"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="p-8 rounded-3xl border grid grid-cols-1 md:grid-cols-2 gap-5" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+                        <Field label="Full Name" icon={User}><input name="fullName" value={form.fullName} onChange={(e) => setForm({...form, fullName: e.target.value})} className={inputCls} style={inputStyle} /></Field>
+                        <Field label="Phone" icon={Phone}><input name="phone" value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} className={inputCls} style={inputStyle} /></Field>
+                        <Field label="Date of Birth" icon={Calendar}><DOBPicker value={form.dateOfBirth} onChange={v => setForm({...form, dateOfBirth: v})} /></Field>
+                        <Field label="Portfolio URL" icon={Link}><input name="portfolioUrl" value={form.portfolioUrl} onChange={(e) => setForm({...form, portfolioUrl: e.target.value})} className={inputCls} style={inputStyle} /></Field>
+                    </div>
+
+                    <div className="p-8 rounded-3xl border space-y-6" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+                        <h4 className="text-xs font-black uppercase tracking-widest opacity-40">Work Preferences</h4>
+                        <Field label="Hours per Week"><div className="flex flex-wrap gap-2">{HOURS_OPTIONS.map(o => <button key={o.value} onClick={() => setForm({...form, hoursPerWeek: o.value})} className={`px-4 py-2 rounded-full text-xs font-bold border ${form.hoursPerWeek === o.value ? 'bg-accent text-white' : 'opacity-40'}`}>{o.label}</button>)}</div></Field>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'app' && (
+                   <motion.div key="app" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                    <div className="p-8 rounded-3xl border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                       <h2 className="text-xl font-black mb-8">System Preferences</h2>
+                       <div className="space-y-6">
+                         <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                               <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+                                  {isDark ? <Moon size={18} /> : <Sun size={18} />}
+                               </div>
+                               <div><h3 className="text-sm font-black">Interface Theme</h3><p className="text-[10px] opacity-40">Cinematic Dark or Clean Light.</p></div>
+                            </div>
+                            <button onClick={toggleTheme} className="w-14 h-8 rounded-full bg-accent/20 relative p-1"><div className={`w-6 h-6 rounded-full bg-accent transition-all ${isDark ? 'translate-x-6' : 'translate-x-0'}`} /></button>
+                         </div>
+
+                         <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                               <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center"><Bell size={18} /></div>
+                               <div><h3 className="text-sm font-black">Browser Notifications</h3><p className="text-[10px] opacity-40">Get alerts for new task approvals and payments.</p></div>
+                            </div>
+                            <button onClick={handlePushToggle} className={`w-14 h-8 rounded-full relative p-1 transition-all ${pushEnabled ? 'bg-accent' : 'bg-accent/20'}`}><div className={`w-6 h-6 rounded-full bg-white shadow-sm transition-all ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} /></button>
+                         </div>
+                       </div>
+                    </div>
+                  </motion.div>
+                )}
+             </AnimatePresence>
+          </div>
         </div>
-
-        {/* -- Status toast ------------------------------------------ */}
-        <AnimatePresence>
-          {status && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold"
-              style={{
-                background: status.type === "success" ? "#10b98122" : "#ef444422",
-                color: status.type === "success" ? "#10b981" : "#ef4444",
-                border: `1px solid ${status.type === "success" ? "#10b98144" : "#ef444444"}`,
-              }}>
-              {status.type === "success" ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-              {status.msg}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
       </div>
     </>
   );
 }
 
-
+function SettingsIcon({ className, size }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+}

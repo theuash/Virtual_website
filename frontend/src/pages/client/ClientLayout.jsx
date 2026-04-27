@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X, Wallet, Video, MoreHorizontal } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Folder, CreditCard, MessageSquare, Settings, LogOut, Menu, X, Wallet, Video, MoreHorizontal, Info, ShieldCheck } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -14,7 +14,7 @@ export default function ClientLayout() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const navItems = [
+  const mainNav = [
     { path: '/client/dashboard',    icon: <LayoutDashboard size={17} strokeWidth={1.5} />, label: 'Dashboard' },
     { path: '/client/post-project', icon: <PlusCircle size={17} strokeWidth={1.5} />,      label: 'Post Project' },
     { path: '/client/projects',     icon: <Folder size={17} strokeWidth={1.5} />,          label: 'My Projects' },
@@ -22,12 +22,19 @@ export default function ClientLayout() {
     { path: '/client/meet',         icon: <Video size={17} strokeWidth={1.5} />,           label: 'Meet' },
     { path: '/client/payments',     icon: <CreditCard size={17} strokeWidth={1.5} />,      label: 'Payments' },
     { path: '/client/messages',     icon: <MessageSquare size={17} strokeWidth={1.5} />,   label: 'Messages' },
-    { path: '/client/settings',     icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
   ];
 
+  const accountNav = [
+    { path: '/client/settings',     icon: <Settings size={17} strokeWidth={1.5} />,        label: 'Settings' },
+    { path: '/client/info',         icon: <Info size={17} strokeWidth={1.5} />,            label: 'Info' },
+    { path: '/client/verification', icon: <ShieldCheck size={17} strokeWidth={1.5} />,      label: 'Verification' },
+  ];
+
+  const allNavItems = [...mainNav, ...accountNav];
+
   // Bottom bar: first 4 items + "More"
-  const bottomBarItems = navItems.slice(0, 4);
-  const drawerItems = navItems.slice(4);
+  const bottomBarItems = allNavItems.slice(0, 4);
+  const drawerItems = allNavItems.slice(4);
 
   const initial = (user?.fullName || 'C').charAt(0).toUpperCase();
 
@@ -57,7 +64,8 @@ export default function ClientLayout() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-colors"
+            onClick={() => { setSidebarOpen(false); navigate('/client/profile'); }}>
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
               style={{ background: 'var(--accent)', color: '#fff' }}
@@ -77,7 +85,21 @@ export default function ClientLayout() {
 
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {navItems.map(item => (
+          <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2" style={{ color: 'var(--text-secondary)' }}>Main</div>
+          {mainNav.map(item => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `nav-link group ${isActive ? 'active' : ''}`}
+            >
+              <span className="opacity-60 group-hover:opacity-100 transition-opacity">{item.icon}</span>
+              <span className="text-sm font-medium">{item.label}</span>
+            </NavLink>
+          ))}
+
+          <div className="text-[9px] font-black uppercase tracking-widest px-3 py-2 mt-3" style={{ color: 'var(--text-secondary)' }}>Account</div>
+          {accountNav.map(item => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -133,7 +155,7 @@ export default function ClientLayout() {
             <div className="mobile-more-drawer-handle" />
 
             {/* User info */}
-            <div className="mobile-more-drawer-user">
+            <div className="mobile-more-drawer-user cursor-pointer" onClick={() => { setMoreOpen(false); navigate('/client/profile'); }}>
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
                 style={{ background: 'var(--accent)', color: '#fff' }}>{initial}</div>
               <div className="min-w-0">

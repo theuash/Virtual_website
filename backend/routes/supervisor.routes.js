@@ -5,7 +5,7 @@ import {
   getGroupProjects,
   getSupervisorClients, getPayouts, distributePayroll,
   getSupervisorEarnings, getSupervisorWallet, supervisorWithdraw,
-  getSupervisorNotifications,
+  getSupervisorNotifications, getVerificationRequests, verifyClient,
 } from '../controllers/supervisor.controller.js';
 import {
   getFreelancerMeetings, createFreelancerMeeting, getMeetingDetail,
@@ -33,6 +33,8 @@ router.get('/earnings',                          getSupervisorEarnings);
 router.get('/wallet',                            getSupervisorWallet);
 router.post('/wallet/withdraw',                  supervisorWithdraw);
 router.get('/notifications',                     getSupervisorNotifications);
+router.get('/verifications',                     getVerificationRequests);
+router.post('/verifications/:id/verify',          verifyClient);
 
 // Meeting routes (reuse freelancer meeting controller — role-agnostic)
 router.route('/meetings')
