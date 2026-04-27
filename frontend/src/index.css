@@ -36,21 +36,15 @@
   --bg-glass: rgba(0, 0, 0, 0.7);
   --gradient-accent: linear-gradient(135deg, #39117d 0%, #1a1a1a 100%);
   
-  /* ─── Responsive Base ─── */
-  font-size: 16px;
+  /* ─── Fluid Scaling ─── */
+  /* This scales the base font size smoothly from 14px (mobile) to ~21px (large desktop) */
+  font-size: clamp(14px, 0.5vw + 12px, 22px);
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 2500px) {
   :root {
-    /* Scale root font size proportionally for large desktop screens to maintain visual consistency */
-    font-size: 1.15vw; 
-  }
-}
-
-@media (min-width: 2000px) {
-  :root {
-    /* Cap the scaling at extreme sizes */
-    font-size: 23px;
+    /* Cap scaling for extreme ultra-wide monitors */
+    font-size: 24px;
   }
 }
 
@@ -141,7 +135,7 @@ body {
 
 /* ─── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 0.5rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -150,7 +144,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--forest);
-  border-radius: 4px;
+  border-radius: 0.25rem;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -163,7 +157,7 @@ body {
   border: 1px solid var(--border);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: 1rem;
 }
 
 .glass-card:hover {
@@ -309,9 +303,9 @@ svg[fill] {
 .modal-box {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: 1.5rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 31rem;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
@@ -325,7 +319,7 @@ svg[fill] {
 .modal-option-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.3s ease;
   text-align: left;
@@ -449,7 +443,7 @@ svg[fill] {
 
   /* Add bottom padding so content isn't hidden behind the nav bar */
   .dashboard-main {
-    padding-bottom: 72px;
+    padding-bottom: 4.5rem;
   }
 
   /* The bottom nav bar */
@@ -464,7 +458,7 @@ svg[fill] {
     border-top: 1px solid var(--border);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    height: 64px;
+    height: 4rem;
     align-items: stretch;
     padding: 0 4px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -534,7 +528,7 @@ svg[fill] {
 
   .mobile-more-drawer {
     position: fixed;
-    bottom: 64px;
+    bottom: 4rem;
     left: 0;
     right: 0;
     z-index: 95;

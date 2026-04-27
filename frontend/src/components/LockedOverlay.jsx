@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Lock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ export default function LockedOverlay({ title = 'Locked', message, unlockAt = 'C
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 flex flex-col items-center text-center px-8 py-12 rounded-2xl border max-w-sm mx-auto"
+        className="relative z-10 flex flex-col items-center text-center px-8 py-12 rounded-2xl border max-w-[24rem] mx-auto"
         style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
       >
         {/* Animated lock icon */}

@@ -45,7 +45,7 @@ export default function FreelancerLayout() {
   const tierLabel = user?.tier ? TIER_LABELS[user.tier] : 'Precrate';
 
   return (
-    <div className="dashboard-layout" style={{ '--sidebar-width': collapsed ? '64px' : '240px' }}>
+    <div className="dashboard-layout" style={{ '--sidebar-width': collapsed ? '4rem' : '15rem' }}>
       {/* Mobile toggle — hidden on mobile via CSS */}
       <button
         className="mobile-sidebar-toggle md:hidden fixed top-4 right-4 z-50 p-2 rounded-lg border"
@@ -56,7 +56,7 @@ export default function FreelancerLayout() {
       </button>
 
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}
-        style={{ width: collapsed ? '64px' : undefined, transition: 'width 0.25s ease', overflow: 'hidden' }}>
+        style={{ width: collapsed ? '4rem' : undefined, transition: 'width 0.25s ease', overflow: 'hidden' }}>
         {/* Logo + collapse toggle */}
         <div className="px-3 pt-5 pb-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
           {!collapsed && (

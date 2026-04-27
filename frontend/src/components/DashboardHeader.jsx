@@ -112,7 +112,7 @@ export default function DashboardHeader({ title }) {
                   initial={{ opacity: 0, y: 15, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 mt-3 w-[320px] sm:w-[420px] rounded-2xl border shadow-2xl overflow-hidden"
+                  className="absolute right-0 mt-3 w-[20rem] sm:w-[26rem] rounded-2xl border shadow-2xl overflow-hidden"
                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}
                 >
                   <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>

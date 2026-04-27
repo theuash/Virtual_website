@@ -166,7 +166,7 @@ export default function FreelancerDashboard() {
   if (isLoading) return (
     <>
       <DashboardHeader title="Dashboard" />
-      <div className="p-8 grid grid-cols-3 gap-4">
+      <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
