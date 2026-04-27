@@ -35,6 +35,23 @@
   --anim-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
   --bg-glass: rgba(0, 0, 0, 0.7);
   --gradient-accent: linear-gradient(135deg, #39117d 0%, #1a1a1a 100%);
+  
+  /* ─── Responsive Base ─── */
+  font-size: 16px;
+}
+
+@media (min-width: 1400px) {
+  :root {
+    /* Scale root font size proportionally for large desktop screens to maintain visual consistency */
+    font-size: 1.15vw; 
+  }
+}
+
+@media (min-width: 2000px) {
+  :root {
+    /* Cap the scaling at extreme sizes */
+    font-size: 23px;
+  }
 }
 
 .light {
@@ -330,7 +347,7 @@ svg[fill] {
   min-height: 100vh;
   background: var(--bg-primary);
   position: relative;
-  --sidebar-width: 240px;
+  --sidebar-width: 15rem; /* Changed to rem for scaling */
 }
 
 .sidebar {
@@ -367,8 +384,19 @@ svg[fill] {
   flex: 1;
   margin-left: var(--sidebar-width);
   background: var(--bg-primary);
-  transition: margin-left 0.25s ease;
+  transition: all 0.25s ease;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Ensure content stays centered and consistent on ultra-wide screens */
+.dashboard-main > * {
+  width: 100%;
+  max-width: 100rem; /* Consistent limit for content areas */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media (max-width: 768px) {
