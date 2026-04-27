@@ -68,7 +68,15 @@ export default function GuidedTour({ onComplete }) {
   }, [isVisible, currentStep]);
 
   const updateTargetRect = () => {
-    const target = document.getElementById(tourSteps[currentStep].target);
+    let targetId = tourSteps[currentStep].target;
+    
+    // On mobile, try to find the mobile-equivalent target (e.g. in bottom nav)
+    if (window.innerWidth < 768) {
+      const mobileTarget = document.getElementById(`${targetId}-mobile`);
+      if (mobileTarget) targetId = `${targetId}-mobile`;
+    }
+
+    const target = document.getElementById(targetId);
     if (target) {
       setTargetRect(target.getBoundingClientRect());
     }
@@ -101,24 +109,36 @@ export default function GuidedTour({ onComplete }) {
   // Helper to get tooltip position with bounds checking
   const getTooltipStyle = () => {
     if (!targetRect) return {};
+    const isMobile = window.innerWidth < 768;
     
-    const gap = 60; // Increased gap for bigger arrows
-    const tooltipWidth = 320;
-    const tooltipHeight = 180; // Approximate height
-    const margin = 20;
+    const gap = isMobile ? 30 : 60; 
+    const tooltipWidth = isMobile ? window.innerWidth - 40 : 320;
+    const tooltipHeight = 180; 
+    const margin = isMobile ? 20 : 20;
 
     let top = 0;
     let left = 0;
     let transform = '';
+
+    if (isMobile) {
+      // On mobile, usually top or bottom of the screen is better
+      left = 20;
+      if (targetRect.top > window.innerHeight / 2) {
+        // Target is in bottom half, show tooltip at top
+        top = 80; // Safe area
+      } else {
+        // Target is in top half, show tooltip at bottom
+        top = window.innerHeight - tooltipHeight - 60;
+      }
+      return { top, left, width: tooltipWidth };
+    }
 
     if (step.position === 'right') {
       top = targetRect.top + targetRect.height / 2;
       left = targetRect.right + gap;
       transform = 'translateY(-50%)';
       
-      // Bounds check right
       if (left + tooltipWidth > window.innerWidth - margin) {
-        // Switch to left if no space
         left = targetRect.left - gap - tooltipWidth;
       }
     } else if (step.position === 'left') {
@@ -126,7 +146,6 @@ export default function GuidedTour({ onComplete }) {
       left = targetRect.left - gap - tooltipWidth;
       transform = 'translateY(-50%)';
       
-      // Bounds check left
       if (left < margin) {
         left = targetRect.right + gap;
       }
@@ -135,7 +154,6 @@ export default function GuidedTour({ onComplete }) {
       left = targetRect.left + targetRect.width / 2;
       transform = 'translateX(-50%)';
       
-      // Bounds check bottom
       if (top + tooltipHeight > window.innerHeight - margin) {
         top = targetRect.top - gap - tooltipHeight;
       }
@@ -145,15 +163,15 @@ export default function GuidedTour({ onComplete }) {
       transform = 'translateX(-50%)';
     }
 
-    // Secondary bounds check for top/bottom overflow regardless of chosen position
     top = Math.max(margin, Math.min(top, window.innerHeight - tooltipHeight - margin));
     left = Math.max(margin, Math.min(left, window.innerWidth - tooltipWidth - margin));
 
-    return { top, left, transform };
+    return { top, left, transform, width: tooltipWidth };
   };
 
   // SVG Curved Arrow logic (Bigger)
   const getArrowPath = () => {
+    if (window.innerWidth < 768) return ''; // No arrows on mobile to reduce clutter
     if (step.position === 'right') return `M-50,0 Q-20,-30 0,0`;
     if (step.position === 'left') return `M50,0 Q20,30 0,0`;
     if (step.position === 'bottom') return `M0,-50 Q-30,-20 0,0`;
@@ -188,7 +206,7 @@ export default function GuidedTour({ onComplete }) {
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 10 }}
-          className="absolute w-[320px] p-8 rounded-3xl border shadow-2xl pointer-events-auto"
+          className="absolute p-6 sm:p-8 rounded-3xl border shadow-2xl pointer-events-auto"
           style={{ 
             ...getTooltipStyle(),
             background: 'var(--bg-card)', 

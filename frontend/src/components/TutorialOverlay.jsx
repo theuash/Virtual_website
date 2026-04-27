@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, CheckCircle2, Zap, BookOpen, FolderKanban, TrendingUp, Info } from 'lucide-react';
 
@@ -93,7 +93,7 @@ export default function TutorialOverlay({ onComplete }) {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-md overflow-hidden rounded-3xl border shadow-2xl"
+          className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md overflow-hidden rounded-3xl border shadow-2xl"
           style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
         >
           {/* Header */}
@@ -103,9 +103,10 @@ export default function TutorialOverlay({ onComplete }) {
                 key={currentStep}
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="p-4 rounded-2xl bg-accent/10 border border-accent/20"
+                className="p-3 sm:p-4 rounded-2xl bg-accent/10 border border-accent/20"
               >
-                {step.icon}
+                {/* Scale icon for mobile */}
+                {window.innerWidth < 640 ? React.cloneElement(step.icon, { size: 32 }) : step.icon}
               </motion.div>
             </div>
             <h2 className="text-xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>

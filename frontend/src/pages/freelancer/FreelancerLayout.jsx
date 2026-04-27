@@ -185,6 +185,7 @@ export default function FreelancerLayout() {
           <NavLink
             key={item.path}
             to={item.path}
+            id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-mobile`}
             className={({ isActive }) => isActive ? 'active' : ''}
           >
             <span className="mobile-nav-icon">{item.icon}</span>
@@ -224,6 +225,7 @@ export default function FreelancerLayout() {
                 <div className="mobile-more-drawer-grid">
                   {drawerItems.map(item => (
                     <NavLink key={item.path} to={item.path}
+                      id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-mobile`}
                       className={({ isActive }) => isActive ? 'active-mobile' : ''}
                       onClick={() => setMoreOpen(false)}>
                       {item.icon}
@@ -238,6 +240,7 @@ export default function FreelancerLayout() {
             <div className="mobile-more-drawer-grid">
               {accountNavItems.map(item => (
                 <NavLink key={item.path} to={item.path}
+                  id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-mobile`}
                   className={({ isActive }) => isActive ? 'active-mobile' : ''}
                   onClick={() => setMoreOpen(false)}>
                   {item.icon}

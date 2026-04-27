@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -18,10 +18,10 @@ const STEPS = [
 ];
 
 const HOURS_OPTIONS = [
-  { value: 5,  label: '15 hrs / week',   desc: 'Light availability' },
-  { value: 10, label: '510 hrs / week',  desc: 'Part-time' },
-  { value: 20, label: '1020 hrs / week', desc: 'Regular commitment' },
-  { value: 40, label: '2040 hrs / week', desc: 'Full-time' },
+  { value: 5,  label: '1-5 hrs / week',   desc: 'Light availability' },
+  { value: 10, label: '5-10 hrs / week',  desc: 'Part-time' },
+  { value: 20, label: '10-20 hrs / week', desc: 'Regular commitment' },
+  { value: 40, label: '20-40 hrs / week', desc: 'Full-time' },
 ];
 
 const CONTACT_SLOTS = [
