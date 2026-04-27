@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useVelocity, AnimatePresence } from 'framer-motion';
@@ -26,11 +26,32 @@ export default function Header() {
   const headerY = useTransform(smoothScrollY, [50, 200], [-64, 0]);
 
   useEffect(() => {
-    if (!isLanding) return;
-    let lastY = 0;
+    if (!isLanding) {
+      setHeaderVisible(true);
+      return;
+    }
+    
+    // Initial state: visible at top
+    setHeaderVisible(true);
+
+    let lastY = window.scrollY;
     const unsub = scrollY.on('change', (y) => {
-      if (y > 80 && y > lastY) setHeaderVisible(true);
-      if (y < 40) setHeaderVisible(false);
+      // Small threshold to avoid flicker
+      if (Math.abs(y - lastY) < 5) return;
+
+      if (y < 80) {
+        setHeaderVisible(true);
+      } else if (y > lastY + 10) {
+        // Scrolling down past threshold: hide only on mobile if you want, 
+        // but user specifically complained header is NOT visible when scrolling down.
+        // So let's keep it visible on mobile or use a much more lenient logic.
+        // Actually, many premium sites show on scroll up. 
+        // If the user said "it is only visible when we scroll back up" as a bug, 
+        // then they want it visible scrolling down too.
+        setHeaderVisible(true); 
+      } else if (y < lastY - 10) {
+        setHeaderVisible(true);
+      }
       lastY = y;
     });
     return () => unsub();
@@ -78,21 +99,22 @@ export default function Header() {
           }
           @media (max-width: 767px) {
             .header-main {
-              height: 56px;
-              padding: 0 1rem;
-              opacity: ${headerVisible ? '1' : '0'} !important;
-              transform: translateY(${headerVisible ? '0' : '-56px'}) !important;
-              transition: opacity 0.3s ease, transform 0.3s ease;
-              pointer-events: ${headerVisible ? 'auto' : 'none'};
+              height: 60px;
+              padding: 0 1.5rem;
+              opacity: 1 !important;
+              transform: translateY(0) !important;
+              background: ${scrolled ? 'var(--bg-glass)' : 'transparent'};
+              border-bottom: ${scrolled ? '1px solid var(--border)' : '1px solid transparent'};
+              transition: background 0.3s ease, border-color 0.3s ease;
             }
           }
         `}</style>
 
         {/* Logo */}
-        <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-end' }}>
+        <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-end', flexShrink: 0 }}>
           <img src={logo} alt="Virtual Logo" style={{
-            width: 'clamp(28px, 36px, 44px)',
-            height: 'clamp(28px, 36px, 44px)',
+            width: 'clamp(26px, 32px, 38px)',
+            height: 'clamp(26px, 32px, 38px)',
             objectFit: 'contain',
             flexShrink: 0,
             marginBottom: '2px',
@@ -100,12 +122,13 @@ export default function Header() {
           }} />
           <span style={{
             fontWeight: 800,
-            fontSize: 'clamp(1.1rem, 1.4rem, 1.5rem)',
+            fontSize: 'clamp(1rem, 1.2rem, 1.4rem)',
             lineHeight: 1,
             color: 'var(--text-primary)',
             letterSpacing: '-0.06em',
             marginBottom: '4px',
-            marginLeft: '-6px',
+            marginLeft: '-4px',
+            whiteSpace: 'nowrap'
           }}>
             irtual
           </span>
@@ -148,14 +171,15 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden flex items-center justify-center rounded-lg transition-colors"
             style={{
-              width: 36, height: 36,
+              width: 38, height: 38,
               color: 'var(--text-secondary)',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
+              flexShrink: 0,
             }}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
           {/* Desktop auth buttons */}
