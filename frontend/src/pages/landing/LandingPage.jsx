@@ -546,7 +546,7 @@ export default function LandingPage() {
             </h2>
             <button
               onClick={() => navigate('/signup?role=client')}
-              className="relative z-10 w-full py-5 bg-accent text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_20px_50px_rgba(var(--accent-rgb),0.5)] active:scale-95 transition-transform"
+              className="relative z-10 w-full py-6 bg-accent text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_20px_50px_rgba(var(--accent-rgb),0.5)] active:scale-95 transition-transform"
             >
               Get Started
             </button>
