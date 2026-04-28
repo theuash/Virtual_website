@@ -109,7 +109,7 @@ export default function PricingStrip() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest border rounded-full mb-4"
-            style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.3)', background: 'rgba(96,10,10,0.08)' }}
+            style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb), 0.3)', background: 'rgba(var(--accent-rgb), 0.08)' }}
           >
             <Zap size={13} />
             Transparent Pricing
@@ -130,7 +130,7 @@ export default function PricingStrip() {
 
         {loading ? (
           <div className="border rounded-[2.2rem] p-2 bg-white/[0.02] shadow-[0_0_20px_rgba(0,0,0,0.3)]" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
-            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2">
+            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2 rounded-[1.8rem] border border-white/5">
               {[...Array(5)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -148,8 +148,8 @@ export default function PricingStrip() {
             </div>
           </div>
         ) : (
-          <div className="border rounded-[2.5rem] p-3 bg-white/[0.03] shadow-[0_0_30px_rgba(0,0,0,0.4)]" style={{ borderColor: 'rgba(255,255,255,0.15)' }}>
-            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2">
+          <div className="border rounded-[2.5rem] p-3 shadow-xl" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+            <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2 rounded-[2rem] border" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
             {departments.map((dept, i) => {
               const discountedPrice = discounted(dept.startingFrom);
               const savings = dept.startingFrom - discountedPrice;
@@ -168,9 +168,9 @@ export default function PricingStrip() {
                   onClick={() => navigate(`/pricing#${dept.department}`)}
                   className="group relative overflow-hidden rounded-[1.5rem] border p-6 flex flex-col justify-between h-[280px] w-[220px] sm:w-[240px] shrink-0 snap-center text-left transition-all duration-500"
                   style={{
-                    background: 'linear-gradient(145deg, var(--bg-secondary) 0%, rgba(20,20,20,0.4) 100%)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    boxShadow: '0 8px 24px -8px rgba(0,0,0,0.5)',
+                    background: 'linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%)',
+                    borderColor: 'var(--border)',
+                    boxShadow: '0 8px 24px -8px rgba(0,0,0,0.2)',
                     backdropFilter: 'blur(8px)',
                   }}
                   whileHover={{ 
@@ -233,7 +233,7 @@ export default function PricingStrip() {
                       </span>
                       <span
                         className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(96,10,10,0.1)', color: 'var(--accent)' }}
+                        style={{ background: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent)' }}
                       >
                         -{convertedNormal.symbol}{convertedSavings}
                       </span>

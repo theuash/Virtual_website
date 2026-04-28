@@ -18,10 +18,7 @@ export default function Header() {
   const location = useLocation();
   const isLanding = location.pathname === '/';
 
-  const effectiveScroll = useTransform([scrollY, scrollVelocity], ([latestY, latestVel]) => {
-    return latestY + (latestVel * 0.2);
-  });
-  const smoothScrollY = useSpring(effectiveScroll, { stiffness: 150, damping: 25, mass: 0.3 });
+  const smoothScrollY = useSpring(scrollY, { stiffness: 150, damping: 25, mass: 0.3 });
   const headerOpacity = useTransform(smoothScrollY, [50, 200], [0, 1]);
   const headerY = useTransform(smoothScrollY, [50, 200], [-64, 0]);
 

@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -57,9 +57,9 @@ export default function RolesPage() {
   return (
     <div className="min-h-screen font-sans" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <Header />
-      {/* Desktop view with floating border */}
-      <div className="hidden sm:block pt-14 pb-8 px-4">
-        <div className="max-w-5xl mx-auto rounded-2xl border p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+      {/* Full content view (responsive) */}
+      <div className="pt-24 sm:pt-14 pb-8 px-4">
+        <div className="max-w-5xl mx-auto sm:rounded-2xl sm:border p-4 sm:p-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
           <div className="space-y-20">
             {/* Back Button */}
             <motion.button
@@ -252,38 +252,6 @@ export default function RolesPage() {
         </div>
       </div>
 
-      {/* Mobile view without floating border */}
-      <div className="sm:hidden pt-28 pb-24 max-w-5xl mx-auto px-4 space-y-20">
-        {/* Back Button */}
-        <motion.button
-          onClick={() => navigate('/')}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-all hover:opacity-80"
-          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
-        >
-          <ArrowLeft size={18} />
-          <span className="text-sm font-medium">Back</span>
-        </motion.button>
-
-        {/* Hero */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" className="text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-bold uppercase tracking-widest border rounded-full mb-6"
-            style={{ color: 'var(--accent)', borderColor: 'var(--accent)' }}>
-            The Hierarchy
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tighter mb-5" style={{ color: 'var(--text-primary)' }}>
-            A Clear Ladder.<br />
-            <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>
-              A Supported Climb.
-            </span>
-          </h1>
-          <p className="text-lg max-w-2xl mx-auto opacity-70 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Virtual provides a structured hierarchy where every role builds on the last - ensuring mentorship, accountability, and continuous growth at every level.
-          </p>
-        </motion.div>
-      </div>
     </div>
   );
 }

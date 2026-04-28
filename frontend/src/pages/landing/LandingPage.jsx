@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent, useSpring, useVelocity } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, Video, Cuboid, MonitorPlay, PenTool, Layout,
-  ShieldCheck, Users, Volume2, VolumeX,
+  ShieldCheck, Users, Volume2, VolumeX, Sparkles, Zap,
+  Activity, HardDrive, Layers, Cpu, Globe, Scale, Gavel, CheckCircle2, Clock, Box, Eye, Lock
 } from 'lucide-react';
 import Header from '../../components/landing/Header';
 import PricingStrip from '../../components/landing/PricingStrip';
@@ -23,46 +24,46 @@ function useIsMobile() {
 // Helper Component for 3D Mesh Layers
 const MeshGrid = ({ count = 5, speed = 10 }) => (
   <div className="w-full h-full relative" style={{ transformStyle: 'preserve-3d' }}>
-     <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
-        <g stroke="var(--accent)" strokeWidth="0.2">
-           {[...Array(count + 1)].map((_, i) => {
-              const pos = (i * 200) / count;
-              return (
-                 <g key={i}>
-                    {/* Horizontal lines */}
-                    <motion.line 
-                       animate={{ strokeDashoffset: [0, 20] }}
-                       transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
-                       x1="0" y1={pos} x2="200" y2={pos} 
-                       strokeDasharray="2 4" 
-                       opacity={0.3}
-                    />
-                    {/* Vertical lines */}
-                    <motion.line 
-                       animate={{ strokeDashoffset: [0, 20] }}
-                       transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
-                       x1={pos} y1="0" x2={pos} y2="200" 
-                       strokeDasharray="2 4"
-                       opacity={0.3}
-                    />
-                    {/* Intersection Nodes */}
-                    {[...Array(count + 1)].map((_, j) => {
-                       const pos2 = (j * 200) / count;
-                       return (
-                          <motion.circle 
-                             key={j}
-                             cx={pos} cy={pos2} r="1"
-                             fill="var(--accent)"
-                             animate={{ opacity: [0.1, 0.4, 0.1], scale: [1, 1.3, 1] }}
-                             transition={{ duration: 2, delay: (i + j) * 0.2, repeat: Infinity }}
-                          />
-                       );
-                    })}
-                 </g>
-              );
-           })}
-        </g>
-     </svg>
+    <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
+      <g stroke="var(--accent)" strokeWidth="0.2">
+        {[...Array(count + 1)].map((_, i) => {
+          const pos = (i * 200) / count;
+          return (
+            <g key={i}>
+              {/* Horizontal lines */}
+              <motion.line
+                animate={{ strokeDashoffset: [0, 20] }}
+                transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+                x1="0" y1={pos} x2="200" y2={pos}
+                strokeDasharray="2 4"
+                opacity={0.3}
+              />
+              {/* Vertical lines */}
+              <motion.line
+                animate={{ strokeDashoffset: [0, 20] }}
+                transition={{ duration: speed, repeat: Infinity, ease: "linear" }}
+                x1={pos} y1="0" x2={pos} y2="200"
+                strokeDasharray="2 4"
+                opacity={0.3}
+              />
+              {/* Intersection Nodes */}
+              {[...Array(count + 1)].map((_, j) => {
+                const pos2 = (j * 200) / count;
+                return (
+                  <motion.circle
+                    key={j}
+                    cx={pos} cy={pos2} r="1"
+                    fill="var(--accent)"
+                    animate={{ opacity: [0.1, 0.4, 0.1], scale: [1, 1.3, 1] }}
+                    transition={{ duration: 2, delay: (i + j) * 0.2, repeat: Infinity }}
+                  />
+                );
+              })}
+            </g>
+          );
+        })}
+      </g>
+    </svg>
   </div>
 );
 
@@ -92,9 +93,9 @@ function HeroExpandingCTA({ onClick }) {
       onClick={onClick}
       className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
       style={{
-        backgroundColor: '#FFFFFF',
-        color: 'var(--accent)',
-        boxShadow: '0 0 40px rgba(255,255,255,0.4)',
+        backgroundColor: 'var(--text-primary)',
+        color: 'var(--bg-primary)',
+        boxShadow: '0 0 40px rgba(var(--accent-rgb),0.2)',
         border: 'none',
       }}
       initial={{ scale: 0.4, opacity: 0 }}
@@ -104,13 +105,13 @@ function HeroExpandingCTA({ onClick }) {
     >
       {/* Arrow - anchor dot */}
       <span className="flex items-center justify-center pl-5 pr-3 py-3.5">
-        <ArrowRight size={16} style={{ color: 'var(--accent)' }} />
+        <ArrowRight size={16} style={{ color: 'var(--bg-primary)' }} />
       </span>
 
       {/* Text expands after pop */}
       <motion.span
         className="text-sm font-bold tracking-widest whitespace-nowrap overflow-hidden pr-6"
-        style={{ color: 'var(--accent)' }}
+        style={{ color: 'var(--bg-primary)' }}
         initial={{ width: 0, opacity: 0 }}
         animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
         transition={{
@@ -126,8 +127,8 @@ function HeroExpandingCTA({ onClick }) {
 
 // Floating Pill - pop-up first, then content reveals after
 function FloatingPill({ splitProgress, navigate, logo, isDark }) {
-  const [visible,   setVisible]   = useState(false);
-  const [expanded,  setExpanded]  = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [flashBorder, setFlashBorder] = useState(false);
   const hasShown = useRef(false);
 
@@ -163,19 +164,15 @@ function FloatingPill({ splitProgress, navigate, logo, isDark }) {
           <div
             className="flex items-center rounded-full relative"
             style={{
-              background: isDark
-                ? 'rgba(30, 20, 60, 0.92)'
-                : 'rgba(255, 255, 255, 0.75)',
+              background: 'var(--bg-glass)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
               overflow: 'hidden',
               border: flashBorder
-                ? '1px solid rgba(110,44,242,0.95)'
-                : `1px solid ${isDark ? 'rgba(140,100,255,0.35)' : 'rgba(110,44,242,0.3)'}`,
+                ? '1px solid var(--accent)'
+                : `1px solid var(--border)`,
               transition: 'border-color 0.9s ease, box-shadow 0.3s ease',
-              boxShadow: isDark
-                ? '0 8px 40px rgba(110,44,242,0.6), inset 0 1px 0 rgba(180,140,255,0.15)'
-                : '0 8px 40px rgba(110,44,242,0.25), inset 0 1px 0 rgba(255,255,255,0.9)',
+              boxShadow: '0 8px 40px rgba(var(--accent-rgb),0.15)',
             }}
           >
             {/* Logo */}
@@ -203,7 +200,7 @@ function FloatingPill({ splitProgress, navigate, logo, isDark }) {
               initial={{ width: 0, opacity: 0 }}
               animate={expanded ? { width: 'auto', opacity: 1 } : { width: 0, opacity: 0 }}
               transition={{
-                width:   { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                width: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
                 opacity: { duration: 0.35, delay: 0.25 },
               }}
               style={{ overflow: 'hidden' }}
@@ -264,26 +261,22 @@ export default function LandingPage() {
   // Scroll & Velocity tracking
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
-  
+
   // Create an "Enhanced Scroll" value that projects forward based on speed
   // This essentially skips animation distance the faster you scroll
-  const effectiveScroll = useTransform([scrollY, scrollVelocity], ([latestY, latestVel]) => {
-    return latestY + (latestVel * 0.2); // 0.2 factor for aggressive skipping
-  });
-
-  const smoothScrollY = useSpring(effectiveScroll, {
+  const smoothScrollY = useSpring(scrollY, {
     stiffness: 150,
     damping: 25,
     mass: 0.3
   });
 
-  // Hero Parallax
-  const heroOpacity = useTransform(smoothScrollY, [100, 400], [0, 1]);
-  const heroScale = useTransform(smoothScrollY, [100, 400], [0.9, 1]);
-  const heroTextY = useTransform(smoothScrollY, [100, 400], [40, 0]);
+  // Hero Parallax (Text appears as you scroll down while pinned)
+  const heroOpacity = useTransform(smoothScrollY, [0, 500], [0, 1]);
+  const heroScale = useTransform(smoothScrollY, [0, 500], [0.95, 1]);
+  const heroTextY = useTransform(smoothScrollY, [0, 500], [40, 0]);
 
-  // Video darken as we scroll deeper
-  const videoOpacity = useTransform(smoothScrollY, [400, 900], [0.7, 0.2]);
+  // Video darken as we scroll deeper - keep it brighter until we transition
+  const videoOpacity = useTransform(smoothScrollY, [500, 1200], [0.8, 0.2]);
 
   // Split-screen Parallax
   const splitRef = useRef(null);
@@ -292,11 +285,11 @@ export default function LandingPage() {
     offset: ["start end", "end start"]
   });
 
-  const leftYRaw = useTransform(splitProgress, [0, 1], [50, -150]);
+  const leftYRaw = useTransform(splitProgress, [0, 1], [0, -200]);
   const rightYRaw = useTransform(splitProgress, [0, 1], [-100, 100]);
   const leftY = isMobile ? 0 : leftYRaw;
   const rightY = isMobile ? 0 : rightYRaw;
-  
+
   // Music Volume: Constant until section enters, then fades out by 20% into the section view
   const musicVolume = useTransform(splitProgress, [0, 0.2], [1, 0]);
 
@@ -306,7 +299,7 @@ export default function LandingPage() {
       // Set up video for optimal playback
       videoRef.current.muted = true;
       videoRef.current.volume = 0.5;
-      
+
       // Attempt to play with error handling
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
@@ -317,7 +310,7 @@ export default function LandingPage() {
           .catch(() => {
             // Autoplay was prevented, ensure muted and try again
             videoRef.current.muted = true;
-            videoRef.current.play().catch(() => {});
+            videoRef.current.play().catch(() => { });
           });
       }
     }
@@ -366,7 +359,7 @@ export default function LandingPage() {
   useMotionValueEvent(musicVolume, "change", (v) => {
     if (videoRef.current && !manuallyMuted) {
       videoRef.current.volume = v;
-      
+
       // Auto-mute/unmute based on scroll position only if NOT manually muted
       if (v <= 0 && !isMuted) {
         setIsMuted(true);
@@ -401,7 +394,7 @@ export default function LandingPage() {
     target: masteryRef,
     offset: ["start start", "end end"]
   });
-  
+
   // Transform vertical progress to horizontal movement
   // Recalibrated to -125vw for pixel-perfect edge alignment
   const masteryX = useTransform(masteryProgress, [0, 1], ["0vw", "-125vw"]);
@@ -416,6 +409,201 @@ export default function LandingPage() {
     }
   }, [activeFeature]);
 
+  // Filter for the logo based on theme
+  const logoFilter = isDark
+    ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)'
+    : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)';
+
+  if (isMobile) {
+
+  }
+
+
+  if (isMobile) {
+    return (
+      <div
+        className="min-h-screen relative font-sans selection:bg-accent/30 overflow-x-hidden max-w-[100vw]"
+        style={{
+          background: 'var(--bg-primary)',
+          color: 'var(--text-primary)',
+          transition: 'background-color 0.3s ease, color 0.3s ease'
+        }}
+      >
+        <Header />
+        <div className="flex flex-col w-full overflow-x-hidden relative" style={{ background: 'var(--bg-primary)' }}>
+          {/* Mobile Hero Section */}
+          <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120%] h-[500px] bg-accent/15 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-[20%] right-[-20%] w-[60%] h-[300px] bg-accent/10 blur-[80px] rounded-full pointer-events-none" />
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative z-10 text-center"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] border rounded-full bg-accent/5 mb-8" style={{ borderColor: 'var(--border)' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                <span style={{ color: 'var(--accent)' }}>The New Standard</span>
+              </div>
+              <h1 className="text-5xl font-black tracking-tighter leading-[0.9] mb-6" style={{ color: 'var(--text-primary)' }}>
+                THE TEAM YOU <br />
+                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--accent-light))' }}>NEVER HAD</span> <br />
+                TO BUILD
+              </h1>
+              <p className="text-base leading-relaxed mb-10 max-w-sm mx-auto font-medium opacity-70" style={{ color: 'var(--text-primary)' }}>
+                A fully departmentalized creative platform. Structured teams, escrow protection, and professional accountability.
+              </p>
+              <div className="flex flex-col gap-4">
+                <button
+                  onClick={() => navigate('/signup?role=client')}
+                  className="w-full py-6 bg-accent text-white font-bold tracking-widest uppercase text-sm rounded-2xl active:scale-95 transition-all shadow-[0_0_40px_rgba(var(--accent-rgb),0.4)]"
+                >
+                  Hire Elite Talent
+                </button>
+                <button
+                  onClick={() => navigate('/how-it-works')}
+                  className="w-full py-6 font-bold tracking-widest uppercase text-sm rounded-2xl active:scale-95 transition-transform backdrop-blur-sm border"
+                  style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
+                >
+                  How it Works
+                </button>
+              </div>
+            </motion.div>
+          </section>
+
+          {/* Agency vs Freelance (The Difference) */}
+          <section className="py-24 px-6 relative border-y" style={{ borderColor: 'var(--border)', background: 'linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary))' }}>
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--text-primary) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+            <div className="relative z-10">
+              <div className="text-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">The Distinction</div>
+              <h2 className="text-3xl font-bold tracking-tight mb-8 leading-tight" style={{ color: 'var(--text-primary)' }}>
+                Not a marketplace. <br />
+                <span className="opacity-60">A structured agency.</span>
+              </h2>
+              <div className="space-y-8">
+                {[
+                  { title: "Structured execution", desc: "Defined chain of command with professional leads." },
+                  { title: "Quality assurance", desc: "Momentum Supervisor reviews every single file." },
+                  { title: "On-time delivery", desc: "Timelines tracked live, delays flagged automatically." }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="mt-1.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center" style={{ background: 'rgba(var(--accent-rgb), 0.15)' }}>
+                      <CheckCircle size={14} className="text-accent" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                      <p className="text-xs leading-relaxed opacity-50" style={{ color: 'var(--text-primary)' }}>{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Pricing Section */}
+          <section className="py-20 border-b" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+            <div className="px-6 mb-12">
+              <div className="text-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">Investment</div>
+              <h2 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Structured Pricing</h2>
+            </div>
+            <PricingStrip />
+          </section>
+
+          {/* The Engine Grid */}
+          <section className="py-24 px-6" style={{ background: 'var(--bg-secondary)' }}>
+            <div className="mb-14 text-center">
+              <div className="text-accent text-[10px] font-bold uppercase tracking-[0.3em] mb-4">Core Architecture</div>
+              <h2 className="text-3xl font-bold tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>The Engine Behind <br />Every Move</h2>
+            </div>
+            <div className="grid grid-cols-1 gap-6">
+              {[
+                { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Complex projects are fragmented into precision-scoped micro-tasks for maximum speed and accuracy." },
+                { tag: "Security", title: "Milestone-Based Protection", desc: "Funds are secured within our protected environment the moment a project is posted, released only upon your final approval." },
+                { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "No bots. No algorithms. Every dispute is handled by a trained Dispute Handler with logic and fairness." },
+                { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement in the ecosystem is driven by hard data - accuracy, speed, and consistent quality." },
+                { tag: "Visibility", title: "Live Command Dashboard", desc: "Full visibility into your project's heartbeat. Track every single micro-task's progress in real time." },
+                { tag: "Quality", title: "Managed Quality Control", desc: "Each fragmented task is personally verified by a Momentum Supervisor before being merged." },
+                { tag: "Global", title: "Borderless Talent Pipeline", desc: "Access elite production specialists from every corner of the world through our vetted network." },
+                { tag: "Speed", title: "Parallel Execution Flow", desc: "Eliminate linear bottlenecks. Our architecture allows multiple departments to build, test, and refine simultaneously—cutting delivery times by up to 70%." }
+              ].map((item, i) => (
+                <div key={i} className="p-8 rounded-[2rem] border relative overflow-hidden" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[50px] rounded-full" />
+                  <div className="text-accent text-[9px] font-black uppercase mb-4 tracking-widest">{item.tag}</div>
+                  <h3 className="font-bold mb-3 text-lg" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                  <p className="text-sm leading-relaxed opacity-50" style={{ color: 'var(--text-primary)' }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="py-32 px-6 text-center relative overflow-hidden border-t" style={{ borderColor: 'var(--border)' }}>
+            <div className="absolute inset-0 bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
+            <h2 className="text-4xl font-black tracking-tighter mb-10 relative z-10 leading-[1.1]" style={{ color: 'var(--text-primary)' }}>
+              READY TO <br /><span className="text-accent">SCALE?</span>
+            </h2>
+            <button
+              onClick={() => navigate('/signup?role=client')}
+              className="relative z-10 w-full py-5 bg-accent text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_20px_50px_rgba(var(--accent-rgb),0.5)] active:scale-95 transition-transform"
+            >
+              Get Started
+            </button>
+          </section>
+
+          {/* Mobile Footer */}
+          <footer className="pt-20 pb-12 px-6 border-t relative z-30" style={{ background: '#0a0a0a', borderColor: 'rgba(255,255,255,0.06)', paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-end mb-6 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <img src={logo} alt="V" className="w-full h-full object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
+                </div>
+                <span className="font-extrabold text-xl" style={{ color: '#ffffff', letterSpacing: '-0.06em', marginLeft: '1px' }}>irtual</span>
+              </div>
+              <p className="font-medium text-xs leading-relaxed mb-8 max-w-xs opacity-60" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                The elite architecture for the creative economy. Managed execution, premium talent, and absolute accountability.
+              </p>
+
+              <div className="flex gap-4 mb-12">
+                <div className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors hover:bg-accent hover:border-accent hover:text-white cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' }}>
+                  <span className="font-bold text-xs tracking-wider">X</span>
+                </div>
+                <div className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors hover:bg-accent hover:border-accent hover:text-white cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' }}>
+                  <span className="font-bold text-xs tracking-wider">IN</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-10 mb-12 text-left w-full">
+                {[
+                  { title: "Platform", links: [["Pricing", "/pricing"], ["About", "/about"], ["How it Works", "/how-it-works"], ["Roles", "/roles"]] },
+                  { title: "Services", links: [["Video Editing", "/pricing"], ["Graphic Design", "/pricing"], ["3D Animation", "/pricing"], ["CGI & VFX", "/pricing"]] },
+                  { title: "Company", links: [["Careers", "#"], ["Blog", "#"], ["Press", "#"], ["Contact", "#"]] },
+                  { title: "Legal", links: [["Privacy", "#"], ["Terms", "#"], ["Cookies", "#"], ["Security", "#"]] },
+                ].map(col => (
+                  <div key={col.title} className="space-y-4">
+                    <h4 className="font-bold text-[10px] uppercase tracking-[0.2em]" style={{ color: '#ffffff' }}>{col.title}</h4>
+                    <div className="flex flex-col gap-3 text-sm font-medium">
+                      {col.links.map(([label, path]) => (
+                        <button key={label} onClick={() => navigate(path)} className="text-left opacity-60 hover:opacity-100 hover:text-accent transition-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="w-full pt-8 border-t flex flex-col items-center gap-4" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40 text-center" style={{ color: '#ffffff' }}>
+                  &copy; {new Date().getFullYear()} Virtual Inc. Defined by Excellence.
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -429,7 +617,7 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section (Sticky Parallax) */}
-      <section className="relative z-10" style={{ height: 'calc(100vh + 800px)' }}>
+      <section className="relative z-10" style={{ height: '200vh' }}>
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden z-20">
           {/* Background - video served from backend */}
           <div className="absolute inset-0 z-0 bg-black overflow-hidden">
@@ -449,7 +637,7 @@ export default function LandingPage() {
                 height: '100%',
                 minWidth: '100%',
                 transform: 'translateX(-50%)',
-                objectFit: 'contain',
+                objectFit: 'cover',
                 opacity: videoOpacity,
                 filter: 'brightness(1) contrast(1.1)',
                 willChange: 'opacity',
@@ -466,7 +654,6 @@ export default function LandingPage() {
 
           {/* Sound toggle - bottom right */}
           <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-8 z-50 flex flex-col items-end gap-2">
-            {/* Tooltip - shown when muted */}
             <AnimatePresence>
               {isMuted && (
                 <motion.div
@@ -503,6 +690,7 @@ export default function LandingPage() {
               {isMuted ? <VolumeX size={16} strokeWidth={1.5} /> : <Volume2 size={16} strokeWidth={1.5} />}
             </button>
           </div>
+
           <AnimatePresence>
             {showScrollCue && (
               <motion.button
@@ -511,8 +699,11 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16, transition: { duration: 0.35, ease: 'easeOut' } }}
-                className="absolute bottom-6 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white"
-              />
+                className="absolute bottom-6 left-1/2 z-40 -translate-x-1/2 text-white/75 transition-all hover:text-white flex flex-col items-center gap-2"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Scroll</span>
+                <div className="w-px h-12 bg-gradient-to-b from-white/50 to-transparent" />
+              </motion.button>
             )}
           </AnimatePresence>
 
@@ -527,7 +718,7 @@ export default function LandingPage() {
             style={{ opacity: heroOpacity, scale: heroScale, y: heroTextY }}
             className="relative z-50 flex flex-col items-center w-full max-w-4xl mx-auto px-4 sm:px-8"
           >
-            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}>
+            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full" style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb),0.2)', background: 'rgba(var(--accent-rgb),0.05)' }}>
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
               The New Standard
             </div>
@@ -555,9 +746,9 @@ export default function LandingPage() {
       </section>
 
       {/* Split Parallax (The Difference) */}
-      <section ref={splitRef} className="py-16 sm:pt-16 sm:pb-10 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+      <section ref={splitRef} className="pt-10 sm:pt-16 pb-16 sm:pb-10 relative z-20 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-          <motion.div style={{ y: leftY }} className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 sm:mb-8" style={{ color: 'var(--text-primary)' }}>
               Not a freelance platform. A structured creative agency.
             </h2>
@@ -576,7 +767,7 @@ export default function LandingPage() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
           <motion.div style={{ y: rightY }} className="relative w-full hidden md:flex flex-col justify-center gap-3 overflow-hidden h-[340px]">
             {/* Fade masks top/bottom */}
@@ -595,579 +786,546 @@ export default function LandingPage() {
                 dir: 1, speed: 30,
                 items: [
                   { label: 'Micro-Task Distribution', href: '/how-it-works#core-platform', available: true },
-                  { label: 'Escrow Protection',        href: '/about#escrow-protection',       available: true },
-                  { label: 'Quality Assurance',        href: '/about#quality-assurance',       available: true },
-                  { label: 'Structured Teams',         href: '/about#structured-teams',        available: true },
+                  { label: 'Escrow Protection', href: '/about#escrow-protection', available: true },
+                  { label: 'Quality Assurance', href: '/about#quality-assurance', available: true },
+                  { label: 'Structured Teams', href: '/about#structured-teams', available: true },
                 ],
               },
               {
                 dir: -1, speed: 24,
                 items: [
-                  { label: 'Project Initiator',    href: '/roles#project-initiator',    available: true },
-                  { label: 'Momentum Supervisor',  href: '/roles#momentum-supervisor',  available: true },
+                  { label: 'Project Initiator', href: '/roles#project-initiator', available: true },
+                  { label: 'Momentum Supervisor', href: '/roles#momentum-supervisor', available: true },
                   { label: 'Earn While You Learn', href: '/about#earn-while-you-learn', available: true },
-                  { label: 'Crate',                href: '/roles#crate',                available: true },
+                  { label: 'Crate', href: '/roles#crate', available: true },
                 ],
               },
               {
                 dir: 1, speed: 36,
                 items: [
-                  { label: 'Video Editing',   href: '/pricing#video_editing',    available: true },
-                  { label: 'Graphic Design',  href: '/pricing#graphic_designing', available: true },
-                  { label: '3D Animation',    href: '/pricing#3d_animation',     available: true },
-                  { label: 'CGI & VFX',       href: '/pricing#cgi',              available: true },
-                  { label: 'Script Writing',  href: '/pricing#script_writing',   available: true },
+                  { label: 'Video Editing', href: '/pricing#video_editing', available: true },
+                  { label: 'Graphic Design', href: '/pricing#graphic_designing', available: true },
+                  { label: '3D Animation', href: '/pricing#3d_animation', available: true },
+                  { label: 'CGI & VFX', href: '/pricing#cgi', available: true },
+                  { label: 'Script Writing', href: '/pricing#script_writing', available: true },
                 ],
               },
               {
                 dir: -1, speed: 28,
                 items: [
-                  { label: 'Merit-Based Promotion', href: '/roles#merit-based-promotion',   available: true },
-                  { label: 'Real Portfolio Work',   href: '/about#real-portfolio-work',     available: true },
-                  { label: 'Chain of Command',      href: '/about#chain-of-command',        available: true },
-                  { label: 'How a Project Works',   href: '/how-it-works#how-a-project-works', available: true },
+                  { label: 'Merit-Based Promotion', href: '/roles#merit-based-promotion', available: true },
+                  { label: 'Real Portfolio Work', href: '/about#real-portfolio-work', available: true },
+                  { label: 'Chain of Command', href: '/about#chain-of-command', available: true },
+                  { label: 'How a Project Works', href: '/how-it-works#how-a-project-works', available: true },
                 ],
               },
-            ].map((row, rowIdx) => {
-              const doubled = [...row.items, ...row.items, ...row.items];
-              return (
-                <div key={rowIdx} className="flex overflow-hidden">
-                  <motion.div
-                    className="flex gap-3 shrink-0"
-                    animate={{ x: row.dir === 1 ? ['0%', '-33.33%'] : ['-33.33%', '0%'] }}
-                    transition={{ duration: row.speed, repeat: Infinity, ease: 'linear' }}
-                  >
-                    {doubled.map((item, i) => (
-                      item.available ? (
-                        <a key={i} href={item.href}
-                          className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all hover:scale-105 cursor-pointer"
-                          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--bg-secondary)'; }}
-                        >
-                          {item.label}
-                        </a>
-                      ) : (
-                        <span key={i}
-                          className="shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap opacity-30 cursor-not-allowed"
-                          style={{ border: '1px dashed var(--border)', color: 'var(--text-secondary)', background: 'transparent' }}
-                          title="Coming soon"
-                        >
-                          {item.label}
-                        </span>
-                      )
-                    ))}
-                  </motion.div>
-                </div>
-              );
-            })}
+            ].map((row, i) => (
+              <div key={i} className="flex gap-3 whitespace-nowrap">
+                <motion.div
+                  animate={{ x: row.dir > 0 ? [-200, 0] : [0, -200] }}
+                  transition={{ duration: row.speed, repeat: Infinity, ease: "linear" }}
+                  className="flex gap-3"
+                >
+                  {[...row.items, ...row.items].map((item, j) => (
+                    <button
+                      key={j}
+                      onClick={() => navigate(item.href)}
+                      className="px-6 py-3 rounded-full border text-[11px] font-bold tracking-widest uppercase transition-all hover:bg-accent hover:text-white"
+                      style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </motion.div>
+              </div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Strip - right after split section */}
+      {/* Pricing Strip Section */}
       <PricingStrip />
+      {/* Mastery Section (Sticky Scrolling Feature Showroom) */}
+      <section ref={masteryRef} className="relative z-20 -mt-24 md:-mt-36">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col lg:flex-row gap-10">
 
-      {/* The Core Engine */}
-      <section className="relative z-20" style={{ background: 'var(--bg-primary)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {/* Left Side: Sticky Professional UI Dashboard */}
+          <div className="w-full lg:w-1/2 sticky top-0 h-screen flex items-center justify-center z-10">
+            <div className="relative w-full aspect-[16/10] max-w-xl border rounded-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.3)] bg-white/[0.01] backdrop-blur-sm" style={{ borderColor: 'var(--border)' }}>
 
-          {/* Mobile: simple stacked cards */}
-          <div className="lg:hidden py-12 space-y-10">
-            {[
-              { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist - not just whoever is available." },
-              { tag: "Security", title: "Wallet & Escrow Protection", desc: "Funds lock into escrow when a project is posted. Released only after you formally approve the completed work." },
-              { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "Every dispute is handled by a trained Dispute Handler - not a chatbot. A structured meeting with all parties inside Virtual's own video meet window." },
-              { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement is driven by data - accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically." },
-              { tag: "Visibility", title: "Live Command Dashboard", desc: "See every micro-task in real time - in progress, under review, completed. Communicate directly with your Project Initiator." },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="p-6 rounded-2xl border"
-                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-              >
-                <div className="text-xs font-bold uppercase tracking-[0.3em] mb-3 bg-clip-text text-transparent"
-                  style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>
-                  {item.tag}
-                </div>
-                <h3 className="text-xl font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
-                <p className="text-sm leading-relaxed opacity-80" style={{ color: 'var(--text-secondary)' }}>{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+              {/* Window Header (Apple Style) */}
+              <div className="h-8 border-b flex items-center px-4 gap-1.5" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/20" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/20" />
+                <div className="ml-4 h-3 w-32 rounded-full bg-white/5" />
+              </div>
 
-          {/* Desktop: original sticky parallax layout */}
-          <div className="hidden lg:flex flex-row gap-20">
-            {/* Left sticky graphics panel */}
-            <div className="lg:w-1/2 h-screen sticky top-0 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
-              <div className="light-texture" />
-              <div className="light-vignette" />
-              
-              {/* Feature 0 Overlay: Blocked Task Distribution (The Fragmentation Engine) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ 
-                  opacity: activeFeature === 0 ? 1 : 0,
-                  scale: activeFeature === 0 ? 1 : 0.95,
-                  y: activeFeature === 0 ? 0 : 20
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center justify-center overflow-hidden"
-              >
-                <div className="relative w-full h-full p-20 overflow-hidden">
-                  {/* The Fragmentation Engine - Continuous Loop */}
-                  <AnimatePresence mode="popLayout">
-                    {activeFeature === 0 && (
-                      <motion.div
-                        key={taskSetKey}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ x: "120%", opacity: 0 }}
-                        transition={{ duration: 1, ease: [0.45, 0, 0.55, 1] }}
-                        className="absolute inset-x-20 inset-y-40"
-                      >
-                        {/* Background Data Glows */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(124,58,237,0.05)_0%,_transparent_100%)]"></div>
+              {/* Feature Content Area */}
+              <div className="p-10 h-full relative overflow-hidden">
 
-                        {/* Structured Task Registry Blocks */}
-                        <div className="grid grid-cols-4 grid-rows-6 gap-6 h-full">
-                          {[...Array(24)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ opacity: 0, x: -100, scale: 0.8 }}
-                              animate={{ opacity: 1, x: 0, scale: 1 }}
-                              transition={{
-                                duration: 0.5,
-                                delay: i * 0.05,
-                                ease: "easeOut"
-                              }}
-                              className="group relative border bg-white/[0.02] backdrop-blur-md rounded-sm overflow-hidden flex flex-col justify-between p-4"
-                              style={{ borderColor: 'var(--border)' }}
-                              whileHover={{ borderColor: 'var(--accent)', transition: { duration: 0.2 } }}
-                            >
-                              {/* Animated Filling Bar */}
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
-                                transition={{ duration: 1, delay: 0.5 + i * 0.05 }}
-                                className="absolute top-0 left-0 h-0.5"
-                                style={{ backgroundColor: 'var(--accent)', opacity: 0.4 }}
-                              ></motion.div>
-
-                              <div className="flex justify-between items-start">
-                                <div className="w-8 h-1 rounded-full" style={{ backgroundColor: 'var(--border)' }}></div>
-                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--accent)' }}></div>
-                              </div>
-
-                              <div className="space-y-1.5 mt-auto">
-                                <div className="w-full h-1 bg-white/5 rounded-full"></div>
-                                <div className="w-2/3 h-1 bg-white/5 rounded-full"></div>
-                              </div>
-
-                              {/* Hover Effect */}
-                              <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity" style={{ background: 'var(--accent)' }}></div>
-                            </motion.div>
-                          ))}
-                        </div>
-
-                        {/* Distribution Signal Lines */}
-                        <svg className="absolute inset-[-40px] w-[calc(100%+80px)] h-[calc(100%+80px)] pointer-events-none" style={{ opacity: 0.1 }}>
-                          {[...Array(6)].map((_, i) => (
-                            <motion.line
-                              key={i}
-                              initial={{ pathLength: 0 }}
-                              animate={{ pathLength: 1 }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                              x1="0" y1={`${i * 20}%`}
-                              x2="100%" y2={`${i * 20}%`}
-                              stroke="var(--text-primary)"
-                              strokeWidth={1}
-                            />
-                          ))}
-                        </svg>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-
-              {/* Feature 1 Overlay: Sovereign Escrow (The Vault) - Kept as requested "second is good" */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ 
-                  opacity: activeFeature === 1 ? 1 : 0,
-                  scale: activeFeature === 1 ? 1 : 0.95,
-                  y: activeFeature === 1 ? 0 : 20
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, var(--anim-glow) 0%, transparent 50%)', opacity: 0.03 }}></div>
-                {[...Array(12)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    animate={{
-                      rotate: i % 2 === 0 ? [0, 90] : [0, -90],
-                      scale: [1, 1.05, 1],
-                      borderColor: i < 3 ? 'var(--accent)' : 'var(--border)',
-                      boxShadow: i === 0 ? 'var(--anim-shadow)' : 'none'
-                    }}
-                    transition={{
-                      duration: 12 + i * 2,
-                      repeat: Infinity,
-                      delay: i * 0.5,
-                      ease: "linear"
-                    }}
-                    className="absolute border border-t-2 border-l-2 rounded-[2rem]"
-                    style={{
-                      width: `${240 + i * 80}px`,
-                      height: `${240 + i * 80}px`,
-                      opacity: 0.25 - (i * 0.02),
-                      borderStyle: 'solid',
-                      borderWidth: i < 1 ? '1px' : '0.5px'
-                    }}
-                  />
-                ))}
-                {/* Central Security Icon - Muted Sophistication */}
-                <div className="z-10 opacity-25 relative animate-pulse-slow" style={{ color: 'var(--text-secondary)' }}>
-                  <ShieldCheck size={360} strokeWidth={0.3} />
-                </div>
-              </motion.div>
-
-              {/* Feature 2 Overlay: Managed Resolution (The Grid Protocol) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ 
-                  opacity: activeFeature === 2 ? 1 : 0,
-                  scale: activeFeature === 2 ? 1 : 0.95,
-                  y: activeFeature === 2 ? 0 : 20
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center justify-center p-20 overflow-hidden"
-              >
-                <div className="w-full max-w-4xl relative flex items-center justify-between z-10">
-                  {/* Left Station (Client) */}
-                  <motion.div
-                    key="left-station"
-                    animate={{ x: activeFeature === 2 ? 0 : -50, opacity: activeFeature === 2 ? 1 : 0 }}
-                    className="flex flex-col items-center gap-6"
-                  >
-                    <div className="w-24 h-48 border backdrop-blur-xl relative flex items-center justify-center overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-                      <Users size={40} style={{ color: 'var(--text-secondary)', opacity: 0.2 }} strokeWidth={1} />
-                      {/* Station Scanline */}
-                      <motion.div
-                        animate={{ y: ['-100%', '200%'] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        className="absolute inset-x-0 h-10 bg-gradient-to-b from-transparent via-accent/5 to-transparent"
-                        style={{ backgroundImage: 'linear-gradient(to bottom, transparent, var(--accent), transparent)', opacity: 0.1 }}
-                      />
+                {/* Feature 0: Intelligence (Task Fragmentation UI) */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: activeFeature === 0 ? 1 : 0 }}
+                  className="absolute inset-0 p-10 flex flex-col justify-center"
+                >
+                  <div className="flex items-center gap-8 h-full">
+                    {/* Input Block */}
+                    <div className="w-1/3 border rounded-2xl p-6 flex flex-col justify-center gap-4 relative z-10 shadow-lg" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)' }}>
+                        <Layers size={20} className="text-accent" />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-2.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
+                        <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-2 w-2/3 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      </div>
                     </div>
-                  </motion.div>
 
-                  {/* The Grid Conduit */}
-                  <div className="flex-1 h-64 relative flex flex-col justify-center items-center">
-                    {/* Central Protocol Router */}
-                    <motion.div
-                      key="router"
-                      animate={{
-                        borderColor: activeFeature === 2 ? 'var(--accent)' : 'var(--border)',
-                        boxShadow: activeFeature === 2 ? '0 0 20px rgba(96,10,10,0.2)' : '0 0 0px transparent'
-                      }}
-                      className="w-40 h-40 border bg-secondary backdrop-blur-3xl z-20 flex flex-col p-6 justify-around relative"
-                      style={{ background: 'var(--bg-secondary)' }}
-                    >
+                    {/* Connecting Lines */}
+                    <div className="flex-1 relative h-full flex flex-col justify-center gap-4">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-1.5 w-full rounded-full overflow-hidden relative z-10" style={{ background: 'var(--border)' }}>
+                        <div key={i} className="flex-1 relative flex items-center w-full">
+                          <div className="absolute w-full h-[1px]" style={{ backgroundColor: 'var(--border)' }} />
                           <motion.div
-                            animate={{ x: ['-100%', '100%'] }}
-                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-                            className="h-full w-12"
-                            style={{ background: 'var(--accent)', opacity: 0.4 }}
+                            animate={{ left: ['0%', '100%'] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: i * 0.3 }}
+                            className="absolute w-12 h-[2px] bg-accent shadow-[0_0_8px_rgba(var(--accent-rgb),0.8)]"
                           />
                         </div>
                       ))}
+                    </div>
+
+                    {/* Output Processors */}
+                    <div className="w-1/3 space-y-4 relative z-10">
+                      {[...Array(3)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ x: 20, opacity: 0 }}
+                          animate={{ x: activeFeature === 0 ? 0 : 20, opacity: activeFeature === 0 ? 1 : 0 }}
+                          transition={{ delay: 0.1 * i }}
+                          className="border rounded-xl p-4 flex items-center gap-4 bg-opacity-50 backdrop-blur-md"
+                          style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
+                        >
+                          <motion.div
+                            animate={{ rotate: activeFeature === 0 ? 360 : 0 }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                            className="w-6 h-6 border-2 border-dashed rounded-full border-accent/40"
+                          />
+                          <div className="space-y-1.5 flex-1">
+                            <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                            <div className="h-1 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Feature 1: Milestone Protection (Professional Layout) */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: activeFeature === 1 ? 1 : 0, scale: activeFeature === 1 ? 1 : 0.98 }}
+                  className="absolute inset-0 p-10 flex flex-col gap-6"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={18} className="text-accent" />
+                        <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      </div>
+                      <div className="text-5xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>$12,450<span className="text-3xl opacity-50">.00</span></div>
+                    </div>
+                    <div className="px-3 py-1.5 rounded-md border text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-sm" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)', borderColor: 'rgba(var(--accent-rgb), 0.3)', color: 'var(--accent)' }}>
+                      <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-2 h-2 rounded-full bg-accent" />
+                      Vault Secured
+                    </div>
+                  </div>
+
+                  <div className="flex-1 grid grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-xl p-5 flex flex-col justify-between relative overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                        <motion.div
+                          animate={{ opacity: activeFeature === 1 ? [0, 0.1, 0] : 0 }}
+                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                          className="absolute inset-0 bg-accent"
+                        />
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center border bg-opacity-50" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                          <CheckCircle2 size={12} className="text-accent" />
+                        </div>
+                        <div className="space-y-2 mt-4 relative z-10">
+                          <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'var(--text-secondary)' }} />
+                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                          <div className="h-1.5 w-2/3 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Feature 2: Dispute (Professional Review UI) */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: activeFeature === 2 ? 1 : 0, x: activeFeature === 2 ? 0 : 20 }}
+                  className="absolute inset-0 p-10 flex flex-col gap-4"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                    <div className="flex gap-2">
+                      <div className="h-6 w-16 rounded-lg border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }} />
+                      <div className="h-6 w-16 rounded-lg border flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)', borderColor: 'rgba(var(--accent-rgb), 0.2)' }}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                        <div className="h-1.5 w-6 rounded-full bg-accent/50" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 relative border rounded-xl overflow-hidden p-6 space-y-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                    {/* Left side message */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: activeFeature === 2 ? 1 : 0, x: activeFeature === 2 ? 0 : -20 }}
+                      transition={{ duration: 0.5 }}
+                      className="flex items-start gap-3 w-[85%]"
+                    >
+                      <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }} />
+                      <div className="space-y-2 flex-1 border rounded-lg p-3" style={{ borderColor: 'var(--border)' }}>
+                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-2/3 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      </div>
                     </motion.div>
 
-                    {/* Perfect Alignment Lines (Horizontal Conduit) */}
-                    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-24 flex flex-col justify-between pointer-events-none px-4">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="w-full h-px relative" style={{ background: 'var(--border)' }}>
+                    {/* Right side message */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: activeFeature === 2 ? 1 : 0, x: activeFeature === 2 ? 0 : 20 }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      className="flex items-start gap-3 w-[85%] ml-auto flex-row-reverse"
+                    >
+                      <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }} />
+                      <div className="space-y-2 flex-1 border rounded-lg p-3" style={{ borderColor: 'var(--border)' }}>
+                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-1/2 rounded-full ml-auto" style={{ backgroundColor: 'var(--border)' }} />
+                      </div>
+                    </motion.div>
+
+                    {/* Dispute Handler Intervention */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                      animate={{ opacity: activeFeature === 2 ? 1 : 0, scale: activeFeature === 2 ? 1 : 0.9, y: activeFeature === 2 ? 0 : 20 }}
+                      transition={{ duration: 0.5, delay: 0.8 }}
+                      className="absolute bottom-6 left-6 right-6 border rounded-xl flex items-center px-4 py-3 justify-between shadow-xl backdrop-blur-md"
+                      style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)', borderColor: 'rgba(var(--accent-rgb), 0.3)' }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          animate={{ rotate: activeFeature === 2 ? [-15, 15, -15] : 0 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center bg-accent"
+                        >
+                          <Gavel size={14} className="text-white" />
+                        </motion.div>
+                        <div>
+                          <div className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1">Human Handler</div>
+                          <div className="h-1.5 w-24 rounded-full" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.3)' }} />
+                        </div>
+                      </div>
+                      <div className="px-3 py-1 rounded-md bg-accent text-white text-[9px] font-bold uppercase tracking-widest shadow-lg">Resolved</div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Feature 3: Growth (Analytics UI) */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: activeFeature === 3 ? 1 : 0 }}
+                  className="absolute inset-0 p-10 flex flex-col"
+                >
+                  <div className="flex justify-between items-end mb-8">
+                    <div className="space-y-2">
+                      <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      <div className="text-4xl font-bold tracking-tighter" style={{ color: 'var(--text-primary)' }}>+42.8%</div>
+                    </div>
+                    <div className="flex gap-1 items-end h-8 relative">
+                      {[0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 1].map((h, i) => (
+                        <div key={i} className="relative h-full flex items-end">
                           <motion.div
-                            animate={{
-                              x: activeFeature === 2 ? ['0%', '100%'] : '0%'
-                            }}
-                            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                            className="absolute top-0 w-2 h-full"
-                            style={{ background: 'var(--accent)' }}
+                            animate={{ opacity: activeFeature === 3 ? [0, 1, 0] : 0, y: activeFeature === 3 ? [0, -15] : 0 }}
+                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                            className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-bold text-accent whitespace-nowrap"
+                          >
+                            +{Math.round(h * 20)}
+                          </motion.div>
+                          <motion.div
+                            animate={{ height: activeFeature === 3 ? [`${h * 100}%`, `${Math.max(0.2, h - 0.2) * 100}%`, `${h * 100}%`] : '10%' }}
+                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
+                            className="w-2 rounded-t-sm"
+                            style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.3)' }}
                           />
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Right Station (Specialist) */}
-                  <motion.div
-                    key="right-station"
-                    animate={{ x: activeFeature === 2 ? 0 : 50, opacity: activeFeature === 2 ? 1 : 0 }}
-                    className="flex flex-col items-center gap-6"
-                  >
-                    <div className="w-24 h-48 border backdrop-blur-xl relative flex items-center justify-center overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-                      <Users size={40} style={{ color: 'var(--text-secondary)', opacity: 0.2 }} strokeWidth={1} />
-                      <motion.div
-                        animate={{ y: ['200%', '-100%'] }}
-                        transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                        className="absolute inset-x-0 h-10 bg-gradient-to-t from-transparent to-transparent"
-                        style={{ backgroundImage: 'linear-gradient(to top, transparent, var(--accent), transparent)', opacity: 0.1 }}
+                  <div className="flex-1 relative border-l border-b" style={{ borderColor: 'var(--border)' }}>
+                    <svg className="w-full h-full overflow-visible">
+                      <motion.path
+                        d="M 0 150 Q 50 140 100 120 T 200 130 T 300 80 T 400 20"
+                        fill="none"
+                        stroke="var(--accent)"
+                        strokeWidth="2"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: activeFeature === 3 ? 1 : 0 }}
+                        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                       />
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
+                      <motion.circle
+                        r="4" fill="var(--accent)"
+                        initial={{ offsetDistance: "0%" }}
+                        animate={{ offsetDistance: activeFeature === 3 ? "100%" : "0%" }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        style={{ offsetPath: 'path("M 0 150 Q 50 140 100 120 T 200 130 T 300 80 T 400 20")' }}
+                      />
+                      <motion.circle
+                        r="10" fill="rgba(var(--accent-rgb), 0.3)"
+                        initial={{ offsetDistance: "0%" }}
+                        animate={{ offsetDistance: activeFeature === 3 ? "100%" : "0%", scale: activeFeature === 3 ? [1, 1.5, 1] : 1 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        style={{ offsetPath: 'path("M 0 150 Q 50 140 100 120 T 200 130 T 300 80 T 400 20")' }}
+                      />
+                    </svg>
+                  </div>
+                </motion.div>
 
-              {/* Feature 3 Overlay: Active Meritocracy (Unified Precision SVG) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ 
-                  opacity: activeFeature === 3 ? 1 : 0,
-                  scale: activeFeature === 3 ? 1 : 0.95,
-                  y: activeFeature === 3 ? 0 : 20
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center justify-center p-10 overflow-hidden"
-              >
-                <div className="relative w-full aspect-video max-h-[500px]">
-                  <svg viewBox="0 0 1000 500" className="w-full h-full z-30 pointer-events-none overflow-visible">
-                    {/* Define Data Points for shared coordinate system */}
-                    {/* [x, height] pairs */}
-                    {[
-                      [100, 120], [200, 180], [300, 140], [400, 280], [500, 220],
-                      [600, 350], [700, 300], [800, 420], [900, 380], [980, 480]
-                    ].map((point, i) => (
-                      <g key={i}>
-                        {/* Unified Bars (motion.rect) */}
-                        <motion.rect
-                          x={point[0] - 25}
-                          width="50"
-                          initial={{ height: 0, y: 500 }}
+                {/* Feature 4: Live Command Dashboard */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: activeFeature === 4 ? 1 : 0, y: activeFeature === 4 ? 0 : 10 }}
+                  className="absolute inset-0 p-10 flex flex-col gap-4"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="h-3 w-40 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                    <div className="flex items-center gap-2 px-2 py-1 border rounded-md" style={{ borderColor: 'var(--border)' }}>
+                      <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Live Sync</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 h-full">
+                    <div className="col-span-2 border rounded-xl p-4 flex flex-col gap-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0" style={{ borderColor: 'var(--border)' }}>
+                          <div className="flex items-center gap-3">
+                            <motion.div
+                              animate={{ opacity: activeFeature === 4 ? [0.3, 1, 0.3] : 0.3 }}
+                              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                              className="w-2 h-2 rounded-full" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.4)' }}
+                            />
+                            <div className="space-y-1.5">
+                              <div className="h-2 w-24 rounded-full" style={{ backgroundColor: 'var(--text-secondary)', opacity: 0.5 }} />
+                              <div className="text-[8px] font-mono tracking-wider" style={{ color: 'var(--text-secondary)' }}>TSK-{1042 + i}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-1 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border)' }}>
+                              <motion.div animate={{ width: ['0%', '100%'] }} transition={{ duration: 3 + i, repeat: Infinity }} className="h-full bg-accent" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="col-span-1 border rounded-xl p-4 flex flex-col gap-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                      <div className="aspect-square rounded-lg border flex items-center justify-center relative overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+                        <Globe size={40} className="text-accent opacity-20 absolute" />
+                        <motion.div animate={{ scale: [1, 2], opacity: [0.5, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-4 h-4 rounded-full border border-accent absolute" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent absolute" />
+                      </div>
+                      <div className="space-y-2 flex-1">
+                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Feature 5: Quality (Checklist Verification UI) */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: activeFeature === 5 ? 1 : 0, scale: activeFeature === 5 ? 1 : 0.98 }}
+                  className="absolute inset-0 p-10 flex flex-col gap-6"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)' }}>
+                        <CheckCircle2 size={20} className="text-accent" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="text-[12px] font-bold uppercase tracking-widest text-accent">Quality Protocol</div>
+                        <div className="h-2 w-24 rounded-full" style={{ backgroundColor: 'var(--text-secondary)', opacity: 0.5 }} />
+                      </div>
+                    </div>
+                    <motion.div
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="px-3 py-1.5 rounded-md bg-accent text-white text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                    >
+                      Active
+                    </motion.div>
+                  </div>
+
+                  <div className="flex-1 grid grid-cols-2 gap-4">
+                    {['Source Validation', 'Syntax Integrity', 'Logic Consistency', 'Final Sign-off'].map((label, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: activeFeature === 5 ? 1 : 0, x: activeFeature === 5 ? 0 : -10 }}
+                        transition={{ duration: 0.5, delay: i * 0.1 }}
+                        className="flex flex-col justify-center p-5 rounded-xl border relative overflow-hidden"
+                        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="text-[12px] font-bold" style={{ color: 'var(--text-primary)' }}>{label}</div>
+                          <motion.div
+                            animate={{
+                              backgroundColor: activeFeature === 5 ? ['rgba(var(--text-secondary-rgb), 0.1)', 'rgba(34, 197, 94, 0.2)', 'rgba(var(--text-secondary-rgb), 0.1)'] : 'rgba(var(--text-secondary-rgb), 0.1)',
+                              borderColor: activeFeature === 5 ? ['var(--border)', 'rgba(34, 197, 94, 0.5)', 'var(--border)'] : 'var(--border)'
+                            }}
+                            transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                            className="w-8 h-8 rounded-full border flex items-center justify-center"
+                          >
+                            <motion.div
+                              animate={{ scale: activeFeature === 5 ? [0, 1, 0] : 0 }}
+                              transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
+                            >
+                              <CheckCircle2 size={16} className="text-green-500" />
+                            </motion.div>
+                          </motion.div>
+                        </div>
+                        <div className="space-y-2 relative z-10 w-2/3">
+                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                          <div className="h-1.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Feature 6: Pipeline (Global Map UI) */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: activeFeature === 6 ? 1 : 0, scale: activeFeature === 6 ? 1 : 0.98 }}
+                  className="absolute inset-0 p-10 flex flex-col"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="h-3 w-48 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                    <div className="px-3 py-1 border rounded-full text-[9px] font-bold uppercase tracking-widest text-accent flex items-center gap-2" style={{ borderColor: 'rgba(var(--accent-rgb), 0.3)', backgroundColor: 'rgba(var(--accent-rgb), 0.05)' }}>
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> Live Network
+                    </div>
+                  </div>
+
+                  <div className="flex-1 grid grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="border rounded-xl p-5 flex flex-col justify-between relative overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                        {/* Scanning background glow */}
+                        <motion.div
+                          animate={{ opacity: activeFeature === 6 ? [0, 0.1, 0] : 0 }}
+                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                          className="absolute inset-0 bg-accent"
+                        />
+
+                        <div className="flex justify-between items-start relative z-10">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                            <Globe size={14} className="text-accent/70" />
+                          </div>
+                          <motion.div
+                            animate={{ opacity: activeFeature === 6 ? [0.2, 1, 0.2] : 0.2 }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                            className="w-2 h-2 rounded-full bg-accent shadow-[0_0_5px_rgba(var(--accent-rgb),1)]"
+                          />
+                        </div>
+
+                        <div className="space-y-2 relative z-10 mt-6">
+                          <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: 'var(--text-secondary)' }} />
+                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                          <div className="h-1.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Feature 7: Speed (Parallel Execution UI) */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: activeFeature === 7 ? 1 : 0 }}
+                  className="absolute inset-0 p-10 flex flex-col justify-center gap-6"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                    <div className="h-3 w-16 rounded-full" style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.2)' }} />
+                  </div>
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="space-y-3 relative">
+                      <div className="flex justify-between items-center">
+                        <div className="h-1.5 w-24 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="text-[9px] font-bold text-accent">Active</div>
+                      </div>
+                      <div className="h-1 w-full rounded-full overflow-hidden relative" style={{ backgroundColor: 'var(--border)' }}>
+                        <motion.div
                           animate={{
-                            height: activeFeature === 3 ? [0, 0, point[1], point[1], 0] : 0,
-                            y: activeFeature === 3 ? [500, 500, 500 - point[1], 500 - point[1], 500] : 500,
-                            fill: activeFeature === 3 ? ['transparent', 'transparent', 'var(--accent)', 'var(--accent)', 'transparent'] : 'transparent'
+                            left: activeFeature === 7 ? ['-100%', '100%'] : '-100%',
                           }}
                           transition={{
-                            duration: 6,
-                            times: [0, (i * 0.07), (i * 0.07) + 0.05, 0.85, 1],
+                            duration: 1.5 + i * 0.2,
                             repeat: Infinity,
                             ease: "linear"
                           }}
-                          stroke="var(--accent)"
-                          strokeOpacity="0.2"
-                          strokeWidth="1"
-                          style={{ fillOpacity: 0.15 }}
+                          className="absolute inset-y-0 w-1/3"
+                          style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.4)' }}
                         />
-                      </g>
-                    ))}
-
-                    <motion.path
-                      animate={{
-                        pathLength: activeFeature === 3 ? [0, 1, 1, 0] : 0,
-                        opacity: activeFeature === 3 ? [0, 1, 1, 0] : 0
-                      }}
-                      transition={{
-                        duration: 6,
-                        times: [0, 0.7, 0.85, 1],
-                        repeat: Infinity,
-                        ease: "linear"
-                      }}
-                      d="M 100 380 L 200 320 L 300 360 L 400 220 L 500 280 L 600 150 L 700 200 L 800 80 L 900 120 L 980 20"
-                      fill="none" stroke="var(--accent)" strokeWidth="6"
-                      style={{ filter: 'drop-shadow(var(--anim-shadow))' }}
-                    />
-
-                    {/* Synchronized Pulse Tracker */}
-                    <motion.circle
-                      r="12" fill="var(--accent)"
-                      animate={{
-                        offsetDistance: activeFeature === 3 ? ["0%", "100%", "100%", "0%"] : "0%",
-                        opacity: activeFeature === 3 ? [0, 1, 1, 0] : 0
-                      }}
-                      transition={{
-                        duration: 6,
-                        times: [0, 0.7, 0.85, 1],
-                        repeat: Infinity,
-                        ease: "linear"
-                      }}
-                      style={{
-                        offsetPath: 'path("M 100 380 L 200 320 L 300 360 L 400 220 L 500 280 L 600 150 L 700 200 L 800 80 L 900 120 L 980 20")',
-                        filter: 'drop-shadow(var(--anim-shadow))'
-                      }}
-                    />
-                  </svg>
-                </div>
-              </motion.div>
-
-              {/* Feature 4 Overlay: Abstract Dashboard Architecture (No Text, Pure Geometry) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ 
-                  opacity: activeFeature === 4 ? 1 : 0,
-                  scale: activeFeature === 4 ? 1 : 0.95,
-                  y: activeFeature === 4 ? 0 : 20
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0 p-12 overflow-hidden flex items-center justify-center"
-              >
-                <div className="grid grid-cols-2 gap-10 w-full max-w-4xl relative z-10">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                      animate={{
-                        opacity: activeFeature === 4 ? 1 : 0,
-                        scale: activeFeature === 4 ? 1 : 0.9,
-                        y: activeFeature === 4 ? 0 : 30,
-                        borderColor: activeFeature === 4 ? 'var(--accent)' : 'var(--border)',
-                        boxShadow: activeFeature === 4 ? 'var(--anim-shadow)' : '0 0 0px transparent'
-                      }}
-                      transition={{ delay: i * 0.1 }}
-                      className="aspect-video border rounded-2xl p-8 relative overflow-hidden flex flex-col justify-between"
-                      style={{ background: 'var(--bg-secondary)', backdropFilter: 'blur(20px)' }}
-                    >
-                      {/* Abstract UI Elements */}
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-2 rounded-full" style={{ background: 'var(--border)' }}></div>
-                        <div className="w-4 h-4 rounded-sm border" style={{ borderColor: 'var(--border)' }}></div>
                       </div>
-
-                      <div className="space-y-4">
-                        <div className="flex gap-2">
-                          {[...Array(6)].map((_, j) => (
-                            <motion.div
-                              key={j}
-                              animate={{ opacity: [0.1, 0.5, 0.1] }}
-                              transition={{ duration: 1, delay: j * 0.1, repeat: Infinity }}
-                              className="w-full h-8 border"
-                              style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}
-                            />
-                          ))}
-                        </div>
-                        <div className="h-1 w-full relative overflow-hidden" style={{ background: 'var(--border)' }}>
-                          <motion.div
-                            animate={{ x: ['-100%', '100%'] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="absolute inset-0 w-20"
-                            style={{ background: 'var(--accent)', opacity: 0.2 }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Moving Scanline Grid */}
-                      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(var(--text-primary) 1px, transparent 1px)', backgroundSize: '100% 10px' }}></div>
-                    </motion.div>
+                    </div>
                   ))}
-
-                  {/* Wired central mesh interconnects */}
-                  <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" style={{ stroke: 'var(--accent)' }} strokeWidth="1">
-                    <circle cx="50%" cy="50%" r="40" fill="none" strokeDasharray="4 4" className="animate-spin-slow" />
-                    <line x1="0" y1="50%" x2="100%" y2="50%" strokeOpacity="0.2" />
-                    <line x1="50%" y1="0" x2="50%" y2="100%" strokeOpacity="0.2" />
-                  </svg>
-                </div>
-              </motion.div>
-
-              {/* Technical Blueprint Elements */}
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)', backgroundSize: '80px 80px' }}></div>
-
-              <div className="absolute left-10 bottom-10 flex flex-col gap-3">
-                {[0, 1, 2, 3, 4].map(idx => (
-                  <div key={idx} className={`w-1 transition-all duration-700 rounded-full ${activeFeature === idx ? 'h-12 bg-white shadow-glow-sm' : 'h-3 bg-white/10'}`}></div>
-                ))}
+                </motion.div>
               </div>
             </div>
+          </div>
 
-            <div className="w-full lg:w-1/2">
-              {[
-                {
-                  tag: "Intelligence",
-                  title: "Micro-Task Distribution Engine",
-                  desc: "Projects are fragmented into precision-scoped tasks. AI-driven mastery tiers match each task to the right specialist - not just whoever is available.",
-                  color: "from-accent to-forest"
-                },
-                {
-                  tag: "Security",
-                  title: "Wallet & Escrow Protection",
-                  desc: "Funds lock into escrow when a project is posted. Released only after you formally approve the completed work. Neither side can lose without the other delivering.",
-                  color: "from-forest to-accent"
-                },
-                {
-                  tag: "Accountability",
-                  title: "Human-Led Dispute Resolution",
-                  desc: "Every dispute is handled by a trained Dispute Handler - not a chatbot. A structured meeting with all parties, inside Virtual's own built-in video meet window.",
-                  color: "from-accent to-forest"
-                },
-                {
-                  tag: "Meritocracy",
-                  title: "Algorithmic Growth System",
-                  desc: "Advancement is driven by data - accuracy, speed, and volume. When metrics cross a threshold, the system promotes automatically. No bias, no opinions.",
-                  color: "from-forest to-accent"
-                },
-                {
-                  tag: "Visibility",
-                  title: "Live Command Dashboard",
-                  desc: "See every micro-task in real time - in progress, under review, completed. Communicate directly with your Project Initiator without leaving the dashboard.",
-                  color: "from-accent to-forest"
-                }
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  onViewportEnter={() => setActiveFeature(i)}
-                  viewport={{ amount: 0.5 }}
-                  className="h-screen flex flex-col justify-center px-10 lg:px-24 relative"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ amount: 0.3 }}
-                    transition={{ duration: 0.8 }}
-                    className="max-w-xl relative z-10"
-                  >
-                    <div className="text-xs font-bold uppercase tracking-[0.4em] mb-8 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--accent), var(--forest))` }}>
-                      {item.tag}
-                    </div>
-                    <h3 className="text-4xl md:text-6xl font-bold mb-10 tracking-tighter leading-[1.1]" style={{ color: 'var(--text-primary)' }}>
-                      {item.title}
-                    </h3>
-                    <p className="text-xl md:text-2xl font-normal leading-relaxed opacity-90" style={{ color: 'var(--text-secondary)' }}>
-                      {item.desc}
-                    </p>
-
-                    <div className="mt-12 flex items-center gap-4 group cursor-default" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
-                      <span className="text-sm font-bold uppercase tracking-widest">System Protocol {i + 1}</span>
-                      <div className="h-px w-20 transition-all duration-500 overflow-hidden" style={{ background: 'var(--border)' }}>
-                        <motion.div
-                          initial={{ x: '-100%' }}
-                          animate={{ x: activeFeature === i ? '100%' : '-100%' }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                          className="h-full w-full"
-                          style={{ background: 'var(--accent)' }}
-                        ></motion.div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Vertical Progress Line Fragment */}
-                  <div className="absolute left-6 h-1/2 w-px hidden lg:block" style={{ background: 'linear-gradient(to bottom, transparent, var(--border), transparent)' }}></div>
-                </motion.div>
-              ))}
-            </div>
-          </div>{/* end desktop flex */}
+          {/* Right Side: Normal Scrolling Descriptions */}
+          <div className="w-full lg:w-1/2 pt-[35vh] pb-[15vh]">
+            {[
+              { tag: "Intelligence", title: "Micro-Task Distribution Engine", desc: "Complex projects are fragmented into precision-scoped micro-tasks for maximum speed and accuracy." },
+              { tag: "Security", title: "Milestone-Based Protection", desc: "Funds are secured within our protected environment the moment a project is posted, released only upon your final approval." },
+              { tag: "Accountability", title: "Human-Led Dispute Resolution", desc: "No bots. No algorithms. Every dispute is handled by a trained Dispute Handler with logic and fairness." },
+              { tag: "Meritocracy", title: "Algorithmic Growth System", desc: "Advancement in the ecosystem is driven by hard data - accuracy, speed, and consistent quality." },
+              { tag: "Visibility", title: "Live Command Dashboard", desc: "Full visibility into your project's heartbeat. Track every single micro-task's progress in real time." },
+              { tag: "Quality", title: "Managed Quality Control", desc: "Each fragmented task is personally verified by a Momentum Supervisor before being merged." },
+              { tag: "Global", title: "Borderless Talent Pipeline", desc: "Access elite production specialists from every corner of the world through our vetted network." },
+              { tag: "Speed", title: "Parallel Execution Flow", desc: "Eliminate linear bottlenecks. Our architecture allows multiple departments to build, test, and refine simultaneously—cutting delivery times by up to 70%." }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                onViewportEnter={() => setActiveFeature(i)}
+                viewport={{ amount: 0.7, once: false }}
+                initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }}
+                whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="min-h-[70vh] flex flex-col justify-center"
+              >
+                <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 text-accent">
+                  {item.tag}
+                </div>
+                <h3 className="text-4xl md:text-5xl font-bold mb-8 tracking-tighter leading-[1.1]" style={{ color: 'var(--text-primary)' }}>
+                  {item.title}
+                </h3>
+                <p className="text-lg md:text-xl font-normal leading-relaxed opacity-70" style={{ color: 'var(--text-secondary)' }}>
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
-
 
       {/* Apple-Style Floating Action Bar (Pill) */}
       <AnimatePresence>
@@ -1175,65 +1333,98 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* Final Call to Action */}
-      <section className="py-20 sm:py-40 relative z-20 overflow-hidden border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter mb-6 sm:mb-8" style={{ color: 'var(--text-primary)' }}>
-              Ready to build with
-              <br />
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(to right, var(--accent), var(--forest))' }}>a real team behind you?</span>
-            </h2>
-            <p className="text-base sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto font-normal" style={{ color: 'var(--text-secondary)' }}>
-              Post your project and get a structured department working on it - escrow-protected, supervisor-reviewed, and delivered on time.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-              <button onClick={() => navigate('/signup?role=client&redirect=/client/post-project')} className="btn-primary w-full sm:w-auto py-4 px-8 text-base font-bold tracking-wide">Post a Project</button>
-              <button className="btn-ghost w-full sm:w-auto py-4 px-8 text-base font-bold tracking-wide">Contact Agency Team</button>
-            </div>
+      <section className="py-16 sm:py-24 relative z-20 overflow-hidden border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+        {/* Cinematic Background Glow */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          viewport={{ once: true }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[400px] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(var(--accent-rgb), 0.15) 0%, transparent 70%)' }}
+        />
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
+          <motion.h2
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-4 sm:mb-6 leading-[1.1]"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            Ready to build with
+            <br />
+            <motion.span
+              initial={{ backgroundPosition: '200% center' }}
+              whileInView={{ backgroundPosition: '0% center' }}
+              transition={{ duration: 2, ease: "easeOut", delay: 0.3 }}
+              viewport={{ once: true }}
+              className="text-transparent bg-clip-text"
+              style={{
+                backgroundImage: 'linear-gradient(to right, var(--text-primary) 0%, var(--accent) 50%, var(--text-primary) 100%)',
+                backgroundSize: '200% auto'
+              }}
+            >
+              a real team behind you?
+            </motion.span>
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-10"
+          >
+            <button
+              onClick={() => navigate('/signup?role=client&redirect=/client/post-project')}
+              className="btn-primary w-full sm:w-auto py-5 px-10 text-sm font-bold tracking-widest uppercase rounded-full shadow-[0_20px_40px_-10px_rgba(var(--accent-rgb),0.4)] hover:shadow-[0_20px_40px_-10px_rgba(var(--accent-rgb),0.6)] hover:-translate-y-1 transition-all"
+            >
+              Post a Project
+            </button>
           </motion.div>
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 flex justify-center items-center pointer-events-none">
-          <div className="w-[400px] sm:w-[800px] h-[200px] sm:h-[400px] opacity-[0.07] rounded-full blur-[80px] sm:blur-[120px] animate-pulse" style={{ background: 'var(--accent)' }} />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="pt-16 sm:pt-32 pb-12 sm:pb-16 relative z-30 border-t" style={{ background: '#000000', borderColor: 'rgba(255,255,255,0.05)', paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
+      <footer className="pt-20 sm:pt-32 pb-12 sm:pb-16 relative z-30 border-t" style={{ background: '#0a0a0a', borderColor: 'rgba(255,255,255,0.06)', paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-16 mb-12 sm:mb-24">
-            <div className="md:col-span-4">
+            <div className="md:col-span-5 lg:col-span-4">
               <div className="flex items-end mb-6 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                 <div className="w-9 h-9 flex items-center justify-center">
-                  <img src={logo} alt="V" className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110"
-                    style={{ filter: isDark ? 'brightness(0) invert(1) sepia(1) saturate(0) brightness(1.1)' : 'invert(15%) sepia(80%) saturate(4000%) hue-rotate(250deg) brightness(30%) contrast(100%)' }} />
+                  <img src={logo} alt="V" className="w-full h-full object-contain"
+                    style={{ filter: 'brightness(0) invert(1)' }} />
                 </div>
-                <span className="font-extrabold text-2xl" style={{ color: 'var(--text-primary)', letterSpacing: '-0.06em', marginLeft: '1px' }}>irtual</span>
+                <span className="font-extrabold text-2xl" style={{ color: '#ffffff', letterSpacing: '-0.06em', marginLeft: '1px' }}>irtual</span>
               </div>
-              <p className="font-normal text-sm leading-relaxed mb-6 max-w-xs opacity-60" style={{ color: 'var(--text-secondary)' }}>
-                The elite architecture for the creative economy. Managed execution for world-class visions.
+              <p className="font-medium text-sm leading-relaxed mb-8 max-w-xs opacity-60" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                The elite architecture for the creative economy. Managed execution, premium talent, and absolute accountability for world-class visions.
               </p>
-              <div className="flex gap-3">
-                {['T', 'L', 'I'].map((s, i) => (
-                  <a key={i} href="#" className="w-9 h-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
-                    style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', color: 'var(--text-primary)' }}>
-                    <span className="text-xs font-bold">{s}</span>
-                  </a>
-                ))}
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors hover:bg-accent hover:border-accent hover:text-white cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' }}>
+                  <span className="font-bold text-xs tracking-wider">X</span>
+                </div>
+                <div className="w-10 h-10 rounded-full border flex items-center justify-center transition-colors hover:bg-accent hover:border-accent hover:text-white cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' }}>
+                  <span className="font-bold text-xs tracking-wider">IN</span>
+                </div>
               </div>
             </div>
 
-            <div className="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
+            <div className="md:col-span-7 lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-8">
               {[
-                { title: "Platform", links: ["Talent Directory", "Managed Services", "Pricing Structure"] },
-                { title: "Resources", links: ["Escrow Protection", "Skill Tiers", "API Docs"] },
-                { title: "Company", links: ["About Virtual", "Legal Framework", "Contact"] },
-                { title: "Support", links: ["Dispute Center", "Help Articles", "System Status"] },
+                { title: "Platform", links: [["Pricing", "/pricing"], ["About", "/about"], ["How it Works", "/how-it-works"], ["Roles", "/roles"]] },
+                { title: "Services", links: [["Video Editing", "/pricing"], ["Graphic Design", "/pricing"], ["3D Animation", "/pricing"], ["CGI & VFX", "/pricing"]] },
+                { title: "Company", links: [["Careers", "#"], ["Blog", "#"], ["Press", "#"], ["Contact", "#"]] },
+                { title: "Legal", links: [["Privacy", "#"], ["Terms", "#"], ["Cookies", "#"], ["Security", "#"]] },
               ].map(col => (
-                <div key={col.title} className="space-y-4">
-                  <h4 className="font-bold text-[10px] uppercase tracking-[0.3em] opacity-40" style={{ color: 'var(--text-primary)' }}>{col.title}</h4>
-                  <div className="flex flex-col gap-3 text-sm">
-                    {col.links.map(link => (
-                      <a key={link} href="#" className="opacity-50 hover:opacity-100 transition-opacity" style={{ color: 'var(--text-secondary)' }}>{link}</a>
+                <div key={col.title} className="space-y-6">
+                  <h4 className="font-bold text-[10px] uppercase tracking-[0.2em]" style={{ color: '#ffffff' }}>{col.title}</h4>
+                  <div className="flex flex-col gap-4 text-sm font-medium">
+                    {col.links.map(([label, path]) => (
+                      <button key={label} onClick={() => navigate(path)} className="text-left opacity-60 hover:opacity-100 hover:text-accent transition-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</button>
                     ))}
                   </div>
                 </div>
@@ -1241,14 +1432,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="text-[10px] font-medium uppercase tracking-[0.2em] opacity-30 text-center sm:text-left" style={{ color: 'var(--text-primary)' }}>
+          <div className="pt-8 border-t flex flex-col justify-center items-center gap-4" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-center" style={{ color: '#ffffff' }}>
               &copy; {new Date().getFullYear()} Virtual Inc. Defined by Excellence.
-            </div>
-            <div className="flex gap-6 text-[10px] font-medium uppercase tracking-[0.2em] opacity-30" style={{ color: 'var(--text-primary)' }}>
-              <a href="#" className="hover:opacity-100 transition-opacity">Privacy</a>
-              <a href="#" className="hover:opacity-100 transition-opacity">Terms</a>
-              <a href="#" className="hover:opacity-100 transition-opacity">Cookies</a>
             </div>
           </div>
         </div>
