@@ -7,7 +7,7 @@ import api from '../../../services/api';
 import { 
   User, Shield, Bell, CreditCard, Moon, Sun, 
   ChevronRight, Camera, Key, Mail, Phone, Building,
-  Check, AlertTriangle, Globe
+  Check, AlertTriangle, Globe, MapPin, Target
 } from 'lucide-react';
 import { COUNTRIES } from '../../../components/common/CountrySelector';
 import { useCurrency } from '../../../context/CurrencyContext';
@@ -38,12 +38,25 @@ export default function ClientSettings() {
     }
   };
 
-  // Form states
+  const parsePhone = (p) => {
+    if (!p) return { code: '+91', num: '' };
+    if (p.startsWith('+91')) return { code: '+91', num: p.slice(3) };
+    if (p.startsWith('+1')) return { code: '+1', num: p.slice(2) };
+    if (p.startsWith('+44')) return { code: '+44', num: p.slice(3) };
+    if (p.startsWith('+61')) return { code: '+61', num: p.slice(3) };
+    if (p.startsWith('+971')) return { code: '+971', num: p.slice(4) };
+    return { code: '+91', num: p };
+  };
+  const parsed = parsePhone(user?.phone);
+
   const [profileForm, setProfileForm] = useState({
     fullName: user?.fullName || '',
     companyName: user?.companyName || '',
-    phone: user?.phone || '',
     country: user?.country || 'IN',
+    city: user?.city || '',
+    objective: user?.objective || '',
+    phoneCode: parsed.code,
+    phone: parsed.num,
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -56,7 +69,11 @@ export default function ClientSettings() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.patch('/profile/update', profileForm);
+      const payload = {
+        ...profileForm,
+        phone: `${profileForm.phoneCode}${profileForm.phone}`
+      };
+      const res = await api.patch('/profile/update', payload);
       const updatedUser = res.data?.data || res.data;
       setUser(prev => ({ ...prev, ...updatedUser }));
       if (updatedUser.country) setIsIndia(updatedUser.country === "IN");
@@ -134,7 +151,38 @@ export default function ClientSettings() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <InputGroup label="Full Name" icon={<User size={16} />} value={profileForm.fullName} onChange={v => setProfileForm({...profileForm, fullName: v})} />
                            <InputGroup label="Company Name" icon={<Building size={16} />} value={profileForm.companyName} onChange={v => setProfileForm({...profileForm, companyName: v})} />
-                           <InputGroup label="Phone Number" icon={<Phone size={16} />} value={profileForm.phone} onChange={v => setProfileForm({...profileForm, phone: v})} />
+                           <label className="block">
+                             <span className="text-[10px] font-black uppercase tracking-widest ml-1 mb-2 block opacity-40" style={{ color: 'var(--text-primary)' }}>Phone Number</span>
+                             <div className="flex gap-2">
+                               <div className="relative group w-28">
+                                 <select 
+                                   value={profileForm.phoneCode} 
+                                   onChange={(e) => setProfileForm({...profileForm, phoneCode: e.target.value})}
+                                   className="w-full h-14 pl-4 pr-2 rounded-2xl border outline-none font-bold text-sm bg-transparent transition-all focus:ring-4 focus:ring-accent/10"
+                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)', appearance: 'none' }}
+                                 >
+                                   <option value="+1">+1 (US/CA)</option>
+                                   <option value="+44">+44 (UK)</option>
+                                   <option value="+91">+91 (IN)</option>
+                                   <option value="+61">+61 (AU)</option>
+                                   <option value="+971">+971 (AE)</option>
+                                 </select>
+                               </div>
+                               <div className="relative group flex-1">
+                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:text-accent transition-colors">
+                                   <Phone size={16} />
+                                 </div>
+                                 <input 
+                                   type="text"
+                                   placeholder="Enter phone number"
+                                   value={profileForm.phone} 
+                                   onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                                   className="w-full h-14 pl-12 pr-4 rounded-2xl border outline-none font-bold text-sm bg-transparent transition-all focus:ring-4 focus:ring-accent/10"
+                                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                 />
+                               </div>
+                             </div>
+                           </label>
                            <label className="block opacity-50">
                               <span className="text-[10px] font-black uppercase tracking-widest ml-1 mb-2 block">Email Address</span>
                               <div className="relative">
@@ -151,6 +199,24 @@ export default function ClientSettings() {
                                  style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)', appearance: 'none' }}
                                >
                                  {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                               </select>
+                             </div>
+                           </label>
+                           <InputGroup label="City" icon={<MapPin size={16} />} value={profileForm.city} onChange={v => setProfileForm({...profileForm, city: v})} />
+                           <label className="block">
+                             <span className="text-[10px] font-black uppercase tracking-widest ml-1 mb-2 block opacity-40" style={{ color: 'var(--text-primary)' }}>Objective</span>
+                             <div className="relative group">
+                               <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:text-accent transition-colors"><Target size={16} /></div>
+                               <select value={profileForm.objective} onChange={(e) => setProfileForm({...profileForm, objective: e.target.value})}
+                                 className="w-full h-14 pl-12 pr-4 rounded-2xl border outline-none font-bold text-sm bg-transparent transition-all focus:ring-4 focus:ring-accent/10"
+                                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)', appearance: 'none' }}
+                               >
+                                 <option value="" disabled>Select Objective</option>
+                                 <option value="content_creation">Content Creation</option>
+                                 <option value="personal">Personal</option>
+                                 <option value="business">Business</option>
+                                 <option value="agency">Agency</option>
+                                 <option value="other">Other</option>
                                </select>
                              </div>
                            </label>
