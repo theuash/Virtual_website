@@ -2,7 +2,7 @@ import express from 'express';
 import {
   getDashboardStats, getNotifications, validateCoupon, createProject, getProjects, getProjectDetail, approveProject,
   getWallet, addMoneyToWallet, payDeposit, payFinal,
-  submitVerification, bypassVerification,
+  submitVerification, bypassVerification, completeOnboarding,
 } from '../controllers/client.controller.js';
 import {
   getClientMeetings, createClientMeeting, getMeetingDetail,
@@ -32,6 +32,7 @@ router.post('/wallet/add', addMoneyToWallet);
 
 router.post('/submit-verification', submitVerification);
 router.post('/bypass-verification', bypassVerification);
+router.post('/onboarding', completeOnboarding);
 
 // Meeting routes
 router.route('/meetings')

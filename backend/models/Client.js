@@ -42,6 +42,21 @@ const clientSchema = new mongoose.Schema({
   totalSpent:         { type: Number, default: 0 },
   activeProjects:     { type: Number, default: 0 },
   completedProjects:  { type: Number, default: 0 },
+
+  // Onboarding
+  onboardingComplete:   { type: Boolean, default: false },
+  objective:            { type: String, enum: ['content_creation', 'personal', 'business', 'agency', 'other'], default: null },
+  platforms:            [{ type: String }],
+  platformHandles:      { type: Map, of: String, default: {} },
+  city:                 { type: String },
+  timezone:             { type: String },
+  servicesNeeded:       [{ type: String }],
+  budgetMin:            { type: Number },
+  budgetMax:            { type: Number },
+  budgetCurrency:       { type: String, default: 'INR' },
+  availableDays:        [{ type: String }],
+  availableTimeSlots:   [{ type: String }],
+  preferredCurrency:    { type: String, default: 'INR' },
 }, { timestamps: true, collection: 'clients' });
 
 clientSchema.methods.matchPassword = async function (password) {

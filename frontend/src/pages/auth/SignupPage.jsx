@@ -569,6 +569,22 @@ export default function SignupPage() {
                 </Field>
               )}
 
+              {/* Client-only: Supervisor Code */}
+              {role === 'client' && (
+                <Field label="Supervisor Code (Optional)" icon={ShieldCheck}>
+                  <input name="supervisorCode" type="text"
+                    className="w-full text-sm rounded-xl border outline-none transition-all font-mono"
+                    style={inputStyle}
+                    placeholder="e.g. V26INMS-LUM01"
+                    maxLength={20}
+                    value={formData.supervisorCode || ''}
+                    onChange={e => setFormData(f => ({ ...f, supervisorCode: e.target.value.toUpperCase() }))} />
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Have a code from your supervisor? Leave blank to be auto-assigned.
+                  </p>
+                </Field>
+              )}
+
               {/* Password row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Password" icon={Lock}>

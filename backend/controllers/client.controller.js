@@ -405,3 +405,45 @@ export const bypassVerification = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, client, 'Verification is now on hold. You can proceed for now.'));
 });
 
+
+// ── Client Onboarding ─────────────────────────────────────────────
+export const completeOnboarding = asyncHandler(async (req, res) => {
+  const {
+    objective,
+    platforms,
+    platformHandles,
+    country,
+    city,
+    timezone,
+    servicesNeeded,
+    budgetMin,
+    budgetMax,
+    availableDays,
+    availableTimeSlots,
+  } = req.body;
+
+  const client = await Client.findById(req.user._id);
+  if (!client) return res.status(404).json(new ApiResponse(404, null, 'Client not found'));
+
+  // Determine preferred currency based on country
+  const preferredCurrency = (country || client.country || 'IN').toUpperCase() === 'IN' ? 'INR' : 'USD';
+
+  client.objective          = objective;
+  client.platforms          = platforms || [];
+  client.platformHandles    = platformHandles || {};
+  client.country            = country || client.country;
+  client.city               = city;
+  client.timezone           = timezone;
+  client.servicesNeeded     = servicesNeeded || [];
+  client.budgetMin          = budgetMin;
+  client.budgetMax          = budgetMax;
+  client.budgetCurrency     = preferredCurrency;
+  client.availableDays      = availableDays || [];
+  client.availableTimeSlots = availableTimeSlots || [];
+  client.preferredCurrency  = preferredCurrency;
+  client.onboardingComplete = true;
+
+  await client.save();
+
+  res.json(new ApiResponse(200, client, 'Onboarding complete'));
+});
