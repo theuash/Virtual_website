@@ -215,6 +215,11 @@ export const verifyOtpAndLogin = async (email, token) => {
 
 // ── Verify OTP → complete signup ──────────────────────────────────
 export const verifySignupOtp = async (email, token, signupData) => {
+  console.log('[verifySignupOtp] email:', email);
+  console.log('[verifySignupOtp] signupData:', JSON.stringify(signupData));
+  console.log('[verifySignupOtp] pendingSignups size:', pendingSignups.size);
+  console.log('[verifySignupOtp] pendingKeys:', [...pendingSignups.keys()]);
+
   if (!email)      throw new Error('Email is required');
   if (!token)      throw new Error('OTP is required');
   if (!signupData) throw new Error('Signup data is missing. Please register again.');
@@ -222,6 +227,9 @@ export const verifySignupOtp = async (email, token, signupData) => {
   const normalizedPhone = normalizePhone(signupData.phone);
   const pendingKey = email;
   const tempData = pendingSignups.get(pendingKey);
+
+  console.log('[verifySignupOtp] tempData found:', !!tempData);
+  if (tempData) console.log('[verifySignupOtp] tempData keys:', Object.keys(tempData));
 
   if (!tempData)                          throw new Error('Signup data expired or not found. Please register again.');
   if (tempData.otpExpiresAt < Date.now()) { pendingSignups.delete(pendingKey); throw new Error('Verification code expired. Please register again.'); }
@@ -231,9 +239,13 @@ export const verifySignupOtp = async (email, token, signupData) => {
   if (existingEmail) { pendingSignups.delete(pendingKey); throw new Error('Email was registered by someone else. Please use a different email.'); }
 
   const Model = modelForRole(signupData.role);
+  console.log('[verifySignupOtp] Model:', Model?.modelName);
+  if (!Model) throw new Error(`Invalid role: ${signupData.role}`);
+
   let user;
   try {
     const userId = await generateUserId('IN', new Date());
+    console.log('[verifySignupOtp] Generated userId:', userId);
     user = await Model.create({
       email,
       passwordHash: tempData.passwordHash,
@@ -247,7 +259,9 @@ export const verifySignupOtp = async (email, token, signupData) => {
       userId,
       ...(signupData.role === 'client' && { companyName: signupData.company || '' }),
     });
+    console.log('[verifySignupOtp] User created:', user._id);
   } catch (createErr) {
+    console.error('[verifySignupOtp] Create error:', createErr);
     throw new Error(createErr.message);
   }
 

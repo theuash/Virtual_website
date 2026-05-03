@@ -66,7 +66,7 @@ const BUDGET_RANGES_USD = [
   { label: '$5,000+', min: 5000, max: 50000 },
 ];
 
-function getTimezoneForCountryCountry(countryCode, cityName) {
+function getTimezoneForCountryCity(countryCode, cityName) {
   const tzMap = {
     US: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'America/Anchorage', 'Pacific/Honolulu'],
     IN: ['Asia/Kolkata'],
@@ -210,7 +210,7 @@ export default function ClientOnboarding() {
 
   useEffect(() => {
     if (selectedCountry && city) {
-      const tz = getTimezoneForCountryCountry(selectedCountry, city);
+      const tz = getTimezoneForCountryCity(selectedCountry, city);
       setDetectedTimezone(tz);
     }
   }, [selectedCountry, city]);

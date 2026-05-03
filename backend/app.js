@@ -80,7 +80,8 @@ app.use((req, res, next) => {
 
 // Default error handler
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
+  console.error('[Express Error Handler]:', err.message, err.stack);
+  const statusCode = err.statusCode || err.status || 500;
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Server Error',

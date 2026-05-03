@@ -155,6 +155,7 @@ export const refreshToken = asyncHandler(async (req, res) => {
 export const signupWithGoogle = asyncHandler(async (req, res) => {
   try {
     const { token, role } = req.body;
+    console.log('[Google Signup] token present:', !!token, 'role:', role);
     if (!token) {
       throw new ApiError(400, 'Google token is required');
     }
@@ -164,6 +165,7 @@ export const signupWithGoogle = asyncHandler(async (req, res) => {
     const data = await googleService.signupWithGoogle(token, role);
     res.status(201).json(new ApiResponse(201, data, data.message));
   } catch (error) {
+    console.error('[Google Signup Error]:', error.message);
     throw new ApiError(400, error.message);
   }
 });

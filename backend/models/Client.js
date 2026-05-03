@@ -63,7 +63,7 @@ clientSchema.methods.matchPassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };
 
-clientSchema.pre('save', async function (next) {
+clientSchema.pre('save', async function () {
   if (this.isNew && !this.clientId) {
     // Determine country code (default to IN if not set)
     const country = this.country || 'IN';
@@ -86,7 +86,6 @@ clientSchema.pre('save', async function (next) {
       this.clientId = generateClientId(code, this.clientType) + Math.floor(Math.random() * 100);
     }
   }
-  next();
 });
 
 export const Client = mongoose.model('Client', clientSchema);

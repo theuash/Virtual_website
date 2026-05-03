@@ -39,7 +39,9 @@ export const verifyGoogleToken = async (token) => {
 
 export const signupWithGoogle = async (googleToken, role) => {
   try {
+    console.log('[Google Service] Verifying token...');
     const googleData = await verifyGoogleToken(googleToken);
+    console.log('[Google Service] Verified email:', googleData.email);
 
     const existing = await findUserByEmail(googleData.email);
     if (existing) {
@@ -52,8 +54,14 @@ export const signupWithGoogle = async (googleToken, role) => {
       return { user: sanitizeUser(existing), token, refreshToken, message: 'Already registered. Logged in with Google.', isNewUser: false };
     }
 
+    console.log('[Google Service] Creating new user...');
     const Model = modelForRole(role);
+    console.log('[Google Service] Model:', Model?.modelName);
+    if (!Model) throw new Error(`Invalid role: ${role}`);
+
     const userId = await generateUserId('IN', new Date());
+    console.log('[Google Service] Generated userId:', userId);
+
     const newUser = await Model.create({
       email:      googleData.email,
       role,
@@ -64,10 +72,12 @@ export const signupWithGoogle = async (googleToken, role) => {
       userId,
       ...(role === 'client' && { companyName: '' }),
     });
+    console.log('[Google Service] User created:', newUser._id);
 
     const { token, refreshToken } = generateTokens(newUser._id);
     return { user: sanitizeUser(newUser), token, refreshToken, message: 'Account created with Google.', isNewUser: true };
   } catch (error) {
+    console.error('[Google Service Error]:', error);
     throw new Error(`Google signup failed: ${error.message}`);
   }
 };
