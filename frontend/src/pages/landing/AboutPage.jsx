@@ -1,4 +1,4 @@
-﻿import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   CheckCircle, ArrowRight, ShieldCheck, Users, MonitorPlay, Scale, ChevronLeft, ArrowLeft
@@ -73,7 +73,7 @@ export default function AboutPage() {
             </button>
             <div
               className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-widest border rounded-full"
-              style={{ color: 'var(--accent)', borderColor: 'rgba(96,10,10,0.2)', background: 'rgba(96,10,10,0.05)' }}
+              style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb), 0.2)', background: 'rgba(var(--accent-rgb), 0.05)' }}
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--accent)' }} />
               About Virtual
@@ -176,7 +176,7 @@ export default function AboutPage() {
             >
               <div
                 className="absolute inset-0 rounded-full"
-                style={{ background: 'radial-gradient(circle at center, rgba(96,10,10,0.08) 0%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle at center, rgba(var(--accent-rgb), 0.08) 0%, transparent 70%)' }}
               />
               <ShieldCheck size={80} strokeWidth={0.8} style={{ color: 'var(--accent)', opacity: 0.6 }} />
             </div>

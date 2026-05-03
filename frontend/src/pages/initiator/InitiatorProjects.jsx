@@ -7,6 +7,7 @@ import {
   AlertTriangle, ChevronRight, Loader2, RefreshCw,
   Tag, DollarSign, Star, Play,
 } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 //  Constants 
 const SKILL_LABELS = {
@@ -109,6 +110,7 @@ function TaskProgressBar({ tasks = [], color = 'var(--accent)' }) {
 
 //  Project Detail Modal 
 function ProjectDetailModal({ project, onClose }) {
+  const { convert } = useCurrency();
   if (!project) return null;
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
   const tasks = project.tasks || [];
@@ -145,7 +147,7 @@ function ProjectDetailModal({ project, onClose }) {
           <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{project.description}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: 'Budget',   value: project.totalAmount ? `Rs.${project.totalAmount.toLocaleString('en-IN')}` : project.openBudget ? `Rs.${project.openBudget.toLocaleString('en-IN')}` : '-' },
+              { label: 'Budget',   value: project.totalAmount ? `${convert(project.totalAmount).display}` : project.openBudget ? `${convert(project.openBudget).display}` : '-' },
               { label: 'Deadline', value: project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN') : '-' },
               { label: 'Start',    value: project.startDate ? new Date(project.startDate).toLocaleDateString('en-IN') : '-' },
               { label: 'Duration', value: project.durationDays ? `${project.durationDays}d` : '-' },
@@ -221,6 +223,7 @@ function ProjectDetailModal({ project, onClose }) {
 //  Team Projects Tab 
 function TeamProjectCard({ project, onClick }) {
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
+  const { convert } = useCurrency();
   const tasks   = project.tasks || [];
   const members = project.team?.members || [];
   const startDays = daysUntil(project.startDate);
@@ -244,7 +247,7 @@ function TeamProjectCard({ project, onClick }) {
           </span>
           {project.totalAmount && (
             <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-              <DollarSign size={10} />Rs.{project.totalAmount.toLocaleString('en-IN')}
+              <DollarSign size={10} />{convert(project.totalAmount).display}
             </span>
           )}
           {notStarted ? (
@@ -391,6 +394,7 @@ function GroupProjectsTab({ data, loading }) {
 function PersonalProjectCard({ project, onClick }) {
   const s = STATUS_CFG[project.status] || STATUS_CFG.open;
   const tasks = project.tasks || [];
+  const { convert } = useCurrency();
   return (
     <motion.div whileHover={{ y: -2 }} onClick={onClick}
       className="rounded-xl border cursor-pointer overflow-hidden"
@@ -410,7 +414,7 @@ function PersonalProjectCard({ project, onClick }) {
           </span>
           {project.totalAmount && (
             <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-              <DollarSign size={10} />Rs.{project.totalAmount.toLocaleString('en-IN')}
+              <DollarSign size={10} />{convert(project.totalAmount).display}
             </span>
           )}
           <DeadlinePill date={project.deadline} extended={project.deadlineExtended} />

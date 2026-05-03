@@ -13,6 +13,7 @@ const payrollSchema = new mongoose.Schema({
   projectId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true, unique: true },
   supervisorId: { type: mongoose.Schema.Types.ObjectId, ref: 'MomentumSupervisor', required: true },
   totalBudget:  { type: Number, required: true },
+  currency:     { type: String, enum: ['INR', 'USD'], default: 'INR' },
   entries:      [payoutEntrySchema],
   finalized:    { type: Boolean, default: false },
   finalizedAt:  { type: Date },

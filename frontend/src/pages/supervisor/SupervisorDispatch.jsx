@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -203,7 +203,7 @@ export default function SupervisorDispatch() {
                         <button key={team._id || i} onClick={() => setSelected(team)}
                           className="w-full p-4 rounded-xl border text-left transition-all hover:scale-[1.01]"
                           style={{
-                            background: isSelected ? 'rgba(96,10,10,0.06)' : 'var(--bg-card)',
+                            background: isSelected ? 'rgba(var(--accent-rgb), 0.06)' : 'var(--bg-card)',
                             borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
                           }}>
                           <div className="flex items-center justify-between mb-2">

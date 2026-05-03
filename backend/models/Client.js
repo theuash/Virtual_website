@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { generateClientId } from '../utils/idGenerator.js';
 
 // ── Independent collection: 'clients' ────────────────────────────
 const clientSchema = new mongoose.Schema({
@@ -12,7 +13,7 @@ const clientSchema = new mongoose.Schema({
   // Profile
   fullName:       { type: String, required: true },
   clientId:       { type: String, unique: true, sparse: true },
-  clientType:     { type: String, enum: ['CG', 'CP', 'CS'], default: 'CG' },
+  clientType:     { type: String, enum: ['CR', 'CP', 'CS'], default: 'CR' },
   userId:         { type: String, unique: true, sparse: true },
   phone:          { type: String },
   avatar:         { type: String },
@@ -46,5 +47,31 @@ const clientSchema = new mongoose.Schema({
 clientSchema.methods.matchPassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };
+
+clientSchema.pre('save', async function (next) {
+  if (this.isNew && !this.clientId) {
+    // Determine country code (default to IN if not set)
+    const country = this.country || 'IN';
+    const code = country.length >= 2 ? country.slice(0, 2).toUpperCase() : 'IN';
+    
+    let unique = false;
+    let attempts = 0;
+    while (!unique && attempts < 10) {
+      const candidate = generateClientId(code, this.clientType);
+      const existing = await mongoose.models.Client.findOne({ clientId: candidate });
+      if (!existing) {
+        this.clientId = candidate;
+        unique = true;
+      }
+      attempts++;
+    }
+    
+    if (!unique) {
+      // Fallback or error
+      this.clientId = generateClientId(code, this.clientType) + Math.floor(Math.random() * 100);
+    }
+  }
+  next();
+});
 
 export const Client = mongoose.model('Client', clientSchema);

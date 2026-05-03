@@ -8,6 +8,7 @@ const projectSchema = new mongoose.Schema({
   category:    { type: String, enum: SKILLS, required: true },
   clientId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
   status:      { type: String, enum: PROJECT_STATUS, default: 'open' },
+  currency:    { type: String, enum: ['INR', 'USD'], default: 'INR' },
 
   // ── Scheduling ────────────────────────────────────────────────
   startDate:        { type: Date, required: true },
@@ -24,8 +25,12 @@ const projectSchema = new mongoose.Schema({
   ratePerUnit:      { type: Number },                          // ₹ per unit (from pricing DB)
   baseAmount:       { type: Number },                          // ratePerUnit × quantity
   timeSensitiveFee: { type: Number, default: 0 },              // +60% if timeSensitive
-  platformFee:      { type: Number, default: 0 },              // +5% of baseAmount
-  totalAmount:      { type: Number },                          // baseAmount + timeSensitiveFee + platformFee
+  discountAmount:   { type: Number, default: 0 },              // first-project discount
+  platformFee:      { type: Number, default: 0 },              // +5% of (subtotal - discount)
+  couponDiscount:   { type: Number, default: 0 },              // additional coupon discount
+  totalAmount:      { type: Number },                          // subtotal - discount + platformFee - couponDiscount
+  isFirstProject:   { type: Boolean, default: false },
+  appliedCouponCode: { type: String },
 
   // For open/custom projects
   isOpenProject:    { type: Boolean, default: false },

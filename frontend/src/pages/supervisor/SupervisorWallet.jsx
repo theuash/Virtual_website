@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
@@ -7,6 +7,7 @@ import {
   CreditCard, Smartphone, Building2, CheckCircle2, Clock,
   TrendingUp, AlertCircle,
 } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const WITHDRAW_METHODS = [
   { id: 'upi',  label: 'UPI',          icon: <Smartphone size={16} strokeWidth={1.5} />,  desc: 'Instant transfer to UPI ID' },
@@ -30,6 +31,7 @@ const STATUS_STYLES = {
 };
 
 function WithdrawModal({ balance, onClose, onSuccess }) {
+  const { convert } = useCurrency();
   const [amount,  setAmount]  = useState('');
   const [method,  setMethod]  = useState('upi');
   const [details, setDetails] = useState('');
@@ -39,7 +41,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
 
   const handleWithdraw = async () => {
     const amt = parseInt(amount);
-    if (!amt || amt < 100) return setError('Minimum withdrawal is ?100');
+    if (!amt || amt < 100) return setError('Minimum withdrawal is ₹100');
     if (amt > balance)     return setError('Insufficient balance');
     if (!details.trim())   return setError('Please enter your account details');
     setLoading(true); setError('');
@@ -83,14 +85,14 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
           <div className="p-6 space-y-5">
             <div className="p-4 rounded-xl text-center" style={{ background: 'var(--bg-card)' }}>
               <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>Available Balance</p>
-              <p className="text-2xl font-black" style={{ color: '#10b981' }}>?{balance.toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-black" style={{ color: '#10b981' }}>{convert(balance, false, true).display}</p>
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest mb-2 block" style={{ color: 'var(--text-secondary)' }}>Amount (?)</label>
+              <label className="text-[10px] font-black uppercase tracking-widest mb-2 block" style={{ color: 'var(--text-secondary)' }}>Amount (₹)</label>
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl border"
                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}>?</span>
+                <span className="text-lg font-black" style={{ color: 'var(--text-secondary)' }}>₹</span>
                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
                   placeholder="0" min="100" max={balance}
                   className="flex-1 bg-transparent text-2xl font-black outline-none"
@@ -105,7 +107,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                       color:       amount === String(a) ? '#f59e0b' : 'var(--text-secondary)',
                       background:  'var(--bg-card)',
                     }}>
-                    ?{a.toLocaleString()}
+                    {convert(a).display}
                   </button>
                 ))}
                 {balance > 0 && (
@@ -158,7 +160,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
             <button onClick={handleWithdraw} disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
               style={{ background: '#f59e0b', color: '#fff' }}>
-              {loading ? 'Processing' : `Withdraw ?${parseInt(amount || 0).toLocaleString('en-IN')}`}
+              {loading ? 'Processing' : `Withdraw ${convert(parseInt(amount || 0), false, true).display}`}
             </button>
           </div>
         )}
@@ -168,6 +170,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
 }
 
 export default function SupervisorWallet() {
+  const { convert } = useCurrency();
   const [wallet,  setWallet]  = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -227,7 +230,7 @@ export default function SupervisorWallet() {
                     </span>
                   </div>
                   <p className="text-2xl font-black" style={{ color: card.color }}>
-                    ?{card.value.toLocaleString('en-IN')}
+                    {convert(card.value || 0, false, true).display}
                   </p>
                 </motion.div>
               ))}
@@ -291,7 +294,7 @@ export default function SupervisorWallet() {
                           </div>
                         </div>
                         <p className="text-sm font-black shrink-0" style={{ color: style.color }}>
-                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '-' : '+'}?{tx.amount.toLocaleString('en-IN')}
+                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '-' : '+'}{convert(tx.amount || 0, false, true).display}
                         </p>
                       </motion.div>
                     );

@@ -6,6 +6,7 @@ import {
   Globe, Tag, DollarSign, Clock, Calendar,
   Loader2, AlertCircle, ArrowRight,
 } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const SKILL_LABELS = {
   video_editing: 'Video Editing', '3d_animation': '3D Animation',
@@ -22,6 +23,7 @@ function Avatar({ name = '?', color = '#3b82f6', size = 6 }) {
 }
 
 function OpenProjectCard({ project, onAccept, accepting }) {
+  const { convert } = useCurrency();
   const posted = project.createdAt
     ? new Date(project.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
     : '';
@@ -46,7 +48,7 @@ function OpenProjectCard({ project, onAccept, accepting }) {
           </span>
           {project.openBudget && (
             <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-              <DollarSign size={10} />Rs.{project.openBudget.toLocaleString('en-IN')}
+              <DollarSign size={10} />{convert(project.openBudget).display}
             </span>
           )}
           {project.durationDays && (

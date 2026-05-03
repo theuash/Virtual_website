@@ -4,7 +4,7 @@ import { ArrowLeft, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
-import authArt from '../../assets/auth/login_art.jpg';
+import authArt from '../../assets/auth/login_art.jpeg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
 import ThemeToggle from '../../components/ThemeToggle';

@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getDashboardStats, createProject, getProjects, getProjectDetail, approveProject,
+  getDashboardStats, getNotifications, validateCoupon, createProject, getProjects, getProjectDetail, approveProject,
   getWallet, addMoneyToWallet, payDeposit, payFinal,
   submitVerification, bypassVerification,
 } from '../controllers/client.controller.js';
@@ -14,7 +14,9 @@ import { requireRole } from '../middleware/roleGuard.js';
 const router = express.Router();
 router.use(protect, requireRole('client'));
 
-router.get('/dashboard', getDashboardStats);
+router.get('/dashboard',     getDashboardStats);
+router.get('/notifications',  getNotifications);
+router.post('/coupons/validate', validateCoupon);
 
 router.route('/projects')
   .get(getProjects)

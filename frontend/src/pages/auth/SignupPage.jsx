@@ -1,11 +1,11 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Briefcase, ArrowLeft, ArrowRight, User, Mail, Compass, Calendar, Link as LinkIcon, Lock, Phone, ShieldCheck } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import { SKILLS, SKILL_LABELS } from '../../utils/roleGuards';
-import signupArt from '../../assets/auth/signup_art.jpg';
+import signupArt from '../../assets/auth/signup_art.jpeg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
 import ThemeToggle from '../../components/ThemeToggle';
@@ -81,6 +81,7 @@ export default function SignupPage() {
     name: '', email: '', countryCode: '+91', phone: '', password: '', confirmPassword: '',
     company: '',
   });
+  const [showRoleNotification, setShowRoleNotification] = useState(false);
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [otp, setOtp] = useState('');
@@ -88,8 +89,17 @@ export default function SignupPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (roleParam === 'client' || roleParam === 'freelancer') setRole(roleParam);
+    if (roleParam === 'client' || roleParam === 'freelancer') {
+      setRole(roleParam);
+      setShowRoleNotification(true);
+    }
   }, [roleParam]);
+
+  useEffect(() => {
+    if (role && !roleParam) {
+      setShowRoleNotification(true);
+    }
+  }, [role, roleParam]);
 
   const handleGoogleSignup = useGoogleLogin({
     flow: 'implicit',
@@ -335,14 +345,14 @@ export default function SignupPage() {
             src={logo}
             className="absolute"
             style={{
-              width: 56, height: 56,
-              filter: 'brightness(0) invert(1)',
+              width: 72, height: 72,
+              filter: 'brightness(0) invert(1) drop-shadow(0 0 20px rgba(255,255,255,0.2))',
               bottom: '5rem',
               left: '3rem',
             }}
-            initial={{ y: 0, opacity: 1 }}
-            animate={{ y: -220, opacity: 1 }}
-            transition={{ duration: 1.0, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ y: 0, opacity: 0, scale: 0.8 }}
+            animate={{ y: -260, opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             alt="Virtual Logo"
           />
 
@@ -507,15 +517,15 @@ export default function SignupPage() {
                   placeholder="e.g. Jane Doe" required value={formData.name} onChange={handleChange} />
               </Field>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Email */}
-                <Field label="Email Address" icon={Mail}>
-                  <input name="email" type="email"
-                    className="w-full text-sm rounded-xl border outline-none transition-all"
-                    style={inputStyle}
-                    placeholder="you@example.com" required value={formData.email} onChange={handleChange} />
-                </Field>
+              {/* Email (Full Width) */}
+              <Field label="Email Address" icon={Mail}>
+                <input name="email" type="email"
+                  className="w-full text-sm rounded-xl border outline-none transition-all"
+                  style={inputStyle}
+                  placeholder="you@example.com" required value={formData.email} onChange={handleChange} />
+              </Field>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Phone */}
                 <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
                   <label className="text-[10px] uppercase font-black tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>
@@ -613,6 +623,56 @@ export default function SignupPage() {
           )}
         </motion.div>
       </div>
+
+      {/* Role Notification Overlay */}
+      <AnimatePresence>
+        {showRoleNotification && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowRoleNotification(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="w-full max-w-sm p-8 rounded-[2rem] border border-white/10 relative overflow-hidden"
+              style={{ background: 'var(--bg-secondary)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Decorative background glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 blur-[80px] -mr-10 -mt-10" 
+                   style={{ backgroundColor: accentColor + '20' }} />
+
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+                     style={{ background: accentColor + '15', color: accentColor }}>
+                  {role === 'client' ? <Target size={32} /> : <Briefcase size={32} />}
+                </div>
+
+                <h3 className="text-2xl font-black mb-3" style={{ color: 'var(--text-primary)' }}>
+                  {role === 'client' ? 'Client Access' : 'Talent Access'}
+                </h3>
+                
+                <p className="text-sm font-light leading-relaxed opacity-60 mb-8" style={{ color: 'var(--text-secondary)' }}>
+                  You are entering the registration portal as a <span className="font-bold" style={{ color: accentColor }}>{role}</span>. 
+                  Proceed to initialize your specialized workspace.
+                </p>
+
+                <button
+                  onClick={() => setShowRoleNotification(false)}
+                  className="w-full py-4 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:brightness-110 active:scale-[0.98]"
+                  style={{ background: accentColor, color: role === 'client' ? '#fff' : '#000' }}
+                >
+                  Continue to Setup
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

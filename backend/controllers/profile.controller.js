@@ -19,7 +19,7 @@ export const getProfile = asyncHandler(async (req, res) => {
 // Body: { fullName, phone, dateOfBirth, portfolioUrl, bio, hoursPerWeek, preferredContactTime }
 export const updateProfile = asyncHandler(async (req, res) => {
   console.log('[profile] file:', req.file?.filename, '| body keys:', Object.keys(req.body));
-  const { fullName, phone, dateOfBirth, portfolioUrl, bio, hoursPerWeek, preferredContactTime } = req.body;
+  const { fullName, phone, dateOfBirth, portfolioUrl, bio, hoursPerWeek, preferredContactTime, country } = req.body;
 
   const allowedFields = {};
   if (fullName?.trim())           allowedFields.fullName = fullName.trim();
@@ -29,6 +29,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
   if (bio !== undefined)          allowedFields.bio = bio.trim();
   if (hoursPerWeek)               allowedFields.hoursPerWeek = Number(hoursPerWeek);
   if (preferredContactTime)       allowedFields.preferredContactTime = preferredContactTime;
+  if (country?.trim())            allowedFields.country = country.trim().toUpperCase();
 
   // If avatar was uploaded, set the URL
   if (req.file) {

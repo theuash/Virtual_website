@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -31,6 +32,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow frontend to load assets
 }));
 app.use(morgan('dev'));
+app.use(cookieParser());
 
 // Serve static assets (videos, images, etc.)
 app.use('/assets', express.static(join(__dirname, 'assets')));

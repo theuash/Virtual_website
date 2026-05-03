@@ -1,12 +1,13 @@
 ﻿import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
-import { formatCurrency } from '../../utils/roleGuards';
+import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
 import { Users2, Server, Banknote, Scale, ArrowRight, Activity } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { convert } = useCurrency();
 
   const { data: adminData, isLoading, isError } = useQuery({
     queryKey: ['adminDashboard'],
@@ -23,7 +24,7 @@ export default function AdminDashboard() {
   const stats = [
     { label: 'Total Network', value: platformStats.totalUsers.toLocaleString(), icon: <Users2 size={20} strokeWidth={1.5} /> },
     { label: 'Active Pipeline', value: platformStats.activeProjects, icon: <Server size={20} strokeWidth={1.5} /> },
-    { label: 'Gross Volume', value: formatCurrency(platformStats.totalRevenue), icon: <Banknote size={20} strokeWidth={1.5} /> },
+    { label: 'Gross Volume', value: convert(platformStats.totalRevenue).display, icon: <Banknote size={20} strokeWidth={1.5} /> },
     { label: 'Open Incidents', value: platformStats.openDisputes, icon: <Scale size={20} strokeWidth={1.5} /> },
   ];
 

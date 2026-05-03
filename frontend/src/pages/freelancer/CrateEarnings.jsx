@@ -7,6 +7,7 @@ import {
   CreditCard, Smartphone, Building2, CheckCircle2, Clock,
   TrendingUp, AlertCircle,
 } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const WITHDRAW_METHODS = [
   { id: 'upi',         label: 'UPI',         icon: <Smartphone size={16} strokeWidth={1.5} />,  desc: 'Instant transfer to UPI ID' },
@@ -30,6 +31,7 @@ const STATUS_STYLES = {
 };
 
 function WithdrawModal({ balance, onClose, onSuccess }) {
+  const { convert } = useCurrency();
   const [amount,  setAmount]  = useState('');
   const [method,  setMethod]  = useState('upi');
   const [details, setDetails] = useState('');
@@ -86,7 +88,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
             {/* Available balance */}
             <div className="p-4 rounded-xl text-center" style={{ background: 'var(--bg-card)' }}>
               <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-secondary)' }}>Available Balance</p>
-              <p className="text-2xl font-black" style={{ color: '#10b981' }}>{balance.toLocaleString('en-IN')}</p>
+              <p className="text-2xl font-black" style={{ color: '#10b981' }}>{convert(balance).display}</p>
             </div>
 
             {/* Amount */}
@@ -104,7 +106,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                 />
               </div>
               <div className="flex gap-2 mt-2 flex-wrap">
-                {QUICK_AMOUNTS.filter(a => a <= balance).map(a => (
+                    {QUICK_AMOUNTS.filter(a => a <= balance).map(a => (
                   <button
                     key={a}
                     onClick={() => setAmount(String(a))}
@@ -118,7 +120,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                     {a.toLocaleString()}
                   </button>
                 ))}
-                {balance > 0 && (
+                    {balance > 0 && (
                   <button
                     onClick={() => setAmount(String(balance))}
                     className="px-3 py-1 rounded-full text-xs font-semibold border transition-all"
@@ -127,9 +129,9 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
                       color:       amount === String(balance) ? 'var(--accent)' : 'var(--text-secondary)',
                       background:  'var(--bg-card)',
                     }}
-                  >
+                    >
                     All
-                  </button>
+                    </button>
                 )}
               </div>
             </div>
@@ -182,7 +184,7 @@ function WithdrawModal({ balance, onClose, onSuccess }) {
               className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
               style={{ background: 'var(--accent)', color: '#fff' }}
             >
-              {loading ? 'Processing' : `Withdraw ${parseInt(amount || 0).toLocaleString('en-IN')}`}
+              {loading ? 'Processing' : `Withdraw ${convert(parseInt(amount || 0)).display}`}
             </button>
           </div>
         )}
@@ -259,7 +261,7 @@ export default function CrateEarnings() {
                     </span>
                   </div>
                   <p className="text-2xl font-black" style={{ color: card.color }}>
-                    {card.value.toLocaleString('en-IN')}
+                    {convert(card.value || 0).display}
                   </p>
                 </motion.div>
               ))}
@@ -343,7 +345,7 @@ export default function CrateEarnings() {
                           className="text-sm font-black shrink-0"
                           style={{ color: style.color }}
                         >
-                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '' : '+'}{tx.amount.toLocaleString('en-IN')}
+                          {tx.type === 'withdrawal' || tx.type === 'deduction' ? '' : '+'}{convert(tx.amount || 0).display}
                         </p>
                       </motion.div>
                     );

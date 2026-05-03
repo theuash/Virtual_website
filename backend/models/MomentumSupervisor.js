@@ -17,6 +17,7 @@ const supervisorSchema = new mongoose.Schema({
   avatar:         { type: String },
   dateOfBirth:    { type: Date },
   bio:            { type: String, default: '' },
+  country:        { type: String },
 
   // Verification
   isVerified:     { type: Boolean, default: false },

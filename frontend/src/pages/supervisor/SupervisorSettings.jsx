@@ -7,8 +7,10 @@ import api from '../../services/api';
 import { 
   User, Shield, Bell, Moon, Sun, 
   Camera, Key, Mail, Phone, Briefcase,
-  Check, AlertTriangle
+  Check, AlertTriangle, Globe
 } from 'lucide-react';
+import { COUNTRIES } from '../../components/CountrySelector';
+import { useCurrency } from '../../context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { requestNotificationPermission } from '../../services/notificationService';
@@ -16,6 +18,7 @@ import { requestNotificationPermission } from '../../services/notificationServic
 export default function SupervisorSettings() {
   const { user, setUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { setIsIndia } = useCurrency();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
@@ -26,6 +29,7 @@ export default function SupervisorSettings() {
     phone: user?.phone || '',
     department: user?.department || '',
     bio: user?.bio || '',
+    country: user?.country || 'IN',
   });
 
   const handleProfileUpdate = async (e) => {
@@ -35,6 +39,7 @@ export default function SupervisorSettings() {
       const res = await api.patch('/profile/update', profileForm);
       const updatedUser = res.data?.data || res.data;
       setUser(prev => ({ ...prev, ...updatedUser }));
+      if (updatedUser.country) setIsIndia(updatedUser.country === "IN");
       toast.success('Profile updated successfully');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Update failed');
@@ -112,6 +117,18 @@ export default function SupervisorSettings() {
                                 <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" />
                                 <input disabled value={user?.email} className="w-full h-14 pl-12 rounded-2xl border outline-none font-bold text-sm bg-transparent cursor-not-allowed" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                               </div>
+                           </label>
+                           <label className="block">
+                             <span className="text-[10px] font-black uppercase tracking-widest ml-1 mb-2 block opacity-40" style={{ color: 'var(--text-primary)' }}>Country</span>
+                             <div className="relative group">
+                               <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 group-focus-within:text-accent transition-colors"><Globe size={16} /></div>
+                               <select value={profileForm.country} onChange={(e) => setProfileForm({...profileForm, country: e.target.value})}
+                                 className="w-full h-14 pl-12 pr-4 rounded-2xl border outline-none font-bold text-sm bg-transparent transition-all focus:ring-4 focus:ring-accent/10"
+                                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)', appearance: 'none' }}
+                               >
+                                 {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                               </select>
+                             </div>
                            </label>
                         </div>
                         <label className="block">

@@ -13,6 +13,7 @@ export const register = asyncHandler(async (req, res) => {
     const data = await authService.registerUser(req.body);
     res.status(201).json(new ApiResponse(201, data, 'User registered successfully'));
   } catch (error) {
+    console.error('Registration Error:', error);
     throw new ApiError(400, error.message);
   }
 });
@@ -25,6 +26,7 @@ export const registerWithOtp = asyncHandler(async (req, res) => {
     const data = await authService.registerWithOtp(req.body);
     res.status(201).json(new ApiResponse(201, data, data.message));
   } catch (error) {
+    console.error('OTP Registration Error:', error);
     throw new ApiError(400, error.message);
   }
 });

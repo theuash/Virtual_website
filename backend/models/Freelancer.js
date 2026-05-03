@@ -17,6 +17,7 @@ const freelancerSchema = new mongoose.Schema({
   avatar:         { type: String },
   dateOfBirth:    { type: Date },
   portfolioUrl:   { type: String },
+  country:        { type: String },
 
   // Verification
   isVerified:     { type: Boolean, default: false },

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { formatCurrency, TIER_LABELS } from '../../utils/roleGuards';
+import { TIER_LABELS } from '../../utils/roleGuards';
+import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
 import LockedBlock from '../../components/LockedBlock';
@@ -61,6 +62,7 @@ function StatCard({ label, value, icon, highlight }) {
 
 export default function FreelancerDashboard() {
   const { user } = useAuth();
+  const { convert } = useCurrency();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -378,7 +380,7 @@ export default function FreelancerDashboard() {
               <StatCard label="Total Earnings" value="-" icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
             </LockedBlock>
           ) : (
-            <StatCard label="Total Earnings" value={formatCurrency(totalEarnings)} icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
+            <StatCard label="Total Earnings" value={convert(totalEarnings).display} icon={<CircleDollarSign size={17} strokeWidth={1.5} />} highlight />
           )}
 
           <StatCard
@@ -543,7 +545,7 @@ export default function FreelancerDashboard() {
                   <div>
                     <div className="flex justify-between mb-1.5">
                       <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Earnings</span>
-                      <span className="text-[9px] font-black" style={{ color: 'var(--accent)' }}>{formatCurrency(totalEarnings)}/{formatCurrency(nextEarnTarget)}</span>
+                      <span className="text-[9px] font-black" style={{ color: 'var(--accent)' }}>{convert(totalEarnings).display}/{convert(nextEarnTarget).display}</span>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                       <motion.div

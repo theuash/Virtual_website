@@ -7,7 +7,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import {
   ArrowRight, ArrowLeft, Info, Clock, Zap, Star, Shield,
-  CheckCircle2, Search, X, Plus, Loader2, AlertCircle, Receipt,
+  CheckCircle2, Search, X, Plus, Loader2, AlertCircle, Receipt, Tag,
 } from 'lucide-react';
 
 //  Constants 
@@ -60,8 +60,15 @@ function minDuration(timeSensitive = false) {
 }
 
 //  Shared UI primitives 
-function Tooltip({ text }) {
+function Tooltip({ text, align = 'center' }) {
   const [show, setShow] = useState(false);
+  
+  const alignClasses = {
+    center: 'left-1/2 -translate-x-1/2',
+    right: 'right-0',
+    left: 'left-0'
+  };
+
   return (
     <span className="relative inline-flex items-center">
       <button
@@ -70,7 +77,7 @@ function Tooltip({ text }) {
         onMouseLeave={() => setShow(false)}
         onFocus={() => setShow(true)}
         onBlur={() => setShow(false)}
-        className="ml-1.5 opacity-60 hover:opacity-100 transition-opacity"
+        className="ml-1 opacity-60 hover:opacity-100 transition-opacity"
         style={{ color: 'var(--text-secondary)' }}
         aria-label="More info"
       >
@@ -83,8 +90,13 @@ function Tooltip({ text }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.15 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 text-xs leading-relaxed p-3 rounded-xl shadow-xl z-50 border"
-            style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            className={`absolute bottom-full mb-2 w-56 text-[11px] leading-relaxed p-3 rounded-xl shadow-2xl z-[100] border ${alignClasses[align] || alignClasses.center}`}
+            style={{ 
+              background: 'var(--bg-card)', 
+              borderColor: 'var(--border)', 
+              color: 'var(--text-secondary)',
+              backdropFilter: 'blur(8px)'
+            }}
           >
             {text}
           </motion.div>
@@ -143,7 +155,11 @@ const inputStyle = {
 };
 
 //  Receipt Panel 
-function ReceiptPanel({ selectedService, form, pricing, convert }) {
+function ReceiptPanel({ 
+  selectedService, form, pricing, convert,
+  couponCode, setCouponCode, appliedCoupon, setAppliedCoupon,
+  validatingCoupon, handleApplyCoupon, couponError, isFirstProject
+}) {
   const hasService  = !!selectedService;
   const hasQuantity = hasService && form.quantity && parseFloat(form.quantity) > 0;
 
@@ -159,12 +175,12 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
 
   return (
     <div
-      className="rounded-2xl border overflow-hidden"
+      className="rounded-2xl border"
       style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
     >
       {/* Header */}
       <div
-        className="px-5 py-4 border-b flex items-center gap-2"
+        className="px-5 py-4 border-b flex items-center gap-2 rounded-t-2xl"
         style={{ borderColor: 'var(--border)' }}
       >
         <Receipt size={15} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
@@ -194,79 +210,149 @@ function ReceiptPanel({ selectedService, form, pricing, convert }) {
           </div>
 
           {/* Quantity row */}
-          <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
-            <span>{hasQuantity ? `${form.quantity} ${selectedService.unit}s` : 'Quantity not set'}</span>
-            <span className="font-semibold">{hasQuantity ? fmt(pricing.base) : '-'}</span>
+          <div className="flex items-center justify-between gap-4 text-sm" style={rowStyle(hasQuantity)}>
+            <span className="flex-1 truncate">{hasQuantity ? `${form.quantity} ${selectedService.unit}s` : 'Quantity not set'}</span>
+            <span className="font-bold shrink-0">{hasQuantity ? fmt(pricing.base) : '-'}</span>
           </div>
 
           <div className="border-t" style={{ borderColor: 'var(--border)' }} />
 
           {/* Time-sensitive row */}
           {form.timeSensitive && (
-            <div className="flex items-center justify-between text-sm" style={{ color: '#f59e0b' }}>
-              <span>+60% surcharge</span>
-              <span className="font-semibold">{hasQuantity ? fmt(pricing.timeFee) : '-'}</span>
+            <div className="flex items-center justify-between gap-4 text-sm" style={{ color: '#f59e0b' }}>
+              <span className="flex-1 truncate">+60% time-sensitive surcharge</span>
+              <span className="font-bold shrink-0">{hasQuantity ? fmt(pricing.timeFee) : '-'}</span>
+            </div>
+          )}
+
+          {/* Discount row - only show for first project in service mode */}
+          {pricing.isFirstProject && hasQuantity && (
+            <div className="flex items-center justify-between gap-4 text-sm" style={{ color: '#22c55e' }}>
+              <span className="flex-1 truncate">First Project Discount (15%)</span>
+              <span className="font-bold shrink-0">-{fmt(pricing.firstProjectDiscount)}</span>
             </div>
           )}
 
           {/* Platform fee row */}
-          <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
-            <span>+5% platform fee</span>
-            <span className="font-semibold">{hasQuantity ? fmt(pricing.platformFee) : '-'}</span>
+          <div className="flex items-center justify-between gap-4 text-sm" style={rowStyle(hasQuantity)}>
+            <span className="flex-1 truncate">Platform Fee (+5%)</span>
+            <span className="font-bold shrink-0">{hasQuantity ? fmt(pricing.platformFee) : '-'}</span>
           </div>
 
-          <div className="border-t" style={{ borderColor: 'var(--border)' }} />
-
-          {/* Discount row - only show for first project in service mode */}
-          {pricing.isFirstProject && hasQuantity && (
-            <div className="flex items-center justify-between text-sm" style={{ color: '#22c55e' }}>
-              <span>First Project Discount (15%)</span>
-              <span className="font-semibold">-{fmt(pricing.firstProjectDiscount)}</span>
+          {/* Coupon row */}
+          {appliedCoupon && hasQuantity && (
+            <div className="flex items-center justify-between gap-4 text-sm font-bold" style={{ color: '#22c55e' }}>
+              <span className="flex-1 truncate flex items-center gap-1">
+                <Tag size={12} /> Coupon Applied ({appliedCoupon.code})
+              </span>
+              <span className="shrink-0">-{fmt(pricing.couponDiscount)}</span>
             </div>
           )}
 
+          <div className="border-t" style={{ borderColor: 'var(--border)' }} />
+
           {/* Total */}
-          <div className="flex items-center justify-between">
-            <span className="text-base font-black" style={{ color: 'var(--text-primary)' }}>Total</span>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>Total</span>
             <div className="text-right">
-              {pricing.isFirstProject && hasQuantity && pricing.firstProjectDiscount > 0 && (
+              {pricing.isFirstProject && hasQuantity && pricing.firstProjectDiscount > 0 && !appliedCoupon && (
                 <span className="text-xs font-medium line-through mr-2" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>
-                  {fmt(pricing.subtotal + pricing.platformFee)}
+                  {fmt(pricing.subtotal + Math.round(pricing.subtotal * PLATFORM_FEE_RATE))}
                 </span>
               )}
-              <span className="text-base font-black" style={{ color: hasQuantity ? '#22c55e' : 'var(--text-secondary)', opacity: hasQuantity ? 1 : 0.45 }}>
+              <span className="text-2xl font-black tracking-tight" style={{ color: hasQuantity ? 'var(--accent)' : 'var(--text-secondary)', opacity: hasQuantity ? 1 : 0.45 }}>
                 {hasQuantity ? fmt(pricing.total) : '-'}
               </span>
             </div>
           </div>
 
+          {/* Coupon Input Area */}
+          {hasQuantity && (
+            <div className="mt-2 min-w-0">
+              {isFirstProject ? (
+                <div className="p-3 rounded-xl border border-dashed text-[10px] font-semibold text-center" style={{ background: 'rgba(34,197,94,0.05)', borderColor: 'rgba(34,197,94,0.2)', color: 'var(--text-secondary)' }}>
+                  Automatic 15% First Project Discount applied! <br/>
+                  <span style={{ color: 'var(--text-primary)' }}>Coupons are available from your next project.</span>
+                </div>
+              ) : !appliedCoupon ? (
+                <div className="flex flex-col gap-2 p-3 rounded-xl border-2 border-dashed" style={{ borderColor: 'var(--border)' }}>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      type="text"
+                      placeholder="Coupon code"
+                      className="min-w-0 flex-1 px-3 py-1.5 rounded-lg text-xs border outline-none focus:ring-1 uppercase"
+                      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={validatingCoupon || !couponCode}
+                      className="whitespace-nowrap px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                      style={{ background: 'var(--accent)', color: '#fff' }}
+                    >
+                      {validatingCoupon ? 'Wait...' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponError && <p className="text-[10px] font-bold break-words" style={{ color: '#ef4444' }}>{couponError}</p>}
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid #22c55e' }}>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-green-600 uppercase truncate">
+                    <Tag size={10} className="shrink-0" /> <span className="truncate">Active: {appliedCoupon.code}</span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setAppliedCoupon(null)}
+                    className="text-[10px] font-black uppercase text-red-500 hover:underline shrink-0"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Deposit */}
           <div
-            className="rounded-xl p-3 space-y-2"
-            style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+            className="rounded-xl p-4 space-y-3"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
           >
-            <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
-              <div>
-                <span className="font-semibold">30% deposit</span>
-                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+            <div className="flex items-start justify-between gap-4 text-sm" style={rowStyle(hasQuantity)}>
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold">30% deposit</span>
+                  <Tooltip 
+                    text="A 30% initial payment is required to start the project after a Momentum Supervisor is assigned to your case." 
+                    align="right"
+                  />
+                </div>
+                <p className="text-[10px] mt-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   Due after initiator assigned
                 </p>
               </div>
-              <span className="font-bold" style={{ color: hasQuantity ? 'var(--accent)' : undefined }}>
+              <span className="font-bold shrink-0" style={{ color: hasQuantity ? 'var(--accent)' : undefined }}>
                 {hasQuantity ? fmt(pricing.deposit) : '-'}
               </span>
             </div>
 
             <div className="border-t" style={{ borderColor: 'var(--border)' }} />
 
-            <div className="flex items-center justify-between text-sm" style={rowStyle(hasQuantity)}>
-              <div>
-                <span className="font-semibold">70% remaining</span>
-                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+            <div className="flex items-start justify-between gap-4 text-sm" style={rowStyle(hasQuantity)}>
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold">70% remaining</span>
+                  <Tooltip 
+                    text="The remaining 70% is held securely and only released once you approve the final project deliverables." 
+                    align="right"
+                  />
+                </div>
+                <p className="text-[10px] mt-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   Due on completion
                 </p>
               </div>
-              <span className="font-semibold">
+              <span className="font-bold shrink-0">
                 {hasQuantity ? fmt(pricing.total - pricing.deposit) : '-'}
               </span>
             </div>
@@ -563,10 +649,10 @@ function StepServiceSelection({
             />
           </InputField>
           {form.quantity && parseFloat(form.quantity) > 0 && (
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               Estimated base:{' '}
               <strong style={{ color: 'var(--text-primary)' }}>
-                {(selectedService.rate * parseFloat(form.quantity)).toLocaleString('en-IN')}
+                {convert(selectedService.rate * parseFloat(form.quantity)).display}
               </strong>
             </p>
           )}
@@ -952,7 +1038,12 @@ function StepProjectDetails({ form, setForm, errors }) {
 }
 
 //  Step 3  Extras 
-function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing, errors }) {
+function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing, errors, convert }) {
+  const fmt = (n) => {
+    const converted = convert(n);
+    return converted.display;
+  };
+
   const filtered = SOFTWARE_OPTIONS.filter(
     s => s.toLowerCase().includes(softwareSearch.toLowerCase()) && !form.preferredSoftware.includes(s)
   );
@@ -1066,21 +1157,21 @@ function StepExtras({ form, setForm, softwareSearch, setSoftwareSearch, pricing,
             <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Standard pricing. Ready to checkout immediately.
             </p>
-            {pricing.total > 0 && (
-              <div className="space-y-1">
-                {pricing.isFirstProject && pricing.firstProjectDiscount > 0 && (
-                  <div className="text-xs font-medium line-through" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>
-                    {fmt(pricing.subtotal + pricing.platformFee)}
-                  </div>
-                )}
-                <div className="text-sm font-black" style={{ color: pricing.isFirstProject ? '#22c55e' : 'var(--accent)' }}>
-                  {fmt(pricing.total)}
-                  {pricing.isFirstProject && pricing.firstProjectDiscount > 0 && (
-                    <span className="ml-1 text-xs font-semibold">(-15%)</span>
-                  )}
-                </div>
-              </div>
-            )}
+    {pricing.total > 0 && (
+      <div className="space-y-1">
+        {pricing.isFirstProject && pricing.firstProjectDiscount > 0 && (
+          <div className="text-xs font-medium line-through" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>
+            {fmt(pricing.subtotal + Math.round(pricing.subtotal * PLATFORM_FEE_RATE))}
+          </div>
+        )}
+        <div className="text-sm font-black" style={{ color: pricing.isFirstProject ? '#22c55e' : 'var(--accent)' }}>
+          {fmt(pricing.total)}
+          {pricing.isFirstProject && pricing.firstProjectDiscount > 0 && (
+            <span className="ml-1 text-xs font-semibold">(-15%)</span>
+          )}
+        </div>
+      </div>
+    )}
           </motion.button>
 
           <motion.button
@@ -1133,11 +1224,14 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
   const rows = [
     { label: 'Base Amount',        value: fmt(pricing.base) },
     ...(pricing.timeFee > 0 ? [{ label: 'Time-Sensitive (+60%)', value: fmt(pricing.timeFee), accent: '#f59e0b' }] : []),
-    { label: 'Platform Fee (+5%)', value: fmt(pricing.platformFee) },
     ...(pricing.isFirstProject && pricing.firstProjectDiscount > 0 
       ? [{ label: 'First Project Discount (15%)', value: `-${fmt(pricing.firstProjectDiscount)}`, accent: '#22c55e' }] 
       : []),
-    { label: 'Total',              value: fmt(pricing.total), bold: true },
+    { label: 'Platform Fee (+5%)', value: fmt(pricing.platformFee) },
+    ...(pricing.couponDiscount > 0 
+      ? [{ label: 'Coupon Discount', value: `-${fmt(pricing.couponDiscount)}`, accent: '#22c55e' }] 
+      : []),
+    { label: 'Total Amount',       value: fmt(pricing.total), bold: true, highlight: true },
     { label: 'Deposit Due (30%)',  value: fmt(pricing.deposit), accent: 'var(--accent)' },
     { label: 'Remaining (70%)',    value: fmt(pricing.total - pricing.deposit), muted: true },
   ];
@@ -1225,7 +1319,7 @@ function StepReview({ form, mode, selectedService, pricing, loading, error, onSu
                 {row.label}
               </span>
               <span
-                className={row.bold ? 'text-base font-black' : 'text-sm font-semibold'}
+                className={row.bold ? (row.highlight ? 'text-xl font-black' : 'text-base font-black') : 'text-sm font-semibold'}
                 style={{ color: row.accent || (row.bold ? 'var(--text-primary)' : 'var(--text-secondary)') }}
               >
                 {row.value}
@@ -1295,6 +1389,10 @@ export default function PostProject() {
   const [loading,         setLoading]         = useState(false);
   const [error,           setError]           = useState('');
   const [errors,          setErrors]          = useState({});
+  const [couponCode,      setCouponCode]      = useState('');
+  const [appliedCoupon,   setAppliedCoupon]   = useState(null);
+  const [validatingCoupon,setValidatingCoupon]= useState(false);
+  const [couponError,     setCouponError]     = useState('');
 
   const [form, setForm] = useState({
     title: '', description: '', startDate: '', duration: '', durationUnit: 'days',
@@ -1336,16 +1434,32 @@ export default function PostProject() {
       : 0;
     const timeFee         = form.timeSensitive ? Math.round(base * TIME_SENSITIVE_RATE) : 0;
     const subtotal        = base + timeFee;
-    const platformFee     = Math.round(subtotal * PLATFORM_FEE_RATE);
-    const totalBeforeDiscount = subtotal + platformFee;
     
     // Apply 15% discount automatically for service mode if no previous projects
     const isFirstProject = mode === 'service' && !hasPreviousProjects;
-    const firstProjectDiscount = isFirstProject ? Math.round(totalBeforeDiscount * FIRST_PROJECT_DISCOUNT) : 0;
-    const total = totalBeforeDiscount - firstProjectDiscount;
-    const deposit         = Math.round(total * DEPOSIT_RATE);
+    const firstProjectDiscount = isFirstProject ? Math.round(subtotal * FIRST_PROJECT_DISCOUNT) : 0;
     
-    return { base, timeFee, subtotal, platformFee, total, deposit, firstProjectDiscount, isFirstProject };
+    const discountedAmount = subtotal - firstProjectDiscount;
+    const platformFee     = Math.round(discountedAmount * PLATFORM_FEE_RATE);
+    
+    let total = discountedAmount + platformFee;
+    let couponDiscount = 0;
+
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percentage') {
+        couponDiscount = Math.round(total * (appliedCoupon.discountValue / 100));
+      } else {
+        couponDiscount = Math.min(appliedCoupon.discountValue, total);
+      }
+      total -= couponDiscount;
+    }
+    
+    const deposit = Math.round(total * DEPOSIT_RATE);
+    
+    return { 
+      base, timeFee, subtotal, platformFee, total, deposit, 
+      firstProjectDiscount, isFirstProject, couponDiscount 
+    };
   };
   const pricing = calcPricing();
 
@@ -1411,7 +1525,26 @@ export default function PostProject() {
     setStep(1);
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setValidatingCoupon(true);
+    setCouponError('');
+    try {
+      const res = await api.post('/client/coupons/validate', { 
+        code: couponCode,
+        amount: pricing.total 
+      });
+      setAppliedCoupon(res.data?.data);
+      setCouponCode('');
+    } catch (err) {
+      setCouponError(err?.response?.data?.message || 'Invalid coupon');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
   const handleSubmit = async () => {
+    console.log('Starting project submission...');
     setLoading(true); setError('');
     try {
       const p = calcPricing();
@@ -1436,8 +1569,8 @@ export default function PostProject() {
         if (form.durationUnit === 'months') return val * 30;
         return val;
       };
-      
-      await api.post('/client/projects', {
+
+      const payload = {
         title:             form.title,
         description:       form.description,
         category:          selectedDept || 'video_editing',
@@ -1462,9 +1595,16 @@ export default function PostProject() {
         platformFee:       p.platformFee,
         totalAmount:       p.total,
         budget:            p.total,
-      });
+        couponCode:        appliedCoupon?.code,
+      };
+      
+      console.log('Submitting project payload:', payload);
+      const response = await api.post('/client/projects', payload);
+      console.log('Project created successfully:', response.data);
+      
       navigate('/client/projects');
     } catch (err) {
+      console.error('Project submission failed:', err);
       setError(err?.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -1563,7 +1703,7 @@ export default function PostProject() {
                       <StepExtras
                         form={form} setForm={setForm}
                         softwareSearch={softwareSearch} setSoftwareSearch={setSoftwareSearch}
-                        pricing={pricing} errors={errors}
+                        pricing={pricing} errors={errors} convert={convert}
                       />
                     )}
                     {isServiceMode && step === 4 && (
@@ -1585,7 +1725,7 @@ export default function PostProject() {
                       <StepExtras
                         form={form} setForm={setForm}
                         softwareSearch={softwareSearch} setSoftwareSearch={setSoftwareSearch}
-                        pricing={pricing} errors={errors}
+                        pricing={pricing} errors={errors} convert={convert}
                       />
                     )}
                     {!isServiceMode && step === 4 && (
@@ -1643,6 +1783,14 @@ export default function PostProject() {
                     form={form}
                     pricing={pricing}
                     convert={convert}
+                    couponCode={couponCode}
+                    setCouponCode={setCouponCode}
+                    appliedCoupon={appliedCoupon}
+                    setAppliedCoupon={setAppliedCoupon}
+                    validatingCoupon={validatingCoupon}
+                    handleApplyCoupon={handleApplyCoupon}
+                    couponError={couponError}
+                    isFirstProject={pricing.isFirstProject}
                   />
                 </div>
               </div>

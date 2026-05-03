@@ -1,10 +1,12 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
 import { TrendingUp, Loader2, AlertCircle, CheckCircle2, Wallet } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 export default function SupervisorEarnings() {
+  const { convert } = useCurrency();
   const [data, setData]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState(null);
@@ -57,7 +59,7 @@ export default function SupervisorEarnings() {
                     </span>
                   </div>
                   <p className="text-2xl font-black" style={{ color: card.color }}>
-                    ?{(card.value || 0).toLocaleString('en-IN')}
+                    {convert(card.value || 0, false, true).display}
                   </p>
                 </motion.div>
               ))}
@@ -97,7 +99,7 @@ export default function SupervisorEarnings() {
                         </p>
                       </div>
                       <p className="text-sm font-black shrink-0" style={{ color: '#10b981' }}>
-                        ?{(p.totalBudget || p.projectId?.totalAmount || 0).toLocaleString('en-IN')}
+                        {convert(p.totalBudget || p.projectId?.totalAmount || 0, false, true).display}
                       </p>
                     </motion.div>
                   ))}

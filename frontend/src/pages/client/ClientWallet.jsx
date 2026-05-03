@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonTable } from '../../components/SkeletonLoader';
@@ -105,7 +105,7 @@ function AddMoneyModal({ onClose, onSuccess }) {
                 <button key={m.id} onClick={() => setMethod(m.id)}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all"
                   style={{
-                    background: method === m.id ? 'rgba(96,10,10,0.05)' : 'var(--bg-card)',
+                    background: method === m.id ? 'rgba(var(--accent-rgb), 0.05)' : 'var(--bg-card)',
                     borderColor: method === m.id ? 'var(--accent)' : 'var(--border)',
                   }}>
                   <span style={{ color: method === m.id ? 'var(--accent)' : 'var(--text-secondary)' }}>{m.icon}</span>
@@ -160,10 +160,9 @@ export default function ClientWallet() {
       <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
 
         {/* Balance cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             { label: 'Available Balance', value: wallet?.balance ?? 0, accent: true },
-            { label: 'In Escrow',         value: wallet?.escrowHeld ?? 0 },
             { label: 'Total Added',       value: wallet?.totalAdded ?? 0 },
           ].map((card, i) => (
             <motion.div key={i}
@@ -194,18 +193,7 @@ export default function ClientWallet() {
           </button>
         </div>
 
-        {/* Escrow info */}
-        <div className="flex items-start gap-3 p-4 rounded-xl border"
-          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-          <ShieldCheck size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" style={{ color: 'var(--accent)' }} />
-          <div>
-            <div className="text-xs font-bold mb-0.5" style={{ color: 'var(--text-primary)' }}>Escrow Protected</div>
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              When you post a project, 30% is held in escrow after a Project Initiator is assigned.
-              The remaining 70% is released only after you approve the final deliverable.
-            </p>
-          </div>
-        </div>
+
 
         {/* Transaction history */}
         <div className="rounded-xl border overflow-hidden" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>

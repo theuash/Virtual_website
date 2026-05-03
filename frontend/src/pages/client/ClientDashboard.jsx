@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { formatCurrency } from '../../utils/roleGuards';
+import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import DashboardHeader from '../../components/DashboardHeader';
 import { SkeletonDashboard } from '../../components/SkeletonLoader';
@@ -41,6 +41,7 @@ function StatCard({ label, value, icon }) {
 
 export default function ClientDashboard() {
   const { user } = useAuth();
+  const { convert } = useCurrency();
   const navigate = useNavigate();
 
   const { data: dashboardData, isLoading, isError } = useQuery({
@@ -124,14 +125,6 @@ export default function ClientDashboard() {
           <div className="flex flex-col gap-1">
             <h2 className="text-base font-bold flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
               Good to see you, {user?.fullName?.split(' ')[0] || 'there'}.
-              {user?.verificationStatus === 'verified' && user?.clientId && (
-                <span 
-                  className="px-2 py-0.5 rounded text-[9px] font-black tracking-widest border"
-                  style={{ background: 'rgba(var(--accent-rgb), 0.05)', color: 'var(--accent)', borderColor: 'var(--border)' }}
-                >
-                  {user.clientId}
-                </span>
-              )}
             </h2>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Here's what's happening with your projects.
@@ -151,7 +144,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard label="Active Projects"   value={activeProjects}              icon={<FolderKanban size={18} strokeWidth={1.5} />} />
           <StatCard label="Pending Approvals" value={pendingApprovals}            icon={<Clock size={18} strokeWidth={1.5} />} />
-          <StatCard label="Total Spent"       value={formatCurrency(totalSpent)}  icon={<Wallet size={18} strokeWidth={1.5} />} />
+          <StatCard label="Total Spent"       value={convert(totalSpent).display}  icon={<Wallet size={18} strokeWidth={1.5} />} />
         </div>
 
         {/* Main grid */}
@@ -206,7 +199,7 @@ export default function ClientDashboard() {
                     </div>
                     <div className="flex items-center gap-4 text-[11px] mb-3" style={{ color: 'var(--text-secondary)' }}>
                       <span>{p.category?.replace('_', ' ')}</span>
-                      <span>{formatCurrency(p.budget)}</span>
+                      <span>{convert(p.budget).display}</span>
                     </div>
                     {/* Progress bar */}
                     <div className="h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>

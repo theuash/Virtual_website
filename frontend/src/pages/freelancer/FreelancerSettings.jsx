@@ -8,8 +8,10 @@ import ImageCropModal from "../../components/ImageCropModal";
 import {
   Camera, User, Mail, Phone, Calendar, Link, Clock,
   CheckCircle2, AlertCircle, Loader2, Trash2, Save, Sparkles,
-  Shield, Bell, Moon, Sun
+  Shield, Bell, Moon, Sun, Globe
 } from "lucide-react";
+import { COUNTRIES } from "../../components/CountrySelector";
+import { useCurrency } from "../../context/CurrencyContext";
 import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
 import { toast } from "react-hot-toast";
 import { requestNotificationPermission } from "../../services/notificationService";
@@ -88,13 +90,14 @@ const inputStyle = { background: "var(--bg-card)", borderColor: "var(--border)",
 export default function FreelancerSettings() {
   const { user, setUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { setIsIndia } = useCurrency();
   const fileRef = useRef(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [pushEnabled, setPushEnabled] = useState(Notification.permission === 'granted');
 
   const [form, setForm] = useState({
     fullName: "", phone: "", dateOfBirth: "", portfolioUrl: "",
-    hoursPerWeek: "",
+    hoursPerWeek: "", country: "",
   });
   const [contactDays, setContactDays] = useState([]);
   const [contactTime, setContactTime] = useState("");
@@ -125,6 +128,7 @@ export default function FreelancerSettings() {
                       : "",
       portfolioUrl: user.portfolioUrl || "",
       hoursPerWeek: user.hoursPerWeek ? Number(user.hoursPerWeek) : "",
+      country:      user.country || "IN",
     });
     setContactDays(parsedDays);
     setContactTime(parsedTime);
@@ -165,6 +169,7 @@ export default function FreelancerSettings() {
         const merged = { ...stored, ...updated, token: stored.token, refreshToken: stored.refreshToken };
         localStorage.setItem("virtual_user", JSON.stringify(merged));
         setUser?.(merged);
+        if (updated.country) setIsIndia(updated.country === "IN");
         toast.success("Profile saved successfully.");
       }
     } catch (err) {
@@ -252,6 +257,11 @@ export default function FreelancerSettings() {
                         <Field label="Phone" icon={Phone}><input name="phone" value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} className={inputCls} style={inputStyle} /></Field>
                         <Field label="Date of Birth" icon={Calendar}><DOBPicker value={form.dateOfBirth} onChange={v => setForm({...form, dateOfBirth: v})} /></Field>
                         <Field label="Portfolio URL" icon={Link}><input name="portfolioUrl" value={form.portfolioUrl} onChange={(e) => setForm({...form, portfolioUrl: e.target.value})} className={inputCls} style={inputStyle} /></Field>
+                        <Field label="Country" icon={Globe}>
+                          <select name="country" value={form.country} onChange={(e) => setForm({...form, country: e.target.value})} className={inputCls} style={inputStyle}>
+                            {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                          </select>
+                        </Field>
                     </div>
 
                     <div className="p-8 rounded-3xl border space-y-6" style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}>

@@ -12,6 +12,7 @@ const transactionSchema = new mongoose.Schema({
 
 const freelancerWalletSchema = new mongoose.Schema({
   freelancerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Freelancer', required: true, unique: true },
+  currency:     { type: String, enum: ['INR', 'USD'], default: 'INR' },
   balance:      { type: Number, default: 0 },       // available to withdraw
   totalEarned:  { type: Number, default: 0 },
   totalWithdrawn: { type: Number, default: 0 },

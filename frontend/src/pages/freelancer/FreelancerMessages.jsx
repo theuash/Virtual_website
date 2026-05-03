@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -31,7 +31,7 @@ export default function FreelancerMessages() {
   return (
     <>
       <DashboardHeader title="Messages" />
-      <div className="p-6 md:p-8 max-w-6xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto md:p-4">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"

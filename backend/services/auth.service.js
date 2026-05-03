@@ -81,6 +81,7 @@ const issuePhoneOtp = async (user, context) => {
 
 // ── Register (OTP flow) ───────────────────────────────────────────
 export const registerUser = async (data) => {
+  console.log('Registering user with data:', { ...data, password: '***' });
   const { email, password, phone, role } = data;
   const normalizedPhone = normalizePhone(phone);
 

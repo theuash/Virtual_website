@@ -6,6 +6,7 @@ import {
   DollarSign, Loader2, AlertCircle, ChevronDown, ChevronUp,
   CheckCircle2, Clock, Send,
 } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const STATUS_STYLES = {
   paid:    { color: '#10b981', bg: '#10b98122', label: 'Paid' },
@@ -14,6 +15,7 @@ const STATUS_STYLES = {
 };
 
 function PayrollRow({ payroll }) {
+  const { convert } = useCurrency();
   const [expanded, setExpanded] = useState(false);
   const [distributing, setDistributing] = useState(false);
   const [error, setError] = useState('');
@@ -52,7 +54,7 @@ function PayrollRow({ payroll }) {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-sm font-black" style={{ color: '#f59e0b' }}>
-            {budget.toLocaleString('en-IN')}
+            {convert(budget).display}
           </span>
           <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
             style={{
@@ -97,7 +99,7 @@ function PayrollRow({ payroll }) {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>
-                          {(entry.amount || 0).toLocaleString('en-IN')}
+                          {convert(entry.amount || 0).display}
                         </span>
                         <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-bold"
                           style={{ background: st.bg, color: st.color }}>

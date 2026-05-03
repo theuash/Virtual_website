@@ -12,6 +12,7 @@ const transactionSchema = new mongoose.Schema({
 
 const walletSchema = new mongoose.Schema({
   clientId:     { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true, unique: true },
+  currency:     { type: String, enum: ['INR', 'USD'], default: 'INR' },
   balance:      { type: Number, default: 0 },       // available balance in ₹
   escrowHeld:   { type: Number, default: 0 },        // locked in escrow
   totalAdded:   { type: Number, default: 0 },

@@ -39,10 +39,11 @@ function ExpandingCTA({ onClick }) {
     <motion.button
       ref={ref}
       onClick={onClick}
-      className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform"
+      className="relative flex items-center rounded-full overflow-hidden active:scale-95 transition-transform cursor-pointer pointer-events-auto"
       style={{
         border: '1px solid var(--accent)',
-        background: 'rgba(96,10,10,0.05)',
+        background: 'rgba(var(--accent-rgb),0.05)',
+        zIndex: 50,
       }}
       initial={{ scale: 0.4, opacity: 0 }}
       animate={popped ? { scale: 1, opacity: 1 } : { scale: 0.4, opacity: 0 }}
@@ -80,7 +81,7 @@ export default function PricingStrip() {
   useEffect(() => {
     getPricingSummary()
       .then(res => setDepartments(res.data.data))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -89,7 +90,7 @@ export default function PricingStrip() {
   return (
     <section
       id="stats"
-      className="pt-8 pb-12 px-6 relative z-20 border-t"
+      className="pt-8 pb-48 px-6 relative z-20 border-t"
       style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}
     >
       {/* Subtle ambient glow */}
@@ -150,113 +151,117 @@ export default function PricingStrip() {
         ) : (
           <div className="border rounded-[2.5rem] p-3 shadow-xl" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <div className="flex gap-4 overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory px-2 rounded-[2rem] border" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
-            {departments.map((dept, i) => {
-              const discountedPrice = discounted(dept.startingFrom);
-              const savings = dept.startingFrom - discountedPrice;
-              const convertedNormal = convert(dept.startingFrom);
-              const convertedDiscounted = convert(discountedPrice);
-              const convertedSavings = convertedNormal.value - convertedDiscounted.value;
-              
-              return (
-                <motion.button
-                  key={dept.department}
-                  custom={i}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true }}
-                  onClick={() => navigate(`/pricing#${dept.department}`)}
-                  className="group relative overflow-hidden rounded-[1.5rem] border p-6 flex flex-col justify-between h-[280px] w-[220px] sm:w-[240px] shrink-0 snap-center text-left transition-all duration-500"
-                  style={{
-                    background: 'linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%)',
-                    borderColor: 'var(--border)',
-                    boxShadow: '0 8px 24px -8px rgba(0,0,0,0.2)',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  whileHover={{ 
-                    scale: 1.02, 
-                    y: -5,
-                    boxShadow: '0 20px 40px -10px rgba(110,44,242,0.25)',
-                    borderColor: 'rgba(110,44,242,0.5)'
-                  }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                >
-                  {/* Subtle Inner Glow */}
-                  <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
-                    style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent) 0%, transparent 70%)' }} />
-                  
-                  {/* Top accent line on hover */}
-                  <div
-                    className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-x-0 group-hover:scale-x-100 origin-center"
-                    style={{ background: 'var(--accent)' }}
-                  />
+              {departments.map((dept, i) => {
+                const convertedNormal = convert(dept.startingFrom);
+                // Apply exact 15% off the converted (psycho-priced) value
+                const discountedValue = parseFloat((convertedNormal.value * (1 - FIRST_PROJECT_DISCOUNT)).toFixed(2));
+                const convertedDiscounted = {
+                  symbol: convertedNormal.symbol,
+                  value: discountedValue,
+                  display: convertedNormal.symbol + discountedValue.toFixed(2),
+                };
+                const convertedSavings = parseFloat((convertedNormal.value - discountedValue).toFixed(2));
 
-                  {/* Content */}
-                  <div className="relative z-10">
+                return (
+                  <motion.button
+                    key={dept.department}
+                    custom={i}
+                    variants={fadeUp}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true }}
+                    onClick={() => navigate(`/pricing#${dept.department}`)}
+                    className="group relative overflow-hidden rounded-[1.5rem] border p-6 flex flex-col justify-between h-[280px] w-[220px] sm:w-[240px] shrink-0 snap-center text-left transition-all duration-500"
+                    style={{
+                      background: 'linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%)',
+                      borderColor: 'var(--border)',
+                      boxShadow: '0 8px 24px -8px rgba(0,0,0,0.2)',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                    whileHover={{
+                      scale: 1.02,
+                      y: -5,
+                      boxShadow: '0 20px 40px -10px rgba(110,44,242,0.25)',
+                      borderColor: 'rgba(110,44,242,0.5)'
+                    }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                  >
+                    {/* Subtle Inner Glow */}
+                    <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
+                      style={{ background: 'radial-gradient(circle at 50% -20%, var(--accent) 0%, transparent 70%)' }} />
+
+                    {/* Top accent line on hover */}
                     <div
-                      className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 break-words leading-tight"
-                      style={{ color: 'var(--text-secondary)', opacity: 0.6 }}
-                    >
-                      {dept.displayName}
-                    </div>
+                      className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-x-0 group-hover:scale-x-100 origin-center"
+                      style={{ background: 'var(--accent)' }}
+                    />
 
-                    {/* Starting from label */}
-                    <div className="text-[9px] font-bold mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
-                      STARTING FROM
-                    </div>
+                    {/* Content */}
+                    <div className="relative z-10">
+                      <div
+                        className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] mb-4 break-words leading-tight"
+                        style={{ color: 'var(--text-secondary)', opacity: 0.6 }}
+                      >
+                        {dept.displayName}
+                      </div>
 
-                    {/* Discounted Price - Smaller responsive sizing */}
-                    <div className="mb-2">
-                      <div className="flex items-baseline flex-wrap gap-1">
+                      {/* Starting from label */}
+                      <div className="text-[9px] font-bold mb-2" style={{ color: 'var(--text-secondary)', opacity: 0.5 }}>
+                        STARTING FROM
+                      </div>
+
+                      {/* Discounted Price - Smaller responsive sizing */}
+                      <div className="mb-2">
+                        <div className="flex items-baseline flex-wrap gap-1">
+                          <span
+                            className="text-2xl sm:text-3xl font-black tracking-tight"
+                            style={{ color: 'var(--accent)' }}
+                          >
+                            {convertedDiscounted.symbol}{convertedDiscounted.value}
+                          </span>
+                          <span
+                            className="text-[10px] font-bold"
+                            style={{ color: 'var(--text-secondary)' }}
+                          >
+                            /{dept.startingUnit}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Original Price - smaller, strikethrough */}
+                      <div className="mb-4 flex flex-wrap items-center gap-2">
                         <span
-                          className="text-2xl sm:text-3xl font-black tracking-tight"
-                          style={{ color: 'var(--accent)' }}
-                        >
-                          {convertedDiscounted.symbol}{convertedDiscounted.value}
-                        </span>
-                        <span
-                          className="text-[10px] font-bold"
+                          className="text-xs line-through opacity-40"
                           style={{ color: 'var(--text-secondary)' }}
                         >
-                          /{dept.startingUnit}
+                          {convertedNormal.symbol}{convertedNormal.value.toFixed(2)}
+                        </span>
+                        <span
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ background: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent)' }}
+                        >
+                          -{convertedNormal.symbol}{convertedSavings.toFixed(2)}
                         </span>
                       </div>
-                    </div>
 
-                    {/* Original Price - smaller, strikethrough */}
-                    <div className="mb-4 flex flex-wrap items-center gap-2">
-                      <span
-                        className="text-xs line-through opacity-40"
-                        style={{ color: 'var(--text-secondary)' }}
+                      {/* First project badge */}
+                      <div
+                        className="flex items-center gap-1.5 text-[9px] font-bold"
+                        style={{ color: 'var(--accent)' }}
                       >
-                        {convertedNormal.symbol}{convertedNormal.value}
-                      </span>
-                      <span
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent)' }}
-                      >
-                        -{convertedNormal.symbol}{convertedSavings}
-                      </span>
+                        <Sparkles size={11} />
+                        First project offer
+                      </div>
+                      {/* Minimal Arrow */}
+                      <div className="flex justify-end mt-auto pt-4">
+                        <ArrowRight size={14} className="opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" style={{ color: 'var(--accent)' }} />
+                      </div>
                     </div>
-
-                    {/* First project badge */}
-                    <div
-                      className="flex items-center gap-1.5 text-[9px] font-bold"
-                      style={{ color: 'var(--accent)' }}
-                    >
-                      <Sparkles size={11} />
-                      First project offer
-                    </div>
-                    {/* Minimal Arrow */}
-                    <div className="flex justify-end mt-auto pt-4">
-                      <ArrowRight size={14} className="opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" style={{ color: 'var(--accent)' }} />
-                    </div>
-                  </div>
-                </motion.button>
-              );
-            })}
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
-        </div>
         )}
 
         {/* CTA */}
@@ -266,7 +271,7 @@ export default function PricingStrip() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mt-10 flex justify-center"
+          className="mt-10 flex justify-center relative z-30"
         >
           <ExpandingCTA onClick={() => navigate('/pricing')} />
         </motion.div>

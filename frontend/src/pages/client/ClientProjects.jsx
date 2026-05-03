@@ -1,7 +1,8 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
+import { useCurrency } from '../../context/CurrencyContext';
 import { SkeletonGrid, SkeletonProjectCard } from '../../components/SkeletonLoader';
 import {
   Search, Filter, Clock, DollarSign, CheckCircle2, 
@@ -44,7 +45,9 @@ function ProjectCard({ project, onView }) {
   const startDate = new Date(project.startDate);
   const deadline = new Date(project.deadline);
   const today = new Date();
-  const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+  const daysLeft = deadline && !isNaN(deadline.getTime()) 
+    ? Math.ceil((deadline - today) / (1000 * 60 * 60 * 24)) 
+    : 0;
   
   const isOverdue = daysLeft < 0 && project.status !== 'completed' && project.status !== 'cancelled';
   
@@ -92,7 +95,7 @@ function ProjectCard({ project, onView }) {
             Budget
           </span>
           <span className="text-sm font-bold" style={{ color: 'var(--accent)' }}>
-            {Number(project.totalAmount || project.baseAmount || project.openBudget || 0).toLocaleString('en-IN')}
+            {convert(Number(project.totalAmount || project.baseAmount || project.openBudget || 0)).display}
           </span>
         </div>
 
@@ -196,6 +199,7 @@ function EmptyState({ onPostNew }) {
 }
 
 export default function ClientProjects() {
+  const { convert } = useCurrency();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -208,7 +212,9 @@ export default function ClientProjects() {
 
   const fetchProjects = async () => {
     try {
+      console.log('Fetching projects...');
       const res = await api.get('/client/projects');
+      console.log('Projects response:', res.data);
       setProjects(res.data?.data || []);
     } catch (err) {
       console.error('Failed to fetch projects:', err);
@@ -219,9 +225,12 @@ export default function ClientProjects() {
 
   const filteredProjects = projects.filter(p => {
     const matchesFilter = filter === 'all' || p.status === filter;
+    const title = p.title || '';
+    const category = CATEGORY_LABELS[p.category] || p.category || '';
+    
     const matchesSearch = !search || 
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      CATEGORY_LABELS[p.category]?.toLowerCase().includes(search.toLowerCase());
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      category.toLowerCase().includes(search.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -432,7 +441,7 @@ export default function ClientProjects() {
                       Budget
                     </p>
                     <p className="text-lg font-black" style={{ color: 'var(--accent)' }}>
-                      {Number(viewProject.totalAmount || viewProject.baseAmount || viewProject.openBudget || 0).toLocaleString('en-IN')}
+                      {convert(Number(viewProject.totalAmount || viewProject.baseAmount || viewProject.openBudget || 0)).display}
                     </p>
                   </div>
                   <div className="p-3 rounded-xl" style={{ background: 'var(--bg-card)' }}>

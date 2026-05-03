@@ -1,10 +1,10 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search } from 'lucide-react';
 import { useCurrency } from '../context/CurrencyContext';
 
 // 180 major freelancing countries - code, name, flag emoji
-const COUNTRIES = [
+export const COUNTRIES = [
   { code: 'US', name: 'United States', flag: '' },
   { code: 'GB', name: 'United Kingdom', flag: '' },
   { code: 'IN', name: 'India', flag: '' },
@@ -225,15 +225,24 @@ export default function CountrySelector() {
   // Auto-detect via backend geo endpoint - overrides locale on response
   useEffect(() => {
     const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    fetch(`${BASE}/geo/country`)
+    fetch(`${BASE}/geo/country`, { credentials: 'include' })
       .then(r => r.json())
       .then(data => {
         console.log('[geo] response:', data);
         const code = data?.data?.country_code;
-        console.log('[geo] country_code:', code);
-        if (!code) return;
+        if (!code) {
+          // No cookie set yet — persist the locale-detected country to backend now
+          const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+          fetch(`${BASE}/geo/country`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ country: selected.code }),
+            credentials: 'include',
+          }).catch(() => {});
+          // Keep locale-detected country — already set on mount
+          return;
+        }
         const match = COUNTRIES.find(c => c.code === code);
-        console.log('[geo] matched country:', match?.name);
         if (match) {
           setSelected(match);
           setDetectedCountry(match);
@@ -244,9 +253,31 @@ export default function CountrySelector() {
 
   const handleSelect = (c) => {
     setSelected(c);
-    setDetectedCountry(c);
+    setDetectedCountry(c); // Instant UI update
     setOpen(false);
     setQuery('');
+
+    // Persist selection to backend so it can set a cookie
+    const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${BASE}/geo/country`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ country: c.code }),
+      credentials: 'include',
+    })
+      .then(r => r.json())
+      .then(data => {
+        // backend returns { data: { country_code, currency } }
+        const code = data?.data?.country_code || c.code;
+        const match = COUNTRIES.find(x => x.code === code) || c;
+        if (match.code !== c.code) {
+          setSelected(match);
+          setDetectedCountry(match);
+        }
+      })
+      .catch(() => {
+        // fallback already handled by instant update
+      });
   };
 
   // Close on outside click

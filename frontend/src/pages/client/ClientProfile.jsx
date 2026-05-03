@@ -1,11 +1,13 @@
 import { useAuth } from "../../context/AuthContext";
 import DashboardHeader from "../../components/DashboardHeader";
-import { User, Mail, Globe, Building2, Calendar, MapPin, Briefcase, CheckCircle2 } from "lucide-react";
+import { User, Mail, Globe, Building2, Calendar, MapPin, Briefcase, CheckCircle2, Edit2, Camera, Image as ImageIcon } from "lucide-react";
 import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function ClientProfile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const initial = (user?.fullName || "C").charAt(0).toUpperCase();
 
   const memberSince = user?.createdAt 
@@ -24,19 +26,34 @@ export default function ClientProfile() {
           className="rounded-2xl border overflow-hidden relative"
           style={{ background: "var(--bg-secondary)", borderColor: "var(--border)" }}
         >
-          <div className="h-32 w-full" style={{ background: "linear-gradient(to right, #3b82f6, #2563eb)", opacity: 0.8 }} />
+          <div className="h-32 w-full relative group" style={{ background: "linear-gradient(to right, #3b82f6, #2563eb)", opacity: 0.8 }}>
+            <button 
+              onClick={() => navigate('/client/settings')}
+              className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold"
+            >
+              <ImageIcon size={14} /> Change Cover
+            </button>
+          </div>
           
           <div className="px-6 pb-6 pt-0 flex flex-col md:flex-row items-center md:items-end gap-6 -mt-12 relative z-10">
-            {user?.avatar ? (
-              <div className="rounded-full border-4 shadow-xl" style={{ borderColor: "var(--bg-secondary)" }}>
-                <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={120} />
-              </div>
-            ) : (
-              <div className="w-[120px] h-[120px] rounded-full border-4 flex items-center justify-center text-4xl font-black shadow-xl"
-                style={{ background: "var(--accent)", color: "#fff", borderColor: "var(--bg-secondary)" }}>
-                {initial}
-              </div>
-            )}
+            <div className="relative group">
+              {user?.avatar ? (
+                <div className="rounded-full border-4 shadow-xl" style={{ borderColor: "var(--bg-secondary)" }}>
+                  <AvatarCircle src={resolveAvatar(user.avatar)} initial={initial} size={120} />
+                </div>
+              ) : (
+                <div className="w-[120px] h-[120px] rounded-full border-4 flex items-center justify-center text-4xl font-black shadow-xl"
+                  style={{ background: "var(--accent)", color: "#fff", borderColor: "var(--bg-secondary)" }}>
+                  {initial}
+                </div>
+              )}
+              <button 
+                onClick={() => navigate('/client/settings')}
+                className="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full border-2 border-white/10 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+              >
+                <Camera size={14} />
+              </button>
+            </div>
             
             <div className="flex-1 text-center md:text-left pt-12 md:pt-0">
               <h1 className="text-3xl font-black tracking-tight flex items-center justify-center md:justify-start gap-2" style={{ color: "var(--text-primary)" }}>
@@ -51,7 +68,7 @@ export default function ClientProfile() {
               </p>
             </div>
             
-            <div className="hidden md:flex gap-6 mb-2">
+            <div className="hidden md:flex gap-6 mb-2 items-end">
               <div className="text-center">
                 <p className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>{user?.projectsPosted || 0}</p>
                 <p className="text-[10px] uppercase tracking-widest opacity-50" style={{ color: "var(--text-secondary)" }}>Projects</p>
@@ -60,7 +77,22 @@ export default function ClientProfile() {
                 <p className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>0</p>
                 <p className="text-[10px] uppercase tracking-widest opacity-50" style={{ color: "var(--text-secondary)" }}>Reviews</p>
               </div>
+              <button 
+                onClick={() => navigate('/client/settings')}
+                className="ml-4 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border transition-all hover:bg-black/5 dark:hover:bg-white/5"
+                style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+              >
+                <Edit2 size={14} /> Edit Profile
+              </button>
             </div>
+            
+            <button 
+              onClick={() => navigate('/client/settings')}
+              className="md:hidden mt-4 flex items-center justify-center w-full gap-2 px-4 py-2 rounded-xl text-sm font-bold border transition-all"
+              style={{ borderColor: "var(--border)", color: "var(--text-primary)", background: "var(--bg-card)" }}
+            >
+              <Edit2 size={14} /> Edit Profile
+            </button>
           </div>
         </motion.div>
 
@@ -91,6 +123,24 @@ export default function ClientProfile() {
                     <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Client</p>
                   </div>
                 </div>
+                {user?.userId && (
+                  <div className="flex items-start gap-3">
+                    <User size={16} className="mt-0.5 opacity-50" style={{ color: "var(--text-primary)" }} />
+                    <div>
+                      <p className="text-[10px] uppercase font-bold tracking-wider opacity-50" style={{ color: "var(--text-secondary)" }}>System ID</p>
+                      <p className="text-sm font-bold font-mono" style={{ color: "var(--text-primary)" }}>{user.userId}</p>
+                    </div>
+                  </div>
+                )}
+                {user?.clientId && (
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 size={16} className="mt-0.5 opacity-50" style={{ color: "var(--text-primary)" }} />
+                    <div>
+                      <p className="text-[10px] uppercase font-bold tracking-wider opacity-50" style={{ color: "var(--text-secondary)" }}>Client ID</p>
+                      <p className="text-sm font-bold font-mono text-accent" style={{ color: "var(--accent)" }}>{user.clientId}</p>
+                    </div>
+                  </div>
+                )}
                 {user?.location && (
                   <div className="flex items-start gap-3">
                     <MapPin size={16} className="mt-0.5 opacity-50" style={{ color: "var(--text-primary)" }} />

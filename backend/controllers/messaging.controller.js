@@ -201,3 +201,28 @@ export const getDefaultConversation = asyncHandler(async (req, res) => {
 
   res.json(new ApiResponse(200, { ...conv, name: partnerName }, 'Default conversation ready'));
 });
+// ── POST /api/messaging/conversations/:id/messages ────────────────
+export const sendMessage = asyncHandler(async (req, res) => {
+  const { id: conversationId } = req.params;
+  const { content } = req.body;
+
+  if (!content) return res.status(400).json(new ApiResponse(400, null, 'Message content required'));
+
+  const conv = await Conversation.findById(conversationId);
+  if (!conv) return res.status(404).json(new ApiResponse(404, null, 'Conversation not found'));
+
+  const isMember = conv.members.map(String).includes(req.user._id.toString());
+  if (!isMember) return res.status(403).json(new ApiResponse(403, null, 'Not a member'));
+
+  const message = await Message.create({
+    conversationId,
+    senderId: req.user._id,
+    content
+  });
+
+  // Update conversation timestamp for sorting
+  conv.updatedAt = new Date();
+  await conv.save();
+
+  res.status(201).json(new ApiResponse(201, message, 'Message sent'));
+});

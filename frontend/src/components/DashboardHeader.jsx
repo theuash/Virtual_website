@@ -85,7 +85,7 @@ export default function DashboardHeader({ title }) {
             {title}
           </h1>
           <p className="text-[10px] sm:text-xs mt-0.5 opacity-60" style={{ color: 'var(--text-secondary)' }}>
-            Welcome, {user?.fullName || 'User'}
+            Welcome, {user?.fullName || 'User'} 
           </p>
         </div>
 

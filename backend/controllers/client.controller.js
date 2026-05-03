@@ -8,15 +8,32 @@ import { Wallet } from '../models/Wallet.js';
 import { Pricing } from '../models/Pricing.js';
 import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
 import { Notification } from '../models/Notification.js';
+import { Coupon } from '../models/Coupon.js';
 
-const PLATFORM_FEE_RATE    = 0.05;   // 5%
-const TIME_SENSITIVE_RATE  = 0.60;   // +60%
-const DEPOSIT_RATE         = 0.30;   // 30% upfront
+const PLATFORM_FEE_RATE     = 0.05;   // 5%
+const TIME_SENSITIVE_RATE   = 0.60;   // +60%
+const DEPOSIT_RATE          = 0.30;   // 30% upfront
+const FIRST_PROJECT_DISCOUNT = 0.15;   // 15% discount for first project
+const USD_MARKUP            = 1;      // 1:1 ratio for non-India clients (requested)
+
+// Psychological pricing: rounds to X4.99 or X9.99
+function psychoPrice(rawUsd) {
+  const floor = Math.floor(rawUsd);
+  const lastDigit = floor % 10;
+  const base = Math.floor(floor / 10) * 10;
+  if (lastDigit === 0) return parseFloat((floor - 0.01).toFixed(2));
+  if (lastDigit >= 1 && lastDigit <= 4) return parseFloat((base + 4.99).toFixed(2));
+  return parseFloat((base + 9.99).toFixed(2)); // 5–9
+}
 
 // ── Helper: get or create wallet ──────────────────────────────────
 const getOrCreateWallet = async (clientId) => {
   let wallet = await Wallet.findOne({ clientId });
-  if (!wallet) wallet = await Wallet.create({ clientId });
+  if (!wallet) {
+    const client = await Client.findById(clientId);
+    const isIndia = (client?.country || 'IN').toUpperCase() === 'IN';
+    wallet = await Wallet.create({ clientId, currency: isIndia ? 'INR' : 'USD' });
+  }
   return wallet;
 };
 
@@ -43,6 +60,53 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, { stats, projects: recentProjects }, 'Dashboard stats retrieved'));
 });
 
+// ── Notifications ─────────────────────────────────────────────────
+export const getNotifications = asyncHandler(async (req, res) => {
+  const notifications = await Notification.find({ 
+    recipientId: req.user._id,
+    recipientModel: 'Client'
+  }).sort({ createdAt: -1 }).limit(20);
+  
+  res.json(new ApiResponse(200, notifications, 'Notifications retrieved'));
+});
+
+// ── Coupons ──────────────────────────────────────────────────────
+export const validateCoupon = asyncHandler(async (req, res) => {
+  const { code, amount } = req.body;
+  
+  // Check if it's the user's first project
+  const projectCount = await Project.countDocuments({ clientId: req.user._id });
+  if (projectCount === 0) {
+    return res.status(400).json(new ApiResponse(400, null, 'Coupons cannot be applied to your first project (you already have an automatic 15% discount!)'));
+  }
+
+  if (!code) return res.status(400).json(new ApiResponse(400, null, 'Coupon code is required'));
+
+  const coupon = await Coupon.findOne({ code: code.toUpperCase() });
+  
+  if (!coupon) {
+    return res.status(404).json(new ApiResponse(404, null, 'Invalid coupon code'));
+  }
+
+  if (coupon.isUsed) {
+    return res.status(400).json(new ApiResponse(400, null, 'This coupon has already been used'));
+  }
+
+  if (new Date(coupon.expiryDate) < new Date()) {
+    return res.status(400).json(new ApiResponse(400, null, 'This coupon has expired'));
+  }
+
+  if (amount && coupon.minPurchaseAmount > amount) {
+    return res.status(400).json(new ApiResponse(400, null, `Minimum purchase of ₹${coupon.minPurchaseAmount} required`));
+  }
+
+  res.json(new ApiResponse(200, {
+    code: coupon.code,
+    discountType: coupon.discountType,
+    discountValue: coupon.discountValue
+  }, 'Coupon applied successfully'));
+});
+
 // ── Create project ────────────────────────────────────────────────
 export const createProject = asyncHandler(async (req, res) => {
   const {
@@ -50,20 +114,71 @@ export const createProject = asyncHandler(async (req, res) => {
     timeSensitive, serviceId, serviceName, unit, quantity, ratePerUnit,
     isOpenProject, openBudget, openUnit,
     experienceFormat, preferredSoftware, referenceLinks, ndaRequired,
+    couponCode,
   } = req.body;
+
+  const countryCode = (req.cookies?.country_code || 'IN').toUpperCase();
+  const isIndia = countryCode === 'IN';
+  const projectCurrency = isIndia ? 'INR' : 'USD';
+
+  let inrToUsd = 0.012;
+  if (!isIndia) {
+    try {
+      const response = await fetch("https://api.exchangerate-api.com/v4/latest/INR");
+      const data = await response.json();
+      if (data?.rates?.USD) inrToUsd = data.rates.USD;
+    } catch (err) {}
+  }
 
   // Compute amounts
   let baseAmount = 0;
   if (isOpenProject) {
-    baseAmount = openBudget || 0;
+    baseAmount = openBudget || 0; // openBudget is already entered by user in their local currency
   } else {
-    baseAmount = (ratePerUnit || 0) * (quantity || 0);
+    let rate = ratePerUnit || 0;
+    if (!isIndia) {
+      rate = rate * USD_MARKUP * inrToUsd;
+    }
+    baseAmount = rate * (quantity || 0);
   }
 
-  const timeSensitiveFee = timeSensitive ? Math.round(baseAmount * TIME_SENSITIVE_RATE) : 0;
-  const subtotal         = baseAmount + timeSensitiveFee;
-  const platformFee      = Math.round(subtotal * PLATFORM_FEE_RATE);
-  const totalAmount      = subtotal + platformFee;
+  // Apply psychological pricing for USD (round to X4.99 or X9.99)
+  if (!isIndia) baseAmount = psychoPrice(baseAmount);
+  else baseAmount = Math.ceil(baseAmount);
+
+  const timeSensitiveFee = timeSensitive ? (isIndia ? Math.round(baseAmount * TIME_SENSITIVE_RATE) : parseFloat((baseAmount * TIME_SENSITIVE_RATE).toFixed(2))) : 0;
+  const subtotal         = isIndia ? Math.round(baseAmount + timeSensitiveFee) : parseFloat((baseAmount + timeSensitiveFee).toFixed(2));
+
+  // Check for first project discount eligibility
+  const projectCount = await Project.countDocuments({ clientId: req.user._id });
+  const isFirstProject = projectCount === 0 && !isOpenProject; // Discount usually applies to catalogue services
+  const discount = isFirstProject ? (isIndia ? Math.round(subtotal * FIRST_PROJECT_DISCOUNT) : parseFloat((subtotal * FIRST_PROJECT_DISCOUNT).toFixed(2))) : 0;
+
+  const discountedAmount = subtotal - discount;
+  const platformFee      = isIndia ? Math.round(discountedAmount * PLATFORM_FEE_RATE) : parseFloat((discountedAmount * PLATFORM_FEE_RATE).toFixed(2));
+  let totalAmount        = isIndia ? Math.round(discountedAmount + platformFee) : parseFloat((discountedAmount + platformFee).toFixed(2));
+
+  // Apply Coupon if provided
+  let couponDiscount = 0;
+  let appliedCoupon = null;
+
+  if (couponCode) {
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (coupon && !coupon.isUsed && new Date(coupon.expiryDate) > new Date()) {
+      let cVal = coupon.discountValue;
+      if (!isIndia && coupon.discountType === 'flat') {
+         cVal = parseFloat((cVal * 1.4 * inrToUsd).toFixed(2));
+      }
+      if (coupon.discountType === 'percentage') {
+        couponDiscount = isIndia ? Math.round(totalAmount * (coupon.discountValue / 100)) : parseFloat((totalAmount * (coupon.discountValue / 100)).toFixed(2));
+      } else {
+        couponDiscount = Math.min(cVal, totalAmount);
+      }
+      totalAmount -= couponDiscount;
+      if (!isIndia) totalAmount = parseFloat(totalAmount.toFixed(2));
+      appliedCoupon = coupon;
+    }
+  }
 
   // Compute deadline
   const start    = new Date(startDate);
@@ -79,6 +194,10 @@ export const createProject = asyncHandler(async (req, res) => {
     timeSensitive: !!timeSensitive,
     serviceId, serviceName, unit, quantity, ratePerUnit,
     baseAmount, timeSensitiveFee, platformFee, totalAmount,
+    discountAmount: discount,
+    couponDiscount,
+    appliedCouponCode: appliedCoupon?.code,
+    isFirstProject,
     isOpenProject: !!isOpenProject,
     openBudget, openUnit,
     experienceFormat: experienceFormat || 'elite',
@@ -86,7 +205,16 @@ export const createProject = asyncHandler(async (req, res) => {
     referenceLinks: referenceLinks || [],
     ndaRequired: !!ndaRequired,
     budget: totalAmount,
+    currency: projectCurrency,
   });
+
+  // Mark coupon as used
+  if (appliedCoupon) {
+    appliedCoupon.isUsed = true;
+    appliedCoupon.usedBy = req.user._id;
+    appliedCoupon.usedAt = new Date();
+    await appliedCoupon.save();
+  }
 
   res.status(201).json(new ApiResponse(201, project, 'Project created'));
 });

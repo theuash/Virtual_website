@@ -12,6 +12,7 @@ const txSchema = new mongoose.Schema({
 
 const supervisorWalletSchema = new mongoose.Schema({
   supervisorId:   { type: mongoose.Schema.Types.ObjectId, ref: 'MomentumSupervisor', required: true, unique: true },
+  currency:       { type: String, enum: ['INR', 'USD'], default: 'INR' },
   balance:        { type: Number, default: 0 },
   totalEarned:    { type: Number, default: 0 },
   totalWithdrawn: { type: Number, default: 0 },

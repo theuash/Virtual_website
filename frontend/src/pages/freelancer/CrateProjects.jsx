@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../../components/DashboardHeader';
 import api from '../../services/api';
+import { useCurrency } from '../../context/CurrencyContext';
 import {
   FolderKanban, Clock, CheckCircle2, AlertCircle, ChevronRight,
   Calendar, DollarSign, Tag, Users, Loader2, RefreshCw, MessageSquare,
@@ -45,6 +46,7 @@ function StatusBadge({ status, config }) {
 }
 
 function ProjectCard({ project, onClick }) {
+  const { convert } = useCurrency();
   const status = STATUS_CONFIG[project.status] || STATUS_CONFIG.open;
   const completedTasks = project.tasks?.filter(t => t.status === 'approved').length ?? 0;
   const totalTasks = project.tasks?.length ?? 0;
@@ -91,7 +93,7 @@ function ProjectCard({ project, onClick }) {
           {project.totalAmount && (
             <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
               <DollarSign size={11} />
-              {project.totalAmount?.toLocaleString('en-IN')}
+              {convert(project.totalAmount).display}
             </div>
           )}
         </div>
@@ -199,7 +201,7 @@ function ProjectDetailModal({ project, onClose }) {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'Budget', value: project.totalAmount ? `${project.totalAmount.toLocaleString('en-IN')}` : '-' },
+              { label: 'Budget', value: project.totalAmount ? `${convert(project.totalAmount).display}` : '-' },
               { label: 'Deadline', value: project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN') : '-' },
               { label: 'Tasks', value: project.tasks?.length ?? 0 },
             ].map(s => (
@@ -229,7 +231,7 @@ function ProjectDetailModal({ project, onClose }) {
                           Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-IN') : '-'}
                         </span>
                         <span className="text-[10px] font-bold" style={{ color: '#10b981' }}>
-                          {task.earnings?.toLocaleString('en-IN')}
+                          {convert(task.earnings || 0).display}
                         </span>
                       </div>
                     </div>

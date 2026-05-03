@@ -16,25 +16,30 @@
 }
 
 :root {
-  --bg-primary: #000000;
-  --bg-secondary: #0a0a0a;
-  --bg-card: #0a0a0a;
+  --bg-primary: #0a0a0c;
+  --bg-primary-rgb: 10, 10, 12;
+  --bg-secondary: #121216;
+  --bg-secondary-rgb: 18, 18, 22;
+  --bg-card: #1c1c21;
+  --bg-card-rgb: 28, 28, 33;
   --text-primary: #FFFFFF;
-  --text-secondary: #86868b;
-  --accent: #6e2cf2;
-  --accent-rgb: 110, 44, 242;
-  --accent-light: #a37dfa;
-  --forest: #121212;
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary: #a1a1aa;
+  --text-secondary-rgb: 161, 161, 170;
+  --accent: #8b5cf6;
+  --accent-rgb: 139, 92, 246;
+  --accent-light: #c084fc;
+  --forest: #1e1e24;
   --btn-bg: #FFFFFF;
   --btn-text: #000000;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.18);
   --transition-speed: 0.4s;
   --video-blend: screen;
-  --anim-glow: rgba(255, 255, 255, 0.05);
-  --anim-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-  --bg-glass: rgba(0, 0, 0, 0.7);
-  --gradient-accent: linear-gradient(135deg, #39117d 0%, #1a1a1a 100%);
+  --anim-glow: rgba(139, 92, 246, 0.15);
+  --anim-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+  --bg-glass: rgba(10, 10, 12, 0.75);
+  --gradient-accent: linear-gradient(135deg, #4c1d95 0%, #0a0a0c 100%);
   
   /* ─── Fluid Scaling ─── */
   /* This scales the base font size smoothly from 14px (mobile) to ~21px (large desktop) */
@@ -50,11 +55,16 @@
 
 .light {
   --bg-primary: #F0F2EF;
+  --bg-primary-rgb: 240, 242, 239;
   --bg-secondary: #E9ECE8;
+  --bg-secondary-rgb: 233, 236, 232;
   --bg-card: #FFFFFF;
+  --bg-card-rgb: 255, 255, 255;
   --bg-surface: #F8FAF7;
   --text-primary: #111D14;
+  --text-primary-rgb: 17, 29, 20;
   --text-secondary: #2C4233;
+  --text-secondary-rgb: 44, 66, 51;
   --accent: #600A0A;
   --accent-rgb: 96, 10, 10;
   --forest: #1B3022;
@@ -69,7 +79,7 @@
 
 /* Fallbacks */
 :root {
-  background-color: #000000;
+  background-color: var(--bg-primary);
 }
 
 .light {
@@ -124,7 +134,7 @@ html {
 }
 
 body {
-  background-color: #000000;
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 400;

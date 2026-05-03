@@ -645,11 +645,6 @@ export default function LandingPage() {
             >
               <source src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001'}/assets/v.mp4`} type="video/mp4" />
             </video>
-            <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, #000 0%, transparent 12%, transparent 88%, #000 100%)", zIndex: 1 }} />
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{ opacity: heroOpacity, background: isDark ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.45)", zIndex: 2 }}
-            />
           </div>
 
           {/* Sound toggle - bottom right */}
@@ -851,10 +846,10 @@ export default function LandingPage() {
 
           {/* Left Side: Sticky Professional UI Dashboard */}
           <div className="w-full lg:w-1/2 sticky top-0 h-screen flex items-center justify-center z-10">
-            <div className="relative w-full aspect-[16/10] max-w-xl border rounded-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.3)] bg-white/[0.01] backdrop-blur-sm" style={{ borderColor: 'var(--border)' }}>
+            <div className="relative w-full aspect-[16/10] max-w-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl" style={{ background: 'var(--bg-card)' }}>
 
               {/* Window Header (Apple Style) */}
-              <div className="h-8 border-b flex items-center px-4 gap-1.5" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+              <div className="h-8 border-b border-white/5 flex items-center px-4 gap-1.5" style={{ background: 'var(--bg-secondary)' }}>
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/20" />
                 <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20" />
                 <div className="w-2.5 h-2.5 rounded-full bg-green-500/20" />
@@ -877,9 +872,9 @@ export default function LandingPage() {
                         <Layers size={20} className="text-accent" />
                       </div>
                       <div className="space-y-2">
-                        <div className="h-2.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
-                        <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                        <div className="h-2 w-2/3 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-2.5 w-3/4 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.8)' }} />
+                        <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.15)' }} />
+                        <div className="h-2 w-2/3 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.15)' }} />
                       </div>
                     </div>
 
@@ -914,8 +909,8 @@ export default function LandingPage() {
                             className="w-6 h-6 border-2 border-dashed rounded-full border-accent/40"
                           />
                           <div className="space-y-1.5 flex-1">
-                            <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                            <div className="h-1 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                            <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
+                            <div className="h-1 w-1/2 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
                           </div>
                         </motion.div>
                       ))}
@@ -933,7 +928,7 @@ export default function LandingPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <ShieldCheck size={18} className="text-accent" />
-                        <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.15)' }} />
                       </div>
                       <div className="text-5xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>$12,450<span className="text-3xl opacity-50">.00</span></div>
                     </div>
@@ -955,9 +950,9 @@ export default function LandingPage() {
                           <CheckCircle2 size={12} className="text-accent" />
                         </div>
                         <div className="space-y-2 mt-4 relative z-10">
-                          <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'var(--text-secondary)' }} />
-                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                          <div className="h-1.5 w-2/3 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                          <div className="h-2 w-1/2 rounded-full" style={{ backgroundColor: 'rgba(var(--text-secondary-rgb), 0.4)' }} />
+                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
+                          <div className="h-1.5 w-2/3 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
                         </div>
                       </div>
                     ))}
@@ -1005,8 +1000,8 @@ export default function LandingPage() {
                     >
                       <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }} />
                       <div className="space-y-2 flex-1 border rounded-lg p-3" style={{ borderColor: 'var(--border)' }}>
-                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                        <div className="h-1.5 w-1/2 rounded-full ml-auto" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
+                        <div className="h-1.5 w-1/2 rounded-full ml-auto" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
                       </div>
                     </motion.div>
 
@@ -1044,7 +1039,7 @@ export default function LandingPage() {
                 >
                   <div className="flex justify-between items-end mb-8">
                     <div className="space-y-2">
-                      <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                      <div className="h-3 w-32 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.15)' }} />
                       <div className="text-4xl font-bold tracking-tighter" style={{ color: 'var(--text-primary)' }}>+42.8%</div>
                     </div>
                     <div className="flex gap-1 items-end h-8 relative">
@@ -1103,7 +1098,7 @@ export default function LandingPage() {
                   className="absolute inset-0 p-10 flex flex-col gap-4"
                 >
                   <div className="flex justify-between items-center mb-2">
-                    <div className="h-3 w-40 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                    <div className="h-3 w-40 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.15)' }} />
                     <div className="flex items-center gap-2 px-2 py-1 border rounded-md" style={{ borderColor: 'var(--border)' }}>
                       <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-red-500" />
                       <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Live Sync</span>
@@ -1140,9 +1135,9 @@ export default function LandingPage() {
                         <div className="w-1.5 h-1.5 rounded-full bg-accent absolute" />
                       </div>
                       <div className="space-y-2 flex-1">
-                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                        <div className="h-1.5 w-3/4 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
-                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+                        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
+                        <div className="h-1.5 w-3/4 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
+                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: 'rgba(var(--text-primary-rgb), 0.1)' }} />
                       </div>
                     </div>
                   </div>
