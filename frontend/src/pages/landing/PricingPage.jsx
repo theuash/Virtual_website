@@ -1,13 +1,33 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import ReactDOM from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sparkles, X, ArrowRight, ChevronLeft, ArrowLeft, Clock, Zap, Star, Shield, Tag, CheckCircle } from "lucide-react";
+import { Search, Sparkles, X, ArrowRight, ChevronLeft, ArrowLeft, Clock, Zap, Star, Shield, Tag, CheckCircle, Info } from "lucide-react";
 import Header from "../../components/landing/Header";
 import { getAllPricing } from "../../services/pricing";
 import { useCurrency } from "../../context/CurrencyContext";
 
 const DISCOUNT = 0.15;
 const FPS_DEPTS = new Set(['3d_animation', 'cgi']);
+
+// ─── Short-form multipliers (applied to popular formats only) ────────────────
+// Maps a substring of the format name (lowercase) → price multiplier
+const SHORT_FORM_MULTIPLIERS = [
+  { match: 'vlog',           multiplier: 1.60 },
+  { match: 'podcast',        multiplier: 1.60 },
+  { match: 'gaming',         multiplier: 1.85 },
+  { match: 'documentary',    multiplier: 1.30 },
+  { match: 'motion graphic', multiplier: 1.30 },
+  { match: 'subtitl',        multiplier: 2.20 },
+];
+
+function getShortFormMultiplier(name) {
+  const n = name.toLowerCase();
+  for (const { match, multiplier } of SHORT_FORM_MULTIPLIERS) {
+    if (n.includes(match)) return multiplier;
+  }
+  return 1; // no change for formats not in the list
+}
 
 const FPS_OPTIONS = [
   { label: '24 fps', value: 24, multiplier: 1.0, note: 'Base' },
@@ -136,7 +156,169 @@ function getServiceInfo(item, deptName) {
   };
 }
 
-// ─── Service Drawer ──────────────────────────────────────────────────────────
+// ─── Tolerance Info Tooltip ──────────────────────────────────────────────────
+function ToleranceInfo({ tolerance }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
+  const hideTimer = useRef(null);
+
+  const getExplanation = (tol) => {
+    if (!tol) return null;
+    const t = tol.toLowerCase();
+    if (t.includes('30') && t.includes('sec')) {
+      return {
+        lines: [
+          `Order 10 min → deliverable lives between 9:30 and 10:30.`,
+          `Stay inside that window and you're billed for exactly 10 min.`,
+          `Cross 10:30 and the clock ticks to 11 min — one extra minute is charged.`,
+        ],
+        note: `The ±30 sec buffer exists because creative work breathes — a perfect cut rarely lands on the dot.`,
+      };
+    }
+    if (t.includes('0.5')) {
+      return {
+        lines: [
+          `Order 10 sec → deliverable lives between 9.5 sec and 10.5 sec.`,
+          `Land inside that window and you pay for 10 sec flat.`,
+          `Exceed 10.5 sec and billing rounds up to 11 sec.`,
+        ],
+        note: `Frame-accurate animation needs breathing room — 0.5 sec keeps timing natural without surprise charges.`,
+      };
+    }
+    const match = tol.match(/\d+/);
+    if (match) {
+      const n = parseInt(match[0]);
+      return {
+        lines: [
+          `Every design includes ${n} free revision round${n === 1 ? '' : 's'}.`,
+          `Need more changes? Each extra round is charged at +10% to +40% of the base price, depending on the scope of the alteration.`,
+          `Minor tweaks (colour, font) sit closer to 10%. Major reworks (layout, concept change) push toward 40%.`,
+        ],
+        note: `Revisions keep the work sharp — the tolerance just ensures unlimited change requests don't go uncompensated.`,
+      };
+    }
+    return {
+      lines: [`The final deliverable may vary slightly from the exact specification.`],
+      note: `This tolerance accounts for natural creative and technical adjustments during production.`,
+    };
+  };
+
+  const explanation = getExplanation(tolerance);
+  if (!explanation) return null;
+
+  const show = () => {
+    clearTimeout(hideTimer.current);
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({
+        top: rect.top + rect.height / 2,   // vertically centered on the icon
+        left: rect.right + 10,             // 10px to the right of the icon
+      });
+    }
+    setOpen(true);
+  };
+
+  const hide = () => {
+    hideTimer.current = setTimeout(() => setOpen(false), 120);
+  };
+
+  return (
+    <span className="inline-flex items-center ml-1.5" style={{ verticalAlign: 'middle' }}>
+      <button
+        ref={btnRef}
+        type="button"
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onFocus={show}
+        onBlur={hide}
+        onClick={e => { e.stopPropagation(); open ? setOpen(false) : show(); }}
+        className="flex items-center justify-center rounded-full transition-opacity hover:opacity-100"
+        style={{ color: "var(--text-secondary)", opacity: 0.55, lineHeight: 1 }}
+        aria-label="Tolerance explanation"
+      >
+        <Info size={11} />
+      </button>
+
+      {open && typeof document !== 'undefined' && ReactDOM.createPortal(
+        <div
+          onMouseEnter={() => clearTimeout(hideTimer.current)}
+          onMouseLeave={hide}
+          style={{
+            position: 'fixed',
+            top: pos.top,
+            left: pos.left,
+            transform: 'translateY(-50%)',   // vertically center on the icon
+            zIndex: 99999,
+            width: 288,
+            borderRadius: 14,
+            border: '1px solid var(--border)',
+            padding: '12px 14px',
+            background: 'var(--bg-primary)',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.55)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <Info size={10} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--accent)',
+            }}>
+              What does {tolerance} mean?
+            </span>
+          </div>
+          {/* Bullet lines */}
+          <ul style={{ margin: '0 0 10px 0', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {explanation.lines.map((line, i) => (
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                <span style={{
+                  marginTop: 3,
+                  width: 5, height: 5,
+                  borderRadius: '50%',
+                  background: 'var(--accent)',
+                  opacity: 0.6,
+                  flexShrink: 0,
+                }} />
+                <span style={{ fontSize: 11, lineHeight: 1.6, color: 'var(--text-primary)' }}>{line}</span>
+              </li>
+            ))}
+          </ul>
+          {/* Note */}
+          <p style={{
+            margin: 0,
+            fontSize: 10,
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            borderTop: '1px solid var(--border)',
+            paddingTop: 8,
+            fontStyle: 'italic',
+          }}>
+            {explanation.note}
+          </p>
+          {/* Arrow pointing left toward the icon */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: -6,
+            transform: 'translateY(-50%)',
+            width: 0,
+            height: 0,
+            borderTop: '6px solid transparent',
+            borderBottom: '6px solid transparent',
+            borderRight: '6px solid var(--border)',
+          }} />
+        </div>,
+        document.body
+      )}
+    </span>
+  );
+}
+
+
 function ServiceDrawer({ service, deptName, onClose }) {
   const navigate = useNavigate();
   const { convert } = useCurrency();
@@ -226,6 +408,7 @@ function ServiceDrawer({ service, deptName, onClose }) {
               <div className="mt-3 flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
                 <Shield size={12} style={{ color: "var(--accent)", opacity: 0.7 }} />
                 Tolerance: {service.tolerance}
+                <ToleranceInfo tolerance={service.tolerance} />
               </div>
             )}
           </div>
@@ -307,6 +490,45 @@ function ServiceDrawer({ service, deptName, onClose }) {
   );
 }
 
+// ─── Short-Form Toggle ────────────────────────────────────────────────────────
+function ShortFormToggle({ active, onChange }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className="mb-6 p-1 rounded-2xl border flex items-center gap-1"
+      style={{ background: "var(--bg-card)", borderColor: "var(--border)", width: 'fit-content' }}
+    >
+      <button
+        type="button"
+        onClick={() => onChange(false)}
+        className="px-5 py-2.5 rounded-xl text-xs font-bold transition-all"
+        style={{
+          background: !active ? "var(--accent)" : "transparent",
+          color: !active ? "#fff" : "var(--text-secondary)",
+          border: 'none',
+        }}
+      >
+        Full-Length
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange(true)}
+        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all"
+        style={{
+          background: active ? "var(--accent)" : "transparent",
+          color: active ? "#fff" : "var(--text-secondary)",
+          border: 'none',
+        }}
+      >
+        <Zap size={11} />
+        Vertical Cut
+      </button>
+    </motion.div>
+  );
+}
+
 // ─── FPS Selector ──────────────────────────────────────────────────────────
 function FpsSelector({ selected, onChange }) {
   return (
@@ -374,8 +596,9 @@ function ServiceBox({ item, index, showDiscount, deptName, onSelect, fpsMultipli
           {item.name}
         </div>
         {item.tolerance && (
-          <div className="text-[10px] mb-3 opacity-50" style={{ color: "var(--text-secondary)" }}>
+          <div className="flex items-center text-[10px] mb-3 opacity-50" style={{ color: "var(--text-secondary)" }}>
             {item.tolerance}
+            <ToleranceInfo tolerance={item.tolerance} />
           </div>
         )}
         <div className="flex items-baseline gap-1.5">
@@ -416,6 +639,7 @@ export default function PricingPage() {
   const [showDiscount, setShowDiscount] = useState(true);
   const [selectedService, setSelectedService] = useState(null);  // { item, deptName }
   const [selectedFps, setSelectedFps] = useState(FPS_OPTIONS[0]); // default 24fps
+  const [shortForm, setShortForm] = useState(false); // short-form mode for video editing
   const sectionRefs = useRef({});
 
   const openDrawer = (item, deptName) => setSelectedService({ item, deptName });
@@ -468,6 +692,7 @@ export default function PricingPage() {
     setQuery("");
     // Reset FPS to 24fps when leaving or entering FPS-enabled tabs
     setSelectedFps(FPS_OPTIONS[0]);
+    setShortForm(false);
     setTimeout(() => {
       const el = sectionRefs.current[key];
       if (el) {
@@ -686,26 +911,37 @@ export default function PricingPage() {
                           {FPS_DEPTS.has(tab.key) && (
                             <FpsSelector selected={selectedFps} onChange={setSelectedFps} />
                           )}
+                          {/* Short-Form Toggle - only for Video Editing */}
+                          {tab.key === 'video_editing' && (
+                            <ShortFormToggle active={shortForm} onChange={setShortForm} />
+                          )}
                           {dept.popularFormats?.length > 0 && (
                             <div className="mb-12">
-                              <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-5" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>Popular Formats</div>
+                              <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-5" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
+                                {shortForm && tab.key === 'video_editing' ? "Vertical Cut · Popular Formats" : "Popular Formats"}
+                              </div>
                               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {dept.popularFormats.map((item, i) => (
+                                {dept.popularFormats.map((item, i) => {
+                                  const sfMult = (shortForm && tab.key === 'video_editing') ? getShortFormMultiplier(item.name) : 1;
+                                  return (
+                                    <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier * sfMult : sfMult} />
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                          {!(shortForm && tab.key === 'video_editing') && (
+                            <div>
+                              <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-4" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
+                                {dept.popularFormats?.length > 0 ? "Generalized Services" : "All Services"}
+                              </div>
+                              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {dept.generalServices.map((item, i) => (
                                   <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier : 1} />
                                 ))}
                               </div>
                             </div>
                           )}
-                          <div>
-                            <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-4" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
-                              {dept.popularFormats?.length > 0 ? "Generalized Services" : "All Services"}
-                            </div>
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                              {dept.generalServices.map((item, i) => (
-                                <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier : 1} />
-                              ))}
-                            </div>
-                          </div>
                         </div>
                       );
                     })
@@ -899,26 +1135,37 @@ export default function PricingPage() {
                       {FPS_DEPTS.has(tab.key) && (
                         <FpsSelector selected={selectedFps} onChange={setSelectedFps} />
                       )}
+                      {/* Short-Form Toggle - only for Video Editing */}
+                      {tab.key === 'video_editing' && (
+                        <ShortFormToggle active={shortForm} onChange={setShortForm} />
+                      )}
                       {dept.popularFormats?.length > 0 && (
                         <div className="mb-12">
-                          <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-5" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>Popular Formats</div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-5" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
+                            {shortForm && tab.key === 'video_editing' ? "Vertical Cut · Popular Formats" : "Popular Formats"}
+                          </div>
                           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {dept.popularFormats.map((item, i) => (
+                            {dept.popularFormats.map((item, i) => {
+                              const sfMult = (shortForm && tab.key === 'video_editing') ? getShortFormMultiplier(item.name) : 1;
+                              return (
+                                <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier * sfMult : sfMult} />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {!(shortForm && tab.key === 'video_editing') && (
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-4" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
+                            {dept.popularFormats?.length > 0 ? "Generalized Services" : "All Services"}
+                          </div>
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {dept.generalServices.map((item, i) => (
                               <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier : 1} />
                             ))}
                           </div>
                         </div>
                       )}
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-4" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
-                          {dept.popularFormats?.length > 0 ? "Generalized Services" : "All Services"}
-                        </div>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {dept.generalServices.map((item, i) => (
-                            <ServiceBox key={item._id} item={item} index={i} showDiscount={showDiscount} deptName={dept.displayName} onSelect={(s) => openDrawer(s, dept.displayName)} fpsMultiplier={FPS_DEPTS.has(tab.key) ? fpsMultiplier : 1} />
-                          ))}
-                        </div>
-                      </div>
                     </div>
                   );
                 })
