@@ -5,7 +5,8 @@ import { Conversation } from '../models/Conversation.js';
 import { Freelancer } from '../models/Freelancer.js';
 import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
 import { Team } from '../models/Team.js';
-import { findUserById } from '../utils/findUser.js';
+import { findUserById, findUserByVId } from '../utils/findUser.js';
+import { Notification } from '../models/Notification.js';
 
 // ── Helper: resolve display name for a conversation ───────────────
 // For DMs: show the OTHER person's name.
@@ -199,7 +200,30 @@ export const getDefaultConversation = asyncHandler(async (req, res) => {
     conv = (await Conversation.create({ type: 'dm', members: allMembers })).toObject();
   }
 
-  res.json(new ApiResponse(200, { ...conv, name: partnerName }, 'Default conversation ready'));
+res.json(new ApiResponse(200, { ...conv, name: partnerName }, 'Default conversation ready'));
+});
+
+// ── GET /api/messaging/search-user/:vId ───────────────────────────
+export const searchUserByVId = asyncHandler(async (req, res) => {
+  const { vId } = req.params;
+  const user = await findUserByVId(vId);
+  
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, 'User not found'));
+  }
+
+  // Don't find self
+  if (user._id.toString() === req.user._id.toString()) {
+    return res.status(400).json(new ApiResponse(400, null, 'You cannot search for yourself'));
+  }
+
+  res.json(new ApiResponse(200, {
+    _id: user._id,
+    fullName: user.fullName,
+    userId: user.userId,
+    avatar: user.avatar,
+    role: user.role
+  }, 'User found'));
 });
 // ── POST /api/messaging/conversations/:id/messages ────────────────
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -223,6 +247,30 @@ export const sendMessage = asyncHandler(async (req, res) => {
   // Update conversation timestamp for sorting
   conv.updatedAt = new Date();
   await conv.save();
+
+  // If this is the first message in a DM, notify the recipient
+  const messageCount = await Message.countDocuments({ conversationId });
+  if (messageCount === 1 && conv.type === 'dm') {
+    const otherId = conv.members.find(m => m.toString() !== req.user._id.toString());
+    const other = await findUserById(otherId);
+    if (other) {
+      const roleToModel = {
+        client: 'Client',
+        freelancer: 'Freelancer',
+        momentum_supervisor: 'MomentumSupervisor',
+        project_initiator: 'ProjectInitiator',
+        admin: 'Admin'
+      };
+      await Notification.create({
+        recipientId: other._id,
+        recipientModel: roleToModel[other.role] || 'Admin',
+        title: 'New Message Request',
+        message: `${req.user.fullName} is trying to text you.`,
+        type: 'message',
+        link: `/messages?conv=${conversationId}`
+      });
+    }
+  }
 
   res.status(201).json(new ApiResponse(201, message, 'Message sent'));
 });

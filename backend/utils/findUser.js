@@ -29,6 +29,17 @@ export const findUserById = async (id) => {
 };
 
 /**
+ * Find a user by V-ID (userId field) across all collections.
+ */
+export const findUserByVId = async (vId) => {
+  for (const Model of MODELS) {
+    const doc = await Model.findOne({ userId: vId.trim() }).select('-passwordHash -otpCodeHash -otpExpiresAt -otpSentAt -loginOtpPending');
+    if (doc) return doc;
+  }
+  return null;
+};
+
+/**
  * Get the correct model for a given role string.
  */
 export const modelForRole = (role) => {

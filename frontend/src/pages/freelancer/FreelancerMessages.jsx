@@ -31,7 +31,7 @@ export default function FreelancerMessages() {
   return (
     <>
       <DashboardHeader title="Messages" />
-      <div className="w-full max-w-7xl mx-auto md:p-4">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"

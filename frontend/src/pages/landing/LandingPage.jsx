@@ -1348,7 +1348,7 @@ export default function LandingPage() {
             className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-4 sm:mb-6 leading-[1.1]"
             style={{ color: 'var(--text-primary)' }}
           >
-            Ready to build with
+            Work. Learn. Level up.
             <br />
             <motion.span
               initial={{ backgroundPosition: '200% center' }}
@@ -1361,7 +1361,7 @@ export default function LandingPage() {
                 backgroundSize: '200% auto'
               }}
             >
-              a real team behind you?
+              Let's get started
             </motion.span>
           </motion.h2>
 
@@ -1373,10 +1373,10 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-10"
           >
             <button
-              onClick={() => navigate('/signup?role=client&redirect=/client/post-project')}
+              onClick={() => navigate('/signup?role=freelancer')}
               className="btn-primary w-full sm:w-auto py-5 px-10 text-sm font-bold tracking-widest uppercase rounded-full shadow-[0_20px_40px_-10px_rgba(var(--accent-rgb),0.4)] hover:shadow-[0_20px_40px_-10px_rgba(var(--accent-rgb),0.6)] hover:-translate-y-1 transition-all"
             >
-              Post a Project
+              Work with Us
             </button>
           </motion.div>
         </div>

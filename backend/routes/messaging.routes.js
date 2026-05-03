@@ -1,5 +1,5 @@
 import express from 'express';
-import { getConversations, getMessages, createConversation, getDefaultConversation, deleteConversation, blockUser, unblockUser, sendMessage } from '../controllers/messaging.controller.js';
+import { getConversations, getMessages, createConversation, getDefaultConversation, deleteConversation, blockUser, unblockUser, sendMessage, searchUserByVId } from '../controllers/messaging.controller.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.delete('/conversations/:id',                 deleteConversation);
 router.post('/conversations/:id/block',             blockUser);
 router.post('/conversations/:id/unblock',           unblockUser);
 router.get('/default-conversation',                 getDefaultConversation);
+router.get('/search-user/:vId',                     searchUserByVId);
 
 export default router;

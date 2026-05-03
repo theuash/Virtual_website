@@ -8,7 +8,7 @@ export default function InitiatorMessages() {
   return (
     <>
       <DashboardHeader title="Messages" />
-      <div className="w-full max-w-7xl mx-auto md:p-4">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <MessagingUI initialConvId={initialConvId} />
       </div>
     </>

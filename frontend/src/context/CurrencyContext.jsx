@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 const CurrencyContext = createContext(null);
 
 const FALLBACK_INR_TO_USD = 0.012;
-const MARKUP = 1; // 1:1 ratio for non-India (requested)
+const MARKUP = 3; // 3x Indian base price for non-India
 
 // Rounds a USD value to the nearest psychological price (X4.99 or X9.99)
 function psychoPrice(rawUsd) {
