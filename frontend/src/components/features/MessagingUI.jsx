@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import '../styles/Messaging.css';
+import '../../styles/Messaging.css';
 
 const REFRESH_INTERVAL = 3000; // 3 seconds
 

@@ -1,8 +1,8 @@
-import { useAuth } from "../../context/AuthContext";
-import DashboardHeader from "../../components/layout/DashboardHeader";
+import { useAuth } from "../../../context/AuthContext";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
 import { User, Mail, Phone, Calendar, Link, Clock, Star, MapPin, Award, CheckCircle2 } from "lucide-react";
-import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
-import { TIER_LABELS } from "../../utils/roleGuards";
+import AvatarCircle, { resolveAvatar } from "../../../components/common/AvatarCircle";
+import { TIER_LABELS } from "../../../utils/roleGuards";
 import { motion } from "framer-motion";
 
 export default function FreelancerProfile() {

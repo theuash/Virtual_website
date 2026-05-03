@@ -1,7 +1,7 @@
-import { useAuth } from "../../context/AuthContext";
-import DashboardHeader from "../../components/layout/DashboardHeader";
+import { useAuth } from "../../../context/AuthContext";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
 import { User, Mail, Calendar, ShieldCheck, CheckCircle2, Users2, Trophy, Eye } from "lucide-react";
-import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
+import AvatarCircle, { resolveAvatar } from "../../../components/common/AvatarCircle";
 import { motion } from "framer-motion";
 
 export default function SupervisorProfile() {

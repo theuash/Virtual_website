@@ -1,8 +1,8 @@
 ﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import DashboardHeader from "../../components/layout/DashboardHeader";
-import api from "../../services/api";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
+import api from "../../../services/api";
 import { FolderKanban, Loader2, AlertCircle, Zap, Target, Calendar, DollarSign, Tag, ChevronRight, RefreshCw } from "lucide-react";
 
 const STATUS_CFG = {

@@ -1,7 +1,7 @@
 ﻿import { useAuth } from '../../../context/AuthContext';
 import DashboardHeader from '../../../components/layout/DashboardHeader';
 import LockedOverlay from '../../../components/ui/LockedOverlay';
-import CrateEarnings from './CrateEarnings';
+import CrateEarnings from '../projects/CrateEarnings';
 
 export default function FreelancerEarnings() {
   const { user } = useAuth();

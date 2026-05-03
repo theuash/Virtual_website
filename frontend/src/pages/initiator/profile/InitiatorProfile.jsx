@@ -1,7 +1,7 @@
-import { useAuth } from "../../context/AuthContext";
-import DashboardHeader from "../../components/layout/DashboardHeader";
+import { useAuth } from "../../../context/AuthContext";
+import DashboardHeader from "../../../components/layout/DashboardHeader";
 import { User, Mail, Calendar, Briefcase, CheckCircle2, TrendingUp, Award, BarChart3 } from "lucide-react";
-import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
+import AvatarCircle, { resolveAvatar } from "../../../components/common/AvatarCircle";
 import { motion } from "framer-motion";
 
 export default function InitiatorProfile() {
