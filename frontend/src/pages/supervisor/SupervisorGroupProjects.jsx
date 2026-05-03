@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import api from '../../services/api';
 import { Globe, Loader2, AlertCircle, Users, CheckCircle2 } from 'lucide-react';
 

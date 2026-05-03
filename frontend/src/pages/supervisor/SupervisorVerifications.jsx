@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import api from '../../services/api';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import { ShieldCheck, User, MapPin, Phone, Clock, MessageSquare, Check, X, AlertCircle, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';

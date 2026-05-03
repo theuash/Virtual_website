@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import api from '../../services/api';
 import {
   FolderKanban, Users, Briefcase, Calendar, Clock,

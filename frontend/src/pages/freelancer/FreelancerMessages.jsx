@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import DashboardHeader from '../../components/DashboardHeader';
-import MessagingUI from '../../components/MessagingUI';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import MessagingUI from '../../components/features/MessagingUI';
 import api from '../../services/api';
 
 export default function FreelancerMessages() {

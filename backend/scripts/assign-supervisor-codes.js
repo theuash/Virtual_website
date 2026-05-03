@@ -1,6 +1,6 @@
 import 'dotenv/config.js';
 import { connectDB } from '../config/db.js';
-import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { MomentumSupervisor } from '../models/users/MomentumSupervisor.js';
 import { generateSupervisorCode } from '../utils/supervisorCode.js';
 
 await connectDB();

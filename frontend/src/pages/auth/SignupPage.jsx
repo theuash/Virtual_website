@@ -8,7 +8,7 @@ import { SKILLS, SKILL_LABELS } from '../../utils/roleGuards';
 import signupArt from '../../assets/auth/signup_art.jpeg';
 import logo from '../../assets/logo.png';
 import { getRoleRedirect } from '../../utils/roleGuards';
-import ThemeToggle from '../../components/ThemeToggle';
+import ThemeToggle from '../../components/ui/ThemeToggle';
 import { useCurrency } from '../../context/CurrencyContext';
 
 // Country code  dial code map (major countries)

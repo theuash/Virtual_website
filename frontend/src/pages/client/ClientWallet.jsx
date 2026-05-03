@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import DashboardHeader from '../../components/DashboardHeader';
-import { SkeletonTable } from '../../components/SkeletonLoader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import { SkeletonTable } from '../../components/ui/SkeletonLoader';
 import api from '../../services/api';
 import {
   Wallet, Plus, ArrowDownLeft, ArrowUpRight, ShieldCheck,

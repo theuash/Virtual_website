@@ -1,4 +1,4 @@
-import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { MomentumSupervisor } from '../models/users/MomentumSupervisor.js';
 
 /**
  * Generate a unique supervisor code.

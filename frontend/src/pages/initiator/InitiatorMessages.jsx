@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
-import DashboardHeader from '../../components/DashboardHeader';
-import MessagingUI from '../../components/MessagingUI';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import MessagingUI from '../../components/features/MessagingUI';
 
 export default function InitiatorMessages() {
   const [params] = useSearchParams();

@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import api from '../../services/api';
 import {
   Users, Briefcase, FolderKanban, Globe, CheckCircle2,

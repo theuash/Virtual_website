@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import api from '../../services/api';
 import {
   Video, Phone, Copy, Share2, Clock, User, Calendar, Plus, X,

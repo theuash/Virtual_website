@@ -1,5 +1,5 @@
-import { Message } from '../models/Message.js';
-import { Conversation } from '../models/Conversation.js';
+import { Message } from '../models/communication/Message.js';
+import { Conversation } from '../models/communication/Conversation.js';
 
 /**
  * Registers all chat-related Socket.io events on a connected socket.

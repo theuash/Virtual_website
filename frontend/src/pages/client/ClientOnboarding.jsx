@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Check, Target, Monitor, MapPin, Clock, DollarSign, Calendar, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { COUNTRIES } from '../../components/CountrySelector';
+import { COUNTRIES } from '../../components/common/CountrySelector';
 import api from '../../services/api';
 
 const OBJECTIVES = [

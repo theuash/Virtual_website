@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import { useCurrency } from '../../context/CurrencyContext';
-import { SkeletonGrid, SkeletonProjectCard } from '../../components/SkeletonLoader';
+import { SkeletonGrid, SkeletonProjectCard } from '../../components/ui/SkeletonLoader';
 import {
   Search, Filter, Clock, DollarSign, CheckCircle2, 
   XCircle, PlayCircle, Eye, MoreVertical, Calendar,

@@ -1,5 +1,5 @@
-import DashboardHeader from '../../components/DashboardHeader';
-import MessagingUI from '../../components/MessagingUI';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import MessagingUI from '../../components/features/MessagingUI';
 import { useSearchParams } from 'react-router-dom';
 
 export default function SupervisorMessages() {

@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
-import DashboardHeader from "../../components/DashboardHeader";
+import DashboardHeader from "../../components/layout/DashboardHeader";
 import { User, Mail, Phone, Calendar, Link, Clock, Star, MapPin, Award, CheckCircle2 } from "lucide-react";
-import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
+import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
 import { TIER_LABELS } from "../../utils/roleGuards";
 import { motion } from "framer-motion";
 

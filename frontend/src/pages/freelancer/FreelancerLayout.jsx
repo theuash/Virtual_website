@@ -5,7 +5,7 @@ import { TIER_LABELS } from '../../utils/roleGuards';
 import { LayoutDashboard, FolderKanban, DollarSign, TrendingUp, MessageSquare, Settings, LogOut, Menu, X, BookOpen, Video, Users, ChevronLeft, ChevronRight, MoreHorizontal, Info } from 'lucide-react';
 import logo from '../../assets/logo.png';
 import { useTheme } from '../../context/ThemeContext';
-import AvatarCircle, { resolveAvatar } from '../../components/AvatarCircle';
+import AvatarCircle, { resolveAvatar } from '../../components/common/AvatarCircle';
 import { useSidebar } from '../../context/SidebarContext';
 
 export default function FreelancerLayout() {

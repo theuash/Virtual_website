@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
-import DashboardHeader from "../../components/DashboardHeader";
+import DashboardHeader from "../../components/layout/DashboardHeader";
 import api from "../../services/api";
 import { motion, AnimatePresence } from "framer-motion";
-import ImageCropModal from "../../components/ImageCropModal";
+import ImageCropModal from "../../components/ui/ImageCropModal";
 import {
   Camera, User, Mail, Phone, Calendar, Link, Clock,
   CheckCircle2, AlertCircle, Loader2, Trash2, Save, Sparkles,
   Shield, Bell, Moon, Sun, Globe
 } from "lucide-react";
-import { COUNTRIES } from "../../components/CountrySelector";
+import { COUNTRIES } from "../../components/common/CountrySelector";
 import { useCurrency } from "../../context/CurrencyContext";
-import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
+import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
 import { toast } from "react-hot-toast";
 import { requestNotificationPermission } from "../../services/notificationService";
 

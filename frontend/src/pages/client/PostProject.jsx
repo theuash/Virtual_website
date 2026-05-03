@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import DashboardHeader from '../../components/DashboardHeader';
-import { SkeletonForm } from '../../components/SkeletonLoader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import { SkeletonForm } from '../../components/ui/SkeletonLoader';
 import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
 import {

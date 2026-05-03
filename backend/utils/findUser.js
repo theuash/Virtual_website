@@ -1,7 +1,7 @@
-import { User } from '../models/User.js';
-import { Client } from '../models/Client.js';
-import { Freelancer } from '../models/Freelancer.js';
-import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { User } from '../models/users/User.js';
+import { Client } from '../models/users/Client.js';
+import { Freelancer } from '../models/users/Freelancer.js';
+import { MomentumSupervisor } from '../models/users/MomentumSupervisor.js';
 
 const MODELS = [Client, Freelancer, MomentumSupervisor, User];
 

@@ -2,7 +2,7 @@
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import { Users2, Server, Banknote, Scale, ArrowRight, Activity } from 'lucide-react';
 
 export default function AdminDashboard() {

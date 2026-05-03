@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import DashboardHeader from '../../components/DashboardHeader';
-import { SkeletonGrid } from '../../components/SkeletonLoader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import { SkeletonGrid } from '../../components/ui/SkeletonLoader';
 import { BookOpen, Play, Clock, MessageSquare, User, Monitor, X, CheckCircle, TrendingUp, Award, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';

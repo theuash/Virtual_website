@@ -1,7 +1,7 @@
 import 'dotenv/config.js';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '../config/db.js';
-import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
+import { MomentumSupervisor } from '../models/users/MomentumSupervisor.js';
 
 await connectDB();
 

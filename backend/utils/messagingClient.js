@@ -5,7 +5,7 @@
  * internal routes using the shared INTERNAL_SECRET header.
  *
  * Usage:
- *   import { createProjectConversation } from '../utils/messagingClient.js';
+ *   import { createProjectConversation } from './messagingClient.js';
  *   const conv = await createProjectConversation(projectId, [clientId, freelancerId]);
  */
 

@@ -4,15 +4,15 @@ import { useAuth } from '../../context/AuthContext';
 import { TIER_LABELS } from '../../utils/roleGuards';
 import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
-import DashboardHeader from '../../components/DashboardHeader';
-import LockedBlock from '../../components/LockedBlock';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import LockedBlock from '../../components/ui/LockedBlock';
 import { motion } from 'framer-motion';
 import {
   FolderKanban, CheckCircle2, CircleDollarSign, ArrowRight,
   TrendingUp, Clock, BookOpen, Play, Lock, ChevronRight, Zap, PlayCircle, User
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import GuidedTour from '../../components/GuidedTour';
+import GuidedTour from '../../components/features/GuidedTour';
 
 const TIER_ORDER = ['precrate', 'crate', 'project_initiator', 'momentum_supervisor', 'admin'];
 const TIER_DESCRIPTIONS = {

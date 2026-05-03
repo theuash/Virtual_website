@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import DashboardHeader from '../../components/DashboardHeader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import api from '../../services/api';
 import { 
   User, Shield, Bell, Moon, Sun, 
   Camera, Key, Mail, Phone, Briefcase,
   Check, AlertTriangle, Globe
 } from 'lucide-react';
-import { COUNTRIES } from '../../components/CountrySelector';
+import { COUNTRIES } from '../../components/common/CountrySelector';
 import { useCurrency } from '../../context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';

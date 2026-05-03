@@ -1,9 +1,9 @@
 import 'dotenv/config.js';
 import { connectDB } from '../config/db.js';
-import { Freelancer } from '../models/Freelancer.js';
-import { Client } from '../models/Client.js';
-import { MomentumSupervisor } from '../models/MomentumSupervisor.js';
-import { User } from '../models/User.js';
+import { Freelancer } from '../models/users/Freelancer.js';
+import { Client } from '../models/users/Client.js';
+import { MomentumSupervisor } from '../models/users/MomentumSupervisor.js';
+import { User } from '../models/users/User.js';
 import { generateUserId } from '../utils/userId.js';
 
 await connectDB();

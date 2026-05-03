@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
-import DashboardHeader from "../../components/DashboardHeader";
+import DashboardHeader from "../../components/layout/DashboardHeader";
 import { User, Mail, Globe, Building2, Calendar, MapPin, Briefcase, CheckCircle2, Edit2, Camera, Image as ImageIcon } from "lucide-react";
-import AvatarCircle, { resolveAvatar } from "../../components/AvatarCircle";
+import AvatarCircle, { resolveAvatar } from "../../components/common/AvatarCircle";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 

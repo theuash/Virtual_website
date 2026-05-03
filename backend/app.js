@@ -40,20 +40,20 @@ app.use('/uploads', express.static(join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-import authRoutes from './routes/auth.routes.js';
-import clientRoutes from './routes/client.routes.js';
-import freelancerRoutes from './routes/freelancer.routes.js';
-import crateRoutes from './routes/crate.routes.js';
-import initiatorRoutes from './routes/initiator.routes.js';
-import adminRoutes from './routes/admin.routes.js';
-import seedRoutes from './routes/seed.routes.js';
-import pricingRoutes from './routes/pricing.routes.js';
-import learningRoutes from './routes/learning.routes.js';
-import messagingRoutes from './routes/messaging.routes.js';
-import profileRoutes from './routes/profile.routes.js';
-import supervisorRoutes from './routes/supervisor.routes.js';
-import geoRoutes from './routes/geo.routes.js';
-import debugRoutes from './routes/debug.routes.js';
+import authRoutes from './routes/users/auth.routes.js';
+import clientRoutes from './routes/roles/client.routes.js';
+import freelancerRoutes from './routes/roles/freelancer.routes.js';
+import crateRoutes from './routes/features/crate.routes.js';
+import initiatorRoutes from './routes/roles/initiator.routes.js';
+import adminRoutes from './routes/roles/admin.routes.js';
+import seedRoutes from './routes/features/seed.routes.js';
+import pricingRoutes from './routes/features/pricing.routes.js';
+import learningRoutes from './routes/features/learning.routes.js';
+import messagingRoutes from './routes/features/messaging.routes.js';
+import profileRoutes from './routes/users/profile.routes.js';
+import supervisorRoutes from './routes/roles/supervisor.routes.js';
+import geoRoutes from './routes/features/geo.routes.js';
+import debugRoutes from './routes/features/debug.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/client', clientRoutes);

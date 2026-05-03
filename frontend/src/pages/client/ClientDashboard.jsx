@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import api from '../../services/api';
-import DashboardHeader from '../../components/DashboardHeader';
-import { SkeletonDashboard } from '../../components/SkeletonLoader';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import { SkeletonDashboard } from '../../components/ui/SkeletonLoader';
 import { FolderKanban, Clock, Wallet, ArrowRight, PlusCircle, ShieldCheck, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const STATUS_COLORS = {

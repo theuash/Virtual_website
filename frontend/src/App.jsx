@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { RoleGuard } from './utils/roleGuards';
-import PublicRoute from './components/PublicRoute';
+import PublicRoute from './components/routes/PublicRoute';
 import { Toaster } from 'react-hot-toast';
 
 // Landing

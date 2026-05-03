@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useVelocity, AnimatePresence } from 'framer-motion';
 import logo from '../../assets/logo.png';
-import ThemeToggle from '../ThemeToggle';
-import CountrySelector from '../CountrySelector';
+import ThemeToggle from '../ui/ThemeToggle';
+import CountrySelector from '../common/CountrySelector';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Header() {
