@@ -275,6 +275,7 @@ export default function ClientOnboarding() {
     setSubmitting(true);
     try {
       const budget = budgetRanges[budgetRange];
+      const supervisorCode = sessionStorage.getItem('pendingSupervisorCode') || null;
       const body = {
         objective,
         platforms: selectedPlatforms,
@@ -288,6 +289,7 @@ export default function ClientOnboarding() {
         budgetCurrency: isIndia ? 'INR' : 'USD',
         availableDays: selectedDays,
         availableTimeSlots: selectedTimeSlots,
+        supervisorCode,
       };
       const { data } = await api.post('/client/onboarding', body);
       const updatedUser = data?.data ?? data;
@@ -297,6 +299,7 @@ export default function ClientOnboarding() {
         localStorage.setItem('virtual_user', JSON.stringify(merged));
         setUser(merged);
       }
+      sessionStorage.removeItem('pendingSupervisorCode');
       navigate('/client/dashboard');
     } catch (err) {
       console.error('Onboarding failed:', err);

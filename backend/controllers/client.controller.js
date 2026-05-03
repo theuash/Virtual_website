@@ -420,6 +420,7 @@ export const completeOnboarding = asyncHandler(async (req, res) => {
     budgetMax,
     availableDays,
     availableTimeSlots,
+    supervisorCode,
   } = req.body;
 
   const client = await Client.findById(req.user._id);
@@ -441,6 +442,37 @@ export const completeOnboarding = asyncHandler(async (req, res) => {
   client.availableDays      = availableDays || [];
   client.availableTimeSlots = availableTimeSlots || [];
   client.preferredCurrency  = preferredCurrency;
+
+  // Handle supervisor code assignment
+  if (supervisorCode) {
+    const supervisor = await MomentumSupervisor.findOne({ supervisorCode: supervisorCode.toUpperCase() });
+    if (supervisor) {
+      client.assignedSupervisorId = supervisor._id;
+    }
+  } else if (!client.assignedSupervisorId) {
+    // Auto-assign to supervisor with fewest clients
+    const onlineSupervisors = await MomentumSupervisor.find({ isOnline: true }).lean();
+    const supervisorsToCheck = onlineSupervisors.length > 0 ? onlineSupervisors : await MomentumSupervisor.find({}).lean();
+    if (supervisorsToCheck.length > 0) {
+      const counts = await Promise.all(supervisorsToCheck.map(async (s) => {
+        const clientCount = await Client.countDocuments({ assignedSupervisorId: s._id });
+        return { id: s._id, count: clientCount };
+      }));
+      counts.sort((a, b) => a.count - b.count);
+      client.assignedSupervisorId = counts[0].id;
+
+      // Notify the assigned supervisor
+      await Notification.create({
+        recipientId: counts[0].id,
+        recipientModel: 'MomentumSupervisor',
+        title: 'New Client Onboarded',
+        message: `${client.fullName} has completed onboarding and been assigned to you.`,
+        type: 'system',
+        link: '/supervisor/clients'
+      });
+    }
+  }
+
   client.onboardingComplete = true;
 
   await client.save();

@@ -31,6 +31,7 @@ import ClientSettings from './pages/client/ClientSettings';
 import ClientWallet from './pages/client/ClientWallet';
 import ClientMeet from './pages/client/ClientMeet';
 import ClientVerification from './pages/client/ClientVerification';
+import ClientOnboarding from './pages/client/ClientOnboarding';
 
 // Freelancer
 import FreelancerLayout from './pages/freelancer/FreelancerLayout';
@@ -110,6 +111,8 @@ function App() {
       <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
       <Route path="/meet/:meetingId" element={<MeetRoom />} />
       <Route path="/freelancer/onboarding" element={<RoleGuard allowedRoles={['freelancer']}><FreelancerOnboarding /></RoleGuard>} />
+
+      <Route path="/client/onboarding" element={<RoleGuard allowedRoles={['client']}><ClientOnboarding /></RoleGuard>} />
 
       {/* Client - protected */}
       <Route path="/client" element={<RoleGuard allowedRoles={['client']}><ClientLayout /></RoleGuard>}>
